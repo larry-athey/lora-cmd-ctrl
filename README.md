@@ -6,5 +6,5 @@ _**NOTE:** While this can be used as an alternative to DCC and WCC in the model 
 ### Motor Control
 The LCC receiver module can control standard DC brushed motors using a PWM driven H bridge driver such as an L298N, or stepper motors such as a Nema 17 with a DRV8825 driver. You may actually use any driver you like.
 
-### Switching
+### Remote Switching
 The LCC receiver module can be any variety of ESP32, the switching capabilities are only limited by the number of exposed GPIO pins. If you have a large number of switching needs per receiver, you may use an MCP23017 I2C 16 port GPIO expansion module.
