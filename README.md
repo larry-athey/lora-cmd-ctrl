@@ -5,7 +5,7 @@ _**NOTE:** While this can be used as an alternative to DCC and WCC in the model 
 
 ---
 
-LCC is actually a client & server system where a mission control web app runs on a Raspberry Pi (or clone) or any other Debian Linux based PC/SBC. The communications backbone between the server and client modules is LoRa WAN wireless networking based on the Reyax RYLR998 modem.
+LCC is actually a client & server system where a mission control web app runs on a Raspberry Pi _(or clone)_ or any other Debian Linux based PC/SBC. The communications backbone between the server and client modules is LoRa WAN wireless networking based on the Reyax RYLR998 modem.
 
 LoRa WAN networking runs at a lower frequency than WiFi and Bluetooth, so it doesn't suffer from all of the noise and congestion that plagues the 2.4 GHz and 5 GHz ISM bands. This method also doesn't require a persistent connection between the client and server and only exchanges short text based messages.
 
@@ -29,4 +29,4 @@ In the case of mobile LCC receivers such as those on a model train, position and
 The LCC remote control commands are completely open ended and are easy to create. These commands can be sent as a single shot instance, or they may run in a sequence which can also run repeatedly.
 
 ### Scheduling
-The LCC mission control server can schedule individual commands or scripts to run at specific times. However, in the case of single board computers such as the Raspberry Pi (or clones) this requires the addition of a real time clock module to be added.
+The LCC mission control server can schedule individual commands or scripts to run at specific times. However, in the case of single board computers such as the Raspberry Pi _(or clones)_ this requires the addition of a real time clock module to be added.
