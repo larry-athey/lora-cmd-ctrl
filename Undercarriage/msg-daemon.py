@@ -51,6 +51,7 @@ def init_serial():
             ("AT+RESET\r\n", 0.2),    # Reset module
             (f"AT+ADDRESS={LORA_ADDRESS}\r\n", 0.2),  # Set address
             (f"AT+NETWORKID={LORA_NETWORK}\r\n", 0.2),  # Set network ID
+            (f"AT+CPIN={LORA_PW}\r\n", 0.2),  # Set domain password
             (f"AT+BAND={LORA_BAND}\r\n", 0.2),  # Set frequency band
             (f"AT+IPR={BAUD_RATE}\r\n", 0.2),  # Set baud rate
             (f"AT+PARAMETER={LORA_PARAMETERS}\r\n", 0.2)  # Set RF parameters
