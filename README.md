@@ -27,3 +27,6 @@ In the case of mobile LCC receivers such as those on a model train, position and
 
 ### Scripting
 The LCC remote control commands are completely open ended and are easy to create. These commands can be sent as a single shot instance, or they may run in a sequence which can also run repeatedly.
+
+### Scheduling
+The LCC mission control server can schedule individual commands or scripts to run at specific times. However, in the case of single board computers such as the Raspberry Pi (or clones) this requires the addition of a real time clock module to be added.
