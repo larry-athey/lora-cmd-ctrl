@@ -97,6 +97,8 @@ def send_lora_message(ser, address, msg):
         # Read response (e.g., +OK)
         response = ser.readline().decode('utf-8').strip()
         print(f"Response: {response}")
+        # Wait 1 second after each message to prevent data loss on the receiving end
+        time.sleep(1)
         return response.startswith('+OK')
     except Exception as e:
         print(f"Error sending message: {e}")
