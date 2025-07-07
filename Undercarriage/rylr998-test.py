@@ -14,6 +14,7 @@ TIMEOUT = 1  # Timeout for serial read operations
 # RYLR998 configuration (customize as needed)
 LORA_ADDRESS = 0  # Unique address for this module (0-65535)
 LORA_NETWORK = 18  # Network ID (0-18)
+LORA_PW = "1A2B3C4D" # Domain password, 8 characters, hex
 LORA_BAND = "915000000"  # Frequency band (e.g., 915 MHz for US, 868100000 for EU)
 LORA_PARAMETERS = "9,7,1,12"  # SF9, 125 kHz, CR 4/5, preamble 12
 #----------------------------------------------------------------------------------------------
