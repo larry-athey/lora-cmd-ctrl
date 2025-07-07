@@ -3,4 +3,4 @@
 
 _**NOTE:** While this can be used as an alternative to DCC and WCC in the model railroad world, that absolutely is not my specialty. However, I do have a local hobbyist in that field that I'm working with in order to make this a viable alternative for that purpose._
 
-## Motor Control
+### Motor Control
