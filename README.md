@@ -9,6 +9,8 @@ LCC is actually a client & server system where a mission control web app runs on
 
 LoRa WAN networking runs at a lower frequency than WiFi and Bluetooth, so it doesn't suffer from all of the noise and congestion that plagues the 2.4 GHz and 5 GHz ISM bands. This method also doesn't require a persistent connection between the client and server and only exchanges short text based messages.
 
+Due to the lower frequency and near zero RF noise/congestion, this system works over incredibly long ranges with no additional infrastructure needed. For example, the mission control modem could be mounted on a rooftop and communicate with clients well over a mile away.
+
 ### Motor Control
 The LCC receiver module can control standard DC brushed motors using a PWM driven H bridge driver such as an L298N, or stepper motors such as a Nema 17 with a DRV8825 driver. _(You may actually use any driver you like.)_ Motor control includes direction, speed, runtime, progression time to smooth speed changes, and the number of steps if using a stepper motor.
 
