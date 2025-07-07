@@ -7,6 +7,8 @@ _**NOTE:** While this can be used as an alternative to DCC and WCC in the model 
 
 LCC is actually a client & server system where a mission control web app runs on a Raspberry Pi (or clone) or any other Debian Linux based PC/SBC. The communications backbone between the server and client modules is LoRa WAN wireless networking based on the Reyax RYLR998 modem.
 
+LoRa WAN networking runs at a lower frequency than WiFi and Bluetooth, so it doesn't suffer from all of the noise and congestion that plagues the 2.4 GHz and 5 GHz ISM bands. This method doesn't require a constant connection between the client and server and only exchanges short text based messages.
+
 ### Motor Control
 The LCC receiver module can control standard DC brushed motors using a PWM driven H bridge driver such as an L298N, or stepper motors such as a Nema 17 with a DRV8825 driver. _(You may actually use any driver you like.)_ Motor control includes direction, speed, runtime, progression time to smooth speed changes, and the number of steps if using a stepper motor.
 
