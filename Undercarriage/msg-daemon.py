@@ -28,6 +28,7 @@ SERIAL_PORT = '/dev/ttyUSB0'
 BAUD_RATE = 115200
 LORA_ADDRESS = 1  # LCC server address is 1
 LORA_NETWORK = 18  # Network ID (0-18)
+LORA_PW = "1A2B3C4D" # Domain password, 8 characters, hex
 LORA_BAND = "915000000"  # Frequency band (e.g., 915 MHz for US, 868100000 for EU)
 LORA_PARAMETERS = "9,7,1,12"  # SF9, 125 kHz, CR 4/5, preamble 12
 #----------------------------------------------------------------------------------------------
