@@ -11,3 +11,6 @@ The LCC receiver module can be any variety of ESP32, the switching capabilities 
 
 ### Position/Location Tracking
 In the case of mobile LCC receivers such as those on a model train, position and location detection is handled by way of IR LED transponders. These are basically an IR remote control transmitter that repeats the same number over and over. The LCC receiver phones home to mission control when these are detected to report its location.
+
+### Scripting
+The LCC mission control server runs on a Raspberry Pi (or clone) or any other Linux PC. This is a web app that works with any desktop/laptop computer or mobile web browser. Remote control commands are completely open ended and are easy to create. These commands can be sent as single shots or in a sequence which can also run repeatedly.
