@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------------------------------
 // LCC - Locomotive Breath | (CopyLeft) 2025-Present | Larry Athey (https://panhandleponics.com)
 //
-// Designed for the Waveshare ESP32-S3 Mini (ESP32-S3FH4R2) development board
+// Designed for the Waveshare ESP32-S3 Mini (ESP32-S3FH4R2) development board using ESP32 v2.0.17
 //
 // This is a custom LoRa-CMD+CTRL (LCC) device that bridges the LCC system with the model railroad
 // hobby. No, this is not another version of DCC or WCC, the LCC name is just a happy coincidence.
