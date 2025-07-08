@@ -31,6 +31,10 @@
 // As commands are received, they are echoed back to the mission control server to show that they
 // have been received correctly. The server will attempt to send them 3 times over 30 seconds and
 // will mark them as failed if no acknowledgement is ever received.
+//
+// Sound effects must be 8 bit encoded mono .wav files since the ESP32 only has 4MB of storage for
+// these. This should be enough to store a decent air horn, air brakes, bell, etc. Please keep in
+// mind that all sound effects have to finish playing before further commands will be executed.
 //------------------------------------------------------------------------------------------------
 #define DISABLE_CODE_FOR_TRANSMITTER
 #define SEND_LEDC_CHANNEL 0      // Fallback to satisfy compiler
