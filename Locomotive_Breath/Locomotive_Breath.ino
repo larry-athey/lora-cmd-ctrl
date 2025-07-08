@@ -32,8 +32,8 @@
 #define SEND_LEDC_CHANNEL 0      // Fallback to satisfy compiler
 #include "IRremote.hpp"          // IR remote controller library, for location/position detection
 
-#include "Audio.h"               // Audio playback library, for sound effects
-#include "SPIFFS.h"              // ESP32 flash memory file storage library, for sound effects
+//#include "Audio.h"               // Audio playback library, for sound effects (from ESP32-AudioI2S)
+//#include "SPIFFS.h"              // ESP32 flash memory file storage library, for sound effects
 //------------------------------------------------------------------------------------------------
 // GPIO Left (USB top)
 #define LIMIT1 1                 // Limit switch 1 (forward)
