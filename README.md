@@ -29,7 +29,7 @@ The LCC receiver module uses two GPIO pins for limit sensing so that the motor w
 The LCC receiver module can be any variety of ESP32, the switching capabilities are only limited by the number of exposed GPIO pins. If you have a large number of switching needs per receiver, you may use an MCP23017 I2C 16 port GPIO expansion module.
 
 ### Remote WAV Playback
-Sound files (.wav) can be stored in flash memory and played back as needed. These are useful for greetings, sound effects, warnings, etc. The ESP32 only has 4MB of flash memory, so these need to be small 8 bit mono recordings.
+Sound files (.wav) can be stored in flash memory and played back as needed. These are useful for greetings, sound effects, warnings, etc. The ESP32 only has 4MB of flash memory, so these need to be small 8 bit mono recordings. This requires a MAX98357 sound module and speaker attached.
 
 ### Scripting
 The LCC remote control commands are completely open ended and are easy to create. These commands can be sent as a single shot instance, or they may run in a sequence, both of which can also run repeatedly.
