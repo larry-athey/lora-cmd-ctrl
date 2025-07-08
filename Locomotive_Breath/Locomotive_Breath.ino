@@ -30,28 +30,26 @@
 //------------------------------------------------------------------------------------------------
 #define DISABLE_CODE_FOR_TRANSMITTER
 #define SEND_LEDC_CHANNEL 0      // Fallback to satisfy compiler
-#include "IRremote.hpp"          // IR remote controller library (for location detection)
+#include "IRremote.hpp"          // IR remote controller library, for location/position detection
 
-#include "Preferences.h"         // ESP32 Flash memory read/write library
+#include "Audio.h"               // Audio playback library, for sound effects
+#include "SPIFFS.h"              // ESP32 flash memory file storage library, for sound effects
 //------------------------------------------------------------------------------------------------
 // GPIO Left (USB top)
-#define OUT_1                    // Output 1
-#define OUT_2                    // Output 2
-#define OUT_3                    // Output 3
-#define OUT_4                    // Output 4 or DRV8825 M0
-#define OUT_5                    // Output 5 or DRV8825 M1
-#define OUT_6                    // Output 6 or DRV8825 M2
+#define LIMIT1 1                 // Limit switch 1 (forward)
+#define LIMIT2 2                 // Limit switch 2 (reverse)
+#define IR_RCV 3                 // TSOP34838 output pin
+#define OUT_1                    // Output 1 or DRV8825 M0
+#define OUT_2                    // Output 2 or DRV8825 M1
+#define OUT_3                    // Output 3 or DRV8825 M2
 // GPIO Right (USB top)
 #define TX2 13                   // To RYLR998 RX pin
 #define RX2 12                   // To RYLR998 TX pin
-#define PWM_F 11                 // H-Bridge forward pin or spare output if using a stepper
-#define PWM_R 10                 // H-Bridge reverse pin or spare output if using a stepper
+#define PWM_F 11                 // H-Bridge forward pin or output pin if using a stepper
+#define PWM_R 10                 // H-Bridge reverse pin or output pin if using a stepper
 #define BUS_1 9                  // Audio BCLK or DRV8825 step pin
 #define BUS_2 8                  // Audio WS or DRV8825 direction pin
 #define BUS_3 7                  // Audio DOUT or DRV8825 sleep pin
-#define LIMIT1 16                // Limit switch 1 (forward)
-#define LIMIT2 15                // Limit switch 2 (reverse)
-#define IR_RCV 14                // TSOP34838 output pin
 //------------------------------------------------------------------------------------------------
 void echoRYLR998() { // Used for debugging RYLR998 output
   char Data;
