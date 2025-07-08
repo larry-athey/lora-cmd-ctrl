@@ -19,17 +19,20 @@ This system is intended for any purpose where remote control of motorized device
 ### Motor Control
 The LCC receiver module can control standard DC brushed motors using a PWM driven H bridge driver such as an L298N, or stepper motors such as a Nema 17 with a DRV8825 driver. _(You may actually use any driver you like.)_ Motor control includes direction, speed, runtime, progression time to smooth speed changes, and the number of steps if using a stepper motor.
 
-### Remote Switching
-The LCC receiver module can be any variety of ESP32, the switching capabilities are only limited by the number of exposed GPIO pins. If you have a large number of switching needs per receiver, you may use an MCP23017 I2C 16 port GPIO expansion module.
+### Position/Location Tracking
+In the case of mobile LCC receivers such as those on a model train, position and location detection is handled by way of IR LED transponders. These are basically an IR remote control transmitter that repeats the same number over and over. The LCC receiver phones home to mission control when these are detected to report its location.
 
 ### Remote Limit Sensing
 The LCC receiver module uses two GPIO pins for limit sensing so that the motor will stop running in the current direction if its limit switch is triggered. The unit will phone home to mission control to report this status.
 
-### Position/Location Tracking
-In the case of mobile LCC receivers such as those on a model train, position and location detection is handled by way of IR LED transponders. These are basically an IR remote control transmitter that repeats the same number over and over. The LCC receiver phones home to mission control when these are detected to report its location.
+### Remote Switching
+The LCC receiver module can be any variety of ESP32, the switching capabilities are only limited by the number of exposed GPIO pins. If you have a large number of switching needs per receiver, you may use an MCP23017 I2C 16 port GPIO expansion module.
 
-### Scripting
-The LCC remote control commands are completely open ended and are easy to create. These commands can be sent as a single shot instance, or they may run in a sequence, both of which can also run repeatedly.
+### Remote WAV Playback
+Sound files (.wav) can be stored in flash memory and played back as needed. These are useful for greetings, sound effects, warnings, etc. This requires a MAX98357 sound module and speaker attached.
 
 ### Scheduling
 The LCC mission control server can schedule individual commands or scripts to run at specific times. However, in the case of single board computers such as the Raspberry Pi _(or clones)_ this requires the addition of a real time clock module to be added.
+
+### Scripting
+The LCC remote control commands are completely open ended and are easy to create. These commands can be sent as a single shot instance, or they may run in a sequence, both of which can also run repeatedly.
