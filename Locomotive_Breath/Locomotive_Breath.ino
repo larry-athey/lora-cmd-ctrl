@@ -22,6 +22,11 @@
 // Roughly $30 in parts to convert any brand of model train locomotive to have all of the features
 // found in a full blown DCC enabled locomotive with sound effects. You want color changing LEDs?
 // That can be added too for a couple dollars. You name it, this system can be expanded to do it.
+//
+// Commands from the LCC mission control server are stored in a buffer on an LCC receiver device
+// and then executed in a FIFO (first-in, first-out) order. Feedback is sent to the server when a
+// command starts so the operator knows what each device is doing at any moment. All motor control
+// commands run as a detached process so other commands can run in real time.
 //------------------------------------------------------------------------------------------------
 void setup() {
 
