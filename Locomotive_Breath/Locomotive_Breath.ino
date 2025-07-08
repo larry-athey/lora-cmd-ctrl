@@ -44,11 +44,11 @@
 // GPIO Right (USB top)
 #define TX2 13                   // To RYLR998 RX pin
 #define RX2 12                   // To RYLR998 TX pin
-#define PWM_F 11                 // H-Bridge forward pin
-#define PWM_R 10                 // H-Bridge reverse pin
-#define STEP_PULSE 9             // DRV8825 step pin
-#define STEP_DIR 8               // DRV8825 direction pin
-#define STEP_EN 7                // DRV8825 sleep pin
+#define PWM_F 11                 // H-Bridge forward pin or spare output if using a stepper
+#define PWM_R 10                 // H-Bridge reverse pin or spare output if using a stepper
+#define BUS_1 9                  // Audio BCLK or DRV8825 step pin
+#define BUS_2 8                  // Audio WS or DRV8825 direction pin
+#define BUS_3 7                  // Audio DOUT or DRV8825 sleep pin
 #define LIMIT1 16                // Limit switch 1 (forward)
 #define LIMIT2 15                // Limit switch 2 (reverse)
 #define IR_RCV 14                // TSOP34838 output pin
