@@ -31,8 +31,8 @@ The LCC receiver module can be any variety of ESP32, the switching capabilities 
 ### Remote WAV Playback
 Sound files (.wav) can be stored in flash memory and played back as needed. These are useful for greetings, sound effects, warnings, etc. The ESP32 only has 4MB of flash memory, so these need to be small 8 bit mono recordings. This requires a MAX98357 sound module and speaker attached.
 
-### Scripting
-The LCC remote control commands are completely open ended and are easy to create. These commands can be sent as a single shot instance, or they may run in a sequence, both of which can also run repeatedly.
-
 ### Scheduling
 The LCC mission control server can schedule individual commands or scripts to run at specific times. However, in the case of single board computers such as the Raspberry Pi _(or clones)_ this requires the addition of a real time clock module to be added.
+
+### Scripting
+The LCC remote control commands are completely open ended and are easy to create. These commands can be sent as a single shot instance, or they may run in a sequence, both of which can also run repeatedly.
