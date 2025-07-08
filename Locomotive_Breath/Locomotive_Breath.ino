@@ -59,6 +59,10 @@
 #define BUS_2 8                  // Audio WS or DRV8825 direction pin
 #define BUS_3 7                  // Audio DOUT or DRV8825 sleep pin
 //------------------------------------------------------------------------------------------------
+int LoRa_Address = 100;          // Device address [1..65535], 1 is reserved for mission control
+int LoRa_Network = 18;           // Network ID [0..15], 18 is valid but often never used
+String LoRa_PW = "1A2B3C4D";     // 8 character hex domain password, much like a WiFi password
+//------------------------------------------------------------------------------------------------
 void echoRYLR998() { // Used for debugging RYLR998 output
   char Data;
   if (Serial) {
