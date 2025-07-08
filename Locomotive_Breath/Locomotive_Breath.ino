@@ -27,6 +27,10 @@
 // and then executed in a FIFO (first-in, first-out) order. Feedback is sent to the server when a
 // command starts so the operator knows what each device is doing at any moment. All motor control
 // commands run as a detached process so other commands can run in real time.
+//
+// As commands are received, they are echoed back to the mission control server to show that they
+// have been received correctly. The server will attempt to send them 3 times over 30 seconds and
+// will mark them as failed if no acknowledgement is ever received.
 //------------------------------------------------------------------------------------------------
 #define DISABLE_CODE_FOR_TRANSMITTER
 #define SEND_LEDC_CHANNEL 0      // Fallback to satisfy compiler
