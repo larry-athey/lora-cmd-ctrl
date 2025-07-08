@@ -28,8 +28,50 @@
 // command starts so the operator knows what each device is doing at any moment. All motor control
 // commands run as a detached process so other commands can run in real time.
 //------------------------------------------------------------------------------------------------
-void setup() {
+#define DISABLE_CODE_FOR_TRANSMITTER
+#define SEND_LEDC_CHANNEL 0      // Fallback to satisfy compiler
+#include "IRremote.hpp"          // IR remote controller library (for location detection)
 
+#include "Preferences.h"         // ESP32 Flash memory read/write library
+//------------------------------------------------------------------------------------------------
+// GPIO Left (USB top)
+#define OUT_1                    // Output 1
+#define OUT_2                    // Output 2
+#define OUT_3                    // Output 3
+#define OUT_4                    // Output 4 or DRV8825 M0
+#define OUT_5                    // Output 5 or DRV8825 M1
+#define OUT_6                    // Output 6 or DRV8825 M2
+// GPIO Right (USB top)
+#define TX2 13                   // To RYLR998 RX pin
+#define RX2 12                   // To RYLR998 TX pin
+#define PWM_F 11                 // H-Bridge forward pin
+#define PWM_R 10                 // H-Bridge reverse pin
+#define STEP_PULSE 9             // DRV8825 step pin
+#define STEP_DIR 8               // DRV8825 direction pin
+#define STEP_EN 7                // DRV8825 sleep pin
+#define LIMIT1 16                // Limit switch 1 (forward)
+#define LIMIT2 15                // Limit switch 2 (reverse)
+#define IR_RCV 14                // TSOP34838 output pin
+//------------------------------------------------------------------------------------------------
+void echoRYLR998() { // Used for debugging RYLR998 output
+  char Data;
+  if (Serial) {
+    while (Serial2.available()) {
+      Data = Serial2.read();
+      Serial.print(Data);
+    }
+  } else {
+    while (Serial2.available()) Serial2.read();
+  }
+}
+//------------------------------------------------------------------------------------------------
+void setup() {
+  Serial.begin(115200);
+  Serial2.setRxBufferSize(1024);
+  Serial2.begin(115200,SERIAL_8N1,RX2,TX2);
+  delay(500);
+
+  IrReceiver.begin(IR_RCV,ENABLE_LED_FEEDBACK);
 }
 //------------------------------------------------------------------------------------------------
 void loop() {
