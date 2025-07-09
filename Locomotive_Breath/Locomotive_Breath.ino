@@ -36,6 +36,22 @@
 // these. This should be enough to store a decent air horn, air brakes, bell, etc. Please keep in
 // mind that all sound effects have to finish playing before further commands will be executed.
 //------------------------------------------------------------------------------------------------
+// LCC Mission Control Server:
+//
+//   Orange Pi Zero 3 2GB     - $31.00
+//   Reyax RYLR998 Modem      - $12.00
+//   TTL to USB Adapter       - $5.00
+//   32 GB Micro SD Card      - $5.00
+//   USB-C 3A Fast Charger    - $5.00
+//   3D Printed Case          - $3.00
+//
+// LCC Location Transponder:
+//
+//   Seeed Studio XIAO SAMD21 - $5.00
+//   3.3v 3A Regulator        - $0.70
+//   IR LED Transmitter       - $1.00
+//   3D Printed Case          - $2.00
+//------------------------------------------------------------------------------------------------
 #define DISABLE_CODE_FOR_TRANSMITTER
 #define SEND_LEDC_CHANNEL 0      // Fallback to satisfy compiler
 #include "IRremote.hpp"          // IR remote controller library, for location/position detection
