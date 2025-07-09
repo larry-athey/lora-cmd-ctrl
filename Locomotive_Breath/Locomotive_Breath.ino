@@ -164,10 +164,10 @@ void setup() {
 void loop() {
 
   // Play .wav file from SPIFFS one time if one isn't already playing
-  if (! Sound.isRunning()) Sound.connecttoFS(SPIFFS,"/test.wav"); 
+  //if (! Sound.isRunning()) Sound.connecttoFS(SPIFFS,"/test.wav"); 
 
   // Keep the loaded .wav file playing repeatedly
-  Sound.loop();
+  //Sound.loop();
 
 }
 //------------------------------------------------------------------------------------------------
