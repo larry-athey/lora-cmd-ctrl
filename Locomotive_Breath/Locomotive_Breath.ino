@@ -38,11 +38,10 @@
 //------------------------------------------------------------------------------------------------
 // LCC Mission Control Server:
 //
-//   Orange Pi Zero 3 2GB     - $31.00
+//   Orange Pi Zero 3 1GB     - $30.00 (with power supply)
 //   Reyax RYLR998 Modem      - $12.00
 //   TTL to USB Adapter       - $5.00
 //   32 GB Micro SD Card      - $5.00
-//   USB-C 3A Fast Charger    - $5.00
 //   3D Printed Case          - $3.00
 //
 // LCC Location Transponder:
@@ -52,7 +51,7 @@
 //   IR LED Transmitter       - $1.00
 //   3D Printed Case          - $2.00
 //
-// NOTE: The location transponder MCU can actually run up to 11 LED transmitters.
+// NOTE: The location transponder MCU can actually run up to 11 unique LED transmitters.
 //------------------------------------------------------------------------------------------------
 #define DISABLE_CODE_FOR_TRANSMITTER
 #define SEND_LEDC_CHANNEL 0      // Fallback to satisfy compiler
@@ -82,6 +81,8 @@ Audio Sound;                     // Create the sound effects system object
 bool SFX = false;                // True if the sound effects system successfully initialized
 int LoRa_Address = 100;          // Device address [1..65535], 1 is reserved for mission control
 int LoRa_Network = 18;           // Network ID [0..15], 18 is valid but often never used
+unsigned long CmdCount = 0;      // Counts the number of received mission control commands
+String Commands[16];             // Command queue for caching mission control commands
 String LoRa_PW = "1A2B3C4D";     // 8 character hex domain password, much like a WiFi password
 //------------------------------------------------------------------------------------------------
 void echoRYLR998() { // Used for debugging RYLR998 output
@@ -168,6 +169,18 @@ void loop() {
 
   // Keep the loaded .wav file playing repeatedly
   //Sound.loop();
+
+  // Handle commands from mission control
+  if ((Serial2) && (Serial2.available())) {
+    String Msg = handleCommand();    
+    if (Msg.length() > 0) {
+      // Send the command acknowledgement to mission control
+      String Response = "AT+SEND=1," + String(Msg.length()) + "," + Msg;
+      Serial2.print(Response + "\r\n");
+      delay(100);
+      Serial2.readStringUntil('\n'); // Purge the +OK response
+    }
+  }
 
 }
 //------------------------------------------------------------------------------------------------
