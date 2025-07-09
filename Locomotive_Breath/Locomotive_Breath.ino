@@ -51,6 +51,8 @@
 //   3.3v 3A Regulator        - $0.70
 //   IR LED Transmitter       - $1.00
 //   3D Printed Case          - $2.00
+//
+// NOTE: The location transponder MCU can actually run up to 11 LED transmitters.
 //------------------------------------------------------------------------------------------------
 #define DISABLE_CODE_FOR_TRANSMITTER
 #define SEND_LEDC_CHANNEL 0      // Fallback to satisfy compiler
