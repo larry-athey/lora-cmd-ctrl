@@ -95,7 +95,7 @@ String LoRa_PW = "1A2B3C4D";     // 8 character hex domain password, much like a
 volatile uint32_t lastLocation = 0; // Store the last received location ID
 volatile bool newLocation = false;  // Flag to indicate a new location has been detected
 //------------------------------------------------------------------------------------------------
-void IRAM_ATTR handleIRInterrupt() { // Check for location transponder detection
+void IRAM_ATTR handleIRInterrupt() { // Interrupt hook to check for location transponder detection
   if (IrReceiver.decode()) {
     lastLocation = IrReceiver.decodedIRData.decodedRawData;
     newLocation = true;
