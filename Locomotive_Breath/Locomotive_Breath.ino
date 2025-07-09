@@ -79,20 +79,26 @@ Audio Sound;                     // Create the sound effects system object
 #define BUS_3 7                  // Audio DOUT or DRV8825 sleep pin, unused for I2C
 //------------------------------------------------------------------------------------------------
 bool SFX = false;                // True if the sound effects system successfully initialized
+byte motorDirection = 0;         // Motor direction, 0 = forward, 1 = reverse
+byte motorSpeed = 0;             // Current motor speed [0..100]
+byte targetSpeed = 0;            // Motor target speed
 int LoRa_Address = 100;          // Device address [1..65535], 1 is reserved for mission control
 int LoRa_Network = 18;           // Network ID [0..15], 18 is valid but often never used
-unsigned long CmdCount = 0;      // Counts the number of received mission control commands
+unsigned long cmdCount = 0;      // Counts the number of received mission control commands
+unsigned long motorTimestamp = 0;// Timestamp of the last motor command execution
+unsigned long progressTime = 0;  // Motor speed change progression time in milliseconds
+unsigned long targetRuntime = 0; // Timestamp of the motor end run (0 = indefinite runtime)
 String Commands[16];             // Command queue for caching mission control commands
 String LoRa_PW = "1A2B3C4D";     // 8 character hex domain password, much like a WiFi password
-
-volatile uint32_t lastLocation = 0; // Store the last received location ID
-volatile bool newLocation = false;  // Flag to indicate a new location was detected
 //------------------------------------------------------------------------------------------------
-void IRAM_ATTR handleIRInterrupt() { // This ISR is triggered when a location transponder is detected
+volatile uint32_t lastLocation = 0; // Store the last received location ID
+volatile bool newLocation = false;  // Flag to indicate a new location has been detected
+//------------------------------------------------------------------------------------------------
+void IRAM_ATTR handleIRInterrupt() { // Check for location transponder detection
   if (IrReceiver.decode()) {
     lastLocation = IrReceiver.decodedIRData.decodedRawData;
-   newLocation = true;
-  IrReceiver.resume();
+    newLocation = true;
+    IrReceiver.resume();
   }
 }
 //------------------------------------------------------------------------------------------------
@@ -177,6 +183,11 @@ void setup() {
 #include "lcc_api.h" // Inline function library for the LCC message processing functions.
 //------------------------------------------------------------------------------------------------
 void loop() {
+  unsigned long CurrentTime = millis();
+  if (CurrentTime > 4200000000) {
+    // Reboot the system if we're reaching the maximum long integer value of CurrentTime (49 days)
+    ESP.restart();
+  }
 
   // Play .wav file from SPIFFS one time if one isn't already playing
   //if (! Sound.isRunning()) Sound.connecttoFS(SPIFFS,"/test.wav"); 
@@ -184,11 +195,17 @@ void loop() {
   // Keep the loaded .wav file playing repeatedly
   //Sound.loop();
 
+  // Shut down the motor if either limit switch has been tripped
+  if ((digitalRead(LIMIT_1) == 0) || (digitalRead(LIMIT_2) == 0)) {
+
+  }
+
+  // Handle new location transponder detection
   if (newLocation) {
-    noInterrupts(); // Disable interrupts briefly to read the volatile variable safely
+    noInterrupts();
     uint32_t Location = lastLocation;
     newLocation = false;
-    interrupts(); // Re-enable interrupts
+    interrupts();
     // Phone home to report the current location
 
     // Check for any actions associated with this location
@@ -206,6 +223,8 @@ void loop() {
     }
   }
 
+  // Run the next command (if any) in the queue
+  processQueue();
 }
 //------------------------------------------------------------------------------------------------
 /*
