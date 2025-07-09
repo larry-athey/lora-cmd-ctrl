@@ -3,9 +3,12 @@
 //
 // Inline functions used for modular unit organization
 //------------------------------------------------------------------------------------------------
-inline void QueueCommand(String Cmd) {
+inline void QueueCommand(String Cmd) { // Add a command to the next empty slot in the queue
   for (byte i = 0; i <= 16; i ++) {
-    
+    if (Commands[i].length() == 0) {
+      Commands[i] = Cmd;
+      break;
+    }
   }
 }
 //------------------------------------------------------------------------------------------------
