@@ -64,17 +64,17 @@
 Audio Sound;                     // Create the sound effects system object
 //------------------------------------------------------------------------------------------------
 // GPIO Left (USB top)
-#define LIMIT1 1                 // Limit switch 1 (forward)
-#define LIMIT2 2                 // Limit switch 2 (reverse)
+#define LIMIT_1 1                // Limit switch 1 (forward)
+#define LIMIT_2 2                // Limit switch 2 (reverse)
 #define IR_RCV 3                 // TSOP34838 output pin
-#define OUT_1                    // Output 1 or DRV8825 M0
-#define OUT_2                    // Output 2 or DRV8825 M1
-#define OUT_3                    // Output 3 or DRV8825 M2
+#define OUT_1 4                  // Output 1 or DRV8825 M0
+#define OUT_2 5                  // Output 2 or DRV8825 M1
+#define MOT_PWM 6                // H-Bridge PWM or DRV8825 M2
 // GPIO Right (USB top)
 #define TX2 13                   // To RYLR998 RX pin
 #define RX2 12                   // To RYLR998 TX pin
-#define PWM_F 11                 // H-Bridge forward pin or output pin if using a stepper
-#define PWM_R 10                 // H-Bridge reverse pin or output pin if using a stepper
+#define MOT_F 11                 // H-Bridge forward pin or output pin if using a stepper
+#define MOT_R 10                 // H-Bridge reverse pin or output pin if using a stepper
 #define BUS_1 9                  // Audio BCLK or DRV8825 step pin, or SCL for I2C
 #define BUS_2 8                  // Audio WS or DRV8825 direction pin, or SDA for I2C
 #define BUS_3 7                  // Audio DOUT or DRV8825 sleep pin, unused for I2C
@@ -102,6 +102,20 @@ void setup() {
   Serial2.begin(115200,SERIAL_8N1,RX2,TX2);
   delay(500);
 
+  // Intialize the GPIO pins
+  pinMode(LIMIT_1,INPUT_PULLUP);
+  pinMode(LIMIT_2,INPUT_PULLUP);
+  pinMode(OUT_1,OUTPUT); digitalWrite(OUT_1,LOW);
+  pinMode(OUT_2,OUTPUT); digitalWrite(OUT_2,LOW);
+  pinMode(MOT_F,OUTPUT); digitalWrite(MOT_F,LOW);
+  pinMode(MOT_R,OUTPUT); digitalWrite(MOT_R,LOW);
+  pinMode(MOT_PWM,OUTPUT); digitalWrite(MOT_PWM,LOW);
+
+  // Initialize the motor speed/direction controller
+  ledcSetup(MOT_PWM,20000,8); // 20 KHz, 8 bit resolution
+  ledcAttachPin(MOT_PWM,0);
+  ledcWrite(MOT_PWM,0); // Set the speed to zero [0..255]
+
   // Initialize the location/position detection sensor
   IrReceiver.begin(IR_RCV,ENABLE_LED_FEEDBACK);
 
@@ -109,12 +123,43 @@ void setup() {
   if (SPIFFS.begin(true)) {
     SFX = true;
     Sound.setPinout(BUS_1,BUS_2,BUS_3);
-    Sound.setVolume(10); // 0..21
+    Sound.setVolume(10); // [0..21]
   } else {
     Serial.println(F("Sound effects system failed to start"));
   }
 
+  // Initialize the RYLR998 modem
+  if (Serial) Serial.println(F("Initializing the RYLR998 modem..."));
+  Serial2.print(F("AT+FACTORY\r\n"));
+  delay(1000);
+  echoRYLR998();
+  Serial2.print(F("AT+RESET\r\n"));
+  delay(200);
+  echoRYLR998();
+  Serial2.print("AT+ADDRESS=" + String(LoRa_Address) + "\r\n");
+  delay(200);
+  echoRYLR998();
+  Serial2.print("AT+NETWORKID=" + String(LoRa_Network) + "\r\n");
+  delay(200);
+  echoRYLR998();
+  Serial2.print("AT+CPIN=" + LoRa_PW + "\r\n");
+  delay(200);
+  echoRYLR998();
+  Serial2.print(F("AT+BAND=915000000\r\n"));
+  delay(200);
+  echoRYLR998();
+  Serial2.print(F("AT+IPR=115200\r\n"));
+  delay(200);
+  echoRYLR998();
+  Serial2.print(F("AT+PARAMETER=9,7,1,12\r\n"));
+  delay(200);
+  echoRYLR998();
+
 }
+//------------------------------------------------------------------------------------------------
+// External function includes are used here to reduce the overall size of the main sketch.
+// Go ahead and call it non-standard, but I don't like spaghetti code that goes on forever.
+#include "lcc_api.h" // Inline function library for the LCC API functions
 //------------------------------------------------------------------------------------------------
 void loop() {
 
