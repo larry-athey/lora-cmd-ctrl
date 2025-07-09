@@ -32,13 +32,18 @@
 // have been received correctly. The server will attempt to send them 3 times over 30 seconds and
 // will mark them as failed if no acknowledgement is ever received.
 //
-// Sound effects must be 8 bit encoded mono .wav files since the ESP32 only has 4MB of storage for
+// Sound effects must be 8 bit, 8 KHz mono .wav files since the ESP32 only has 4MB of storage for
 // these. This should be enough to store a decent air horn, air brakes, bell, etc. Please keep in
 // mind that all sound effects have to finish playing before further commands will be executed.
 //------------------------------------------------------------------------------------------------
 #define DISABLE_CODE_FOR_TRANSMITTER
 #define SEND_LEDC_CHANNEL 0      // Fallback to satisfy compiler
 #include "IRremote.hpp"          // IR remote controller library, for location/position detection
+
+#include "Audio.h"               // MAX98357 support library, From ESP32-audioI2S v2.0.0
+#include "SPIFFS.h"              // Flash memory library that allows it to work as a file system
+//------------------------------------------------------------------------------------------------
+Audio Sound;                     // Create the sound effects system object
 //------------------------------------------------------------------------------------------------
 // GPIO Left (USB top)
 #define LIMIT1 1                 // Limit switch 1 (forward)
@@ -52,10 +57,11 @@
 #define RX2 12                   // To RYLR998 TX pin
 #define PWM_F 11                 // H-Bridge forward pin or output pin if using a stepper
 #define PWM_R 10                 // H-Bridge reverse pin or output pin if using a stepper
-#define BUS_1 9                  // Audio BCLK or DRV8825 step pin
-#define BUS_2 8                  // Audio WS or DRV8825 direction pin
-#define BUS_3 7                  // Audio DOUT or DRV8825 sleep pin
+#define BUS_1 9                  // Audio BCLK or DRV8825 step pin, or SCL for I2C
+#define BUS_2 8                  // Audio WS or DRV8825 direction pin, or SDA for I2C
+#define BUS_3 7                  // Audio DOUT or DRV8825 sleep pin, unused for I2C
 //------------------------------------------------------------------------------------------------
+bool SFX = false;                // True if the sound effects system successfully initialized
 int LoRa_Address = 100;          // Device address [1..65535], 1 is reserved for mission control
 int LoRa_Network = 18;           // Network ID [0..15], 18 is valid but often never used
 String LoRa_PW = "1A2B3C4D";     // 8 character hex domain password, much like a WiFi password
@@ -78,10 +84,27 @@ void setup() {
   Serial2.begin(115200,SERIAL_8N1,RX2,TX2);
   delay(500);
 
+  // Initialize the location/position detection sensor
   IrReceiver.begin(IR_RCV,ENABLE_LED_FEEDBACK);
+
+  // Initialize the sound effects system
+  if (SPIFFS.begin(true)) {
+    SFX = true;
+    Sound.setPinout(BUS_1,BUS_2,BUS_3);
+    Sound.setVolume(10); // 0..21
+  } else {
+    Serial.println(F("Sound effects system failed to start"));
+  }
+
 }
 //------------------------------------------------------------------------------------------------
 void loop() {
+
+  // Play .wav file from SPIFFS one time if one isn't already playing
+  //if (! Sound.isRunning()) Sound.connecttoFS(SPIFFS,"/test.wav"); 
+
+  // Keep the loaded .wav file playing repeatedly
+  //Sound.loop();
 
 }
 //------------------------------------------------------------------------------------------------
