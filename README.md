@@ -17,8 +17,8 @@ Due to the lower frequency and near zero RF noise/congestion, this system works 
 This system is intended for any purpose where remote control of motorized devices and remote switching is needed, without the need for an internet connection or WiFi infrastructure. Network password protection prevents nefarious actors from tampering with your devices by setting up their own mission control server.
 
 ### Use Cases
-- Lighting automation
-- Fan/Blower automation
+- Lighting/Fan/Pump automation
+- Solsr panel position automation
 - Conveyor automation
 - Irrigation automation
 - Motorized seasonal decorations
