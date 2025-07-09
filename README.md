@@ -18,7 +18,7 @@ This system is intended for any purpose where remote control of motorized device
 
 ### Use Cases
 - Lighting/Fan/Pump automation
-- Solsr panel position automation
+- Solar panel position automation
 - Conveyor automation
 - Irrigation automation
 - Motorized seasonal decorations
