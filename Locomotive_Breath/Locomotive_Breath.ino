@@ -104,10 +104,10 @@ void setup() {
   delay(500);
 
   // Intialize the GPIO pins
-  pinMode(LIMIT_1,INPUT_PULLUP);
-  pinMode(LIMIT_2,INPUT_PULLUP);
-  pinMode(OUT_1,OUTPUT); digitalWrite(OUT_1,LOW);
-  pinMode(OUT_2,OUTPUT); digitalWrite(OUT_2,LOW);
+  pinMode(LIMIT_1,INPUT_PULLUP); // Probably not of much use in a model train locomotive
+  pinMode(LIMIT_2,INPUT_PULLUP); // "                                                  "
+  pinMode(OUT_1,OUTPUT); digitalWrite(OUT_1,LOW); // Interior lights
+  pinMode(OUT_2,OUTPUT); digitalWrite(OUT_2,LOW); // Exterior lights
   pinMode(MOT_F,OUTPUT); digitalWrite(MOT_F,LOW); // AIN1 (Standby is pulled high to enable the driver)
   pinMode(MOT_R,OUTPUT); digitalWrite(MOT_R,LOW); // AIN2
   pinMode(MOT_PWM,OUTPUT); digitalWrite(MOT_PWM,LOW); // PWMA
