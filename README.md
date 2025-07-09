@@ -22,7 +22,7 @@ This system is intended for any purpose where remote control of motorized device
 - Conveyor automation
 - Irrigation automation
 - Motorized seasonal decorations
-- Model railroads
+- Model railroad automation
 
 ### Motor Control
 The LCC receiver module can control standard DC brushed motors using a PWM driven H bridge driver such as an L298N, or stepper motors such as a Nema 17 with a DRV8825 driver. _(You may actually use any driver you like.)_ Motor control includes direction, speed, runtime, progression time to smooth speed changes, and the number of steps if using a stepper motor.
