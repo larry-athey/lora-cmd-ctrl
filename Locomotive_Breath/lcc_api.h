@@ -27,8 +27,6 @@ inline void queueCommand(String Cmd) { // Add a command to the next empty slot i
 }
 //------------------------------------------------------------------------------------------------
 inline String handleCommand() { // Handle commands sent from mission control
-  String Result = "";
-
   String incoming = Serial2.readStringUntil('\n');
   if (Serial) Serial.println("Raw Msg: " + incoming);
   // Check if the message is a received LoRa message
@@ -38,15 +36,14 @@ inline String handleCommand() { // Handle commands sent from mission control
     if (firstComma > 4) { // Ensure valid +RCV format
       String senderIDStr = incoming.substring(5,firstComma); // Extract SenderID
       int senderID = senderIDStr.toInt();
-
       // Only process if the sender is the mission control server (ID 1)
       if (senderID == 1) {
         int secondComma = incoming.indexOf(',',firstComma + 1);
         int thirdComma = incoming.indexOf(',',secondComma + 1);
         if (thirdComma > secondComma) {
           String message = incoming.substring(secondComma + 1,thirdComma);
-          CmdCount ++;
-          if (Serial) Serial.println("S" + String(CmdCount) + "<-: " + message);
+          cmdCount ++;
+          if (Serial) Serial.println("S" + String(cmdCount) + "<-: " + message);
           queueCommand(message);
           return message; // Return the command
         }
@@ -55,7 +52,6 @@ inline String handleCommand() { // Handle commands sent from mission control
   } else {
     if (Serial) Serial.println(F("Not a valid mission control command"));
   }
-
-  return Result;
+  return "";
 }
 //------------------------------------------------------------------------------------------------
