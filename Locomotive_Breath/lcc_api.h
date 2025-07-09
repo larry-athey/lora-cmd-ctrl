@@ -3,8 +3,22 @@
 //
 // Inline functions used for modular unit organization
 //------------------------------------------------------------------------------------------------
-inline void QueueCommand(String Cmd) { // Add a command to the next empty slot in the queue
-  for (byte i = 0; i <= 16; i ++) {
+inline void runCommand(String Cmd) { // Execute an LCC command
+
+}
+//------------------------------------------------------------------------------------------------
+inline void processQueue() { // Process the next command in the FIFO queue
+  if (Commands[0].length() > 0) {
+    runCommand(Commands[0]);
+    for (byte i = 0; i <= 14; i ++) { // Remove the processed command from the queue
+      Commands[i] = Commands[i + 1];
+    }
+    Commands[15] = ""; // Add a blank slot to the end of the queue
+  }
+}
+//------------------------------------------------------------------------------------------------
+inline void queueCommand(String Cmd) { // Add a command to the next empty slot in the queue
+  for (byte i = 0; i <= 15; i ++) {
     if (Commands[i].length() == 0) {
       Commands[i] = Cmd;
       break;
@@ -33,7 +47,7 @@ inline String handleCommand() { // Handle commands sent from mission control
           String message = incoming.substring(secondComma + 1,thirdComma);
           CmdCount ++;
           if (Serial) Serial.println("S" + String(CmdCount) + "<-: " + message);
-          QueueCommand(message);
+          queueCommand(message);
           return message; // Return the command
         }
       }
