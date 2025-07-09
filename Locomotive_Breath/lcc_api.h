@@ -13,7 +13,7 @@ inline void processQueue() { // Process the next command in the FIFO queue
     for (byte i = 0; i <= 14; i ++) { // Remove the processed command from the queue
       Commands[i] = Commands[i + 1];
     }
-    Commands[15] = ""; // Add a blank slot to the end of the queue
+    Commands[15].clear(); // Add a blank slot to the end of the queue
   }
 }
 //------------------------------------------------------------------------------------------------
