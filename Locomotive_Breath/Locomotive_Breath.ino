@@ -159,7 +159,7 @@ void setup() {
 //------------------------------------------------------------------------------------------------
 // External function includes are used here to reduce the overall size of the main sketch.
 // Go ahead and call it non-standard, but I don't like spaghetti code that goes on forever.
-#include "lcc_api.h" // Inline function library for the LCC API functions
+#include "lcc_api.h" // Inline function library for the LCC message processing functions.
 //------------------------------------------------------------------------------------------------
 void loop() {
 
