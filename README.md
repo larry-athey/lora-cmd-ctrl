@@ -8,7 +8,7 @@ _**NOTE:** While this can be used as an alternative to DCC and WCC in the model 
 
 ---
 
-LCC is a client & server system where a mission control web app runs on a Raspberry Pi _(or clone)_ or any other Debian Linux based PC/SBC. The communications backbone between the server and client modules is LoRa WAN wireless networking based on the Reyax RYLR998 modem.
+LCC is a client & server system where a mission control web app runs on a Raspberry Pi _(or clone)_ or any other Debian Linux based PC/SBC. The communications backbone between the server and client devices is LoRa WAN wireless networking based on the Reyax RYLR998 modem.
 
 LoRa WAN networking runs at a lower frequency than WiFi and Bluetooth, so it doesn't suffer from all of the noise and congestion that plagues the 2.4 GHz and 5 GHz ISM bands. This method also doesn't require a persistent connection between the client and server and only exchanges short text based messages.
 
