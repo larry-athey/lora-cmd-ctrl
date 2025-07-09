@@ -84,6 +84,17 @@ int LoRa_Network = 18;           // Network ID [0..15], 18 is valid but often ne
 unsigned long CmdCount = 0;      // Counts the number of received mission control commands
 String Commands[16];             // Command queue for caching mission control commands
 String LoRa_PW = "1A2B3C4D";     // 8 character hex domain password, much like a WiFi password
+
+volatile uint32_t lastLocation = 0; // Store the last received location ID
+volatile bool newLocation = false;  // Flag to indicate a new location was detected
+//------------------------------------------------------------------------------------------------
+void IRAM_ATTR handleIRInterrupt() { // This ISR is triggered when a location transponder is detected
+  if (IrReceiver.decode()) {
+    lastLocation = IrReceiver.decodedIRData.decodedRawData;
+   newLocation = true;
+  IrReceiver.resume();
+  }
+}
 //------------------------------------------------------------------------------------------------
 void echoRYLR998() { // Used for debugging RYLR998 output
   char Data;
@@ -119,6 +130,9 @@ void setup() {
 
   // Initialize the location/position detection sensor
   IrReceiver.begin(IR_RCV,ENABLE_LED_FEEDBACK);
+
+  // Attach interrupt to the IR receiver pin
+  attachInterrupt(digitalPinToInterrupt(IR_RCV),handleIRInterrupt,CHANGE);
 
   // Initialize the sound effects system
   if (SPIFFS.begin(true)) {
@@ -170,6 +184,13 @@ void loop() {
   // Keep the loaded .wav file playing repeatedly
   //Sound.loop();
 
+  if (newLocation) {
+    noInterrupts(); // Disable interrupts briefly to read the volatile variable safely
+    uint32_t Location = lastLocation;
+    newLocation = false;
+    interrupts(); // Re-enable interrupts
+  }
+
   // Handle commands from mission control
   if ((Serial2) && (Serial2.available())) {
     String Msg = handleCommand();    
@@ -184,3 +205,28 @@ void loop() {
 
 }
 //------------------------------------------------------------------------------------------------
+/*
+// Location trasmitter code
+
+#include <IRremote.hpp>
+
+#define IR_SEND_PIN 6  // Use D6 (PA06) for IR LED, a PWM-capable pin
+const uint16_t LOCATION_ID = 0x03;  // Unique ID for this track section
+
+IRsend irsend(IR_SEND_PIN);  // Initialize IRsend with specific pin
+
+void setup() {
+  Serial.begin(115200);
+  while (!Serial) {
+    ; // Wait for Serial to initialize (important for XIAO SAMD21)
+  }
+  Serial.println("XIAO SAMD21 IR Transmitter Initialized");
+}
+
+void loop() {
+  irsend.sendNEC(LOCATION_ID, 8);  // Send 8-bit LOCATION_ID using NEC protocol
+  Serial.print("Sent IR Code: 0x");
+  Serial.println(LOCATION_ID, HEX);
+  delay(50);  // Repeat every 50 ms
+}
+*/
