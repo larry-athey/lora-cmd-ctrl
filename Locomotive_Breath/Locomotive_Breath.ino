@@ -80,14 +80,15 @@ Audio Sound;                     // Create the sound effects system object
 //------------------------------------------------------------------------------------------------
 bool SFX = false;                // True if the sound effects system successfully initialized
 byte motorDirection = 0;         // Motor direction, 0 = forward, 1 = reverse
-byte motorSpeed = 0;             // Current motor speed [0..100]
-byte targetSpeed = 0;            // Motor target speed
+byte progressDir = 0;            // Motor speed progress direction, 0 = down, 1 = up
+byte targetSpeed = 0;            // Motor target speed [0..100]
 int LoRa_Address = 100;          // Device address [1..65535], 1 is reserved for mission control
 int LoRa_Network = 18;           // Network ID [0..15], 18 is valid but often never used
 unsigned long cmdCount = 0;      // Counts the number of received mission control commands
 unsigned long motorTimestamp = 0;// Timestamp of the last motor command execution
-unsigned long progressTime = 0;  // Motor speed change progression time in milliseconds
 unsigned long targetRuntime = 0; // Timestamp of the motor end run (0 = indefinite runtime)
+float motorSpeed = 0.0;          // Current motor speed [0..100]
+float progressFactor = 0.0;      // How much (percent) to change the motor speed per second
 String Commands[16];             // Command queue for caching mission control commands
 String LoRa_PW = "1A2B3C4D";     // 8 character hex domain password, much like a WiFi password
 //------------------------------------------------------------------------------------------------
