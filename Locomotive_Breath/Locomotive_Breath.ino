@@ -189,9 +189,12 @@ void loop() {
     uint32_t Location = lastLocation;
     newLocation = false;
     interrupts(); // Re-enable interrupts
+    // Phone home to report the current location
+
+    // Check for any actions associated with this location
   }
 
-  // Handle commands from mission control
+  // Handle new commands received from mission control
   if ((Serial2) && (Serial2.available())) {
     String Msg = handleCommand();    
     if (Msg.length() > 0) {
