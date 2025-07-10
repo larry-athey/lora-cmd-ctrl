@@ -3,19 +3,24 @@
 //
 // Inline functions used for modular unit organization
 //------------------------------------------------------------------------------------------------
-inline void sendRepeatRequest(String Request, String ID) {
+inline void sendRepeatRequest(String Request, String ID) { // Request a repeat of the last command/script
 
 }
 //------------------------------------------------------------------------------------------------
-inline void setupLocation(int Pin) {
+inline void setupLocation(int Pin) { // Add a transponder pin to the locations queue
+  for (byte i = 0; i <= 15; i ++) {
+    if (Locations[i] == 0) {
+      Locations[i] = Pin;
+      break;
+    }
+  }
+}
+//------------------------------------------------------------------------------------------------
+inline void setupMotor(byte Direction, byte Speed, int Progression, int Duration) { // Set up motor background process
 
 }
 //------------------------------------------------------------------------------------------------
-inline void setupMotor(byte Direction, byte Speed, int Progression, int Duration) {
-
-}
-//------------------------------------------------------------------------------------------------
-inline void setupStepper(byte Direction, byte Speed, byte Resolution, int Steps) {
+inline void setupStepper(byte Direction, byte Speed, byte Resolution, int Steps) { // Set up stepper background process
   /*
      M0	M1	M2	Step Size
   1. Low	Low	Low	Full step
@@ -27,11 +32,11 @@ inline void setupStepper(byte Direction, byte Speed, byte Resolution, int Steps)
   */
 }
 //------------------------------------------------------------------------------------------------
-inline void setupSound(String FileName, byte Loop) {
+inline void setupSound(String FileName, byte Loop) { // Set up sound effect background process
 
 }
 //------------------------------------------------------------------------------------------------
-inline void toggleSwitch(byte gpioPin, byte State) {
+inline void toggleSwitch(byte gpioPin, byte State) { // Toggle a specific GPIO pin
 
 }
 //------------------------------------------------------------------------------------------------
