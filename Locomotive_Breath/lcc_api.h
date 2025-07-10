@@ -76,7 +76,11 @@ inline void runCommand(String Cmd) { // Execute a queued LCC mission control com
     //if (partCount == 6) setupMotor(/direction/speed/progression/duration);
   } else if (parts[1] == "reboot") {
     // /ID/reboot
-    if (partCount == 2) ESP.restart();;
+    if (partCount == 2) ESP.restart();
+  } else if (parts[1] == "repeat") {
+    // /ID/repeat/script
+
+    //if (partCount == 3);
   } else if (parts[1] == "sound") {
     // /ID/sound/wav/loop
 
