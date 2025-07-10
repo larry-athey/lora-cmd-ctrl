@@ -185,16 +185,16 @@ void setup() {
   echoRYLR998();
 
   // Zero out the location detection queue
-  for (byte i = 0; i <= 15; i ++) Location[i] = 0;
+  for (byte i = 0; i <= 15; i ++) Locations[i] = 0;
 }
 //------------------------------------------------------------------------------------------------
 void beaconCheck(int Pin) { // Stop the motor if a registered location transponder is detected
   for (byte i = 0; i <= 15; i ++) {
-    if (Pin == Location[i]) {
+    if (Pin == Locations[i]) {
       setMotorSpeed(0);
       targetSpeed = 0;
       progressFactor = 0;
-      Location[i] = 0;
+      Locations[i] = 0;
     }
   }
 }
