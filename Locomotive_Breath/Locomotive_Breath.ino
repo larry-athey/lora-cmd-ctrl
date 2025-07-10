@@ -72,14 +72,15 @@ Audio Sound;                     // Create the sound effects system object
 // GPIO Right (USB top)
 #define TX2 13                   // To RYLR998 RX pin
 #define RX2 12                   // To RYLR998 TX pin
-#define MOT_F 11                 // H-Bridge forward pin or output pin if using a stepper
-#define MOT_R 10                 // H-Bridge reverse pin or output pin if using a stepper
+#define MOT_F 11                 // H-Bridge forward pin or user defined if using a stepper
+#define MOT_R 10                 // H-Bridge reverse pin or user defined if using a stepper
 #define BUS_1 9                  // Audio BCLK or DRV8825 step pin, or SCL for I2C
 #define BUS_2 8                  // Audio WS or DRV8825 direction pin, or SDA for I2C
 #define BUS_3 7                  // Audio DOUT or DRV8825 sleep pin, unused for I2C
 //------------------------------------------------------------------------------------------------
 bool SFX = false;                // True if the sound effects system successfully initialized
-byte motorDirection = 0;         // Motor direction, 0 = forward, 1 = reverse
+bool sfxLoop = false;            // True if a sound effect command is supposed to play endlessly
+byte motorDirection = 1;         // Motor direction, 0 = reverse, 1 = forward
 byte progressDir = 0;            // Motor speed progress direction, 0 = down, 1 = up
 byte targetSpeed = 0;            // Motor target speed [0..100]
 int LoRa_Address = 100;          // Device address [1..65535], 1 is reserved for mission control
@@ -130,10 +131,15 @@ void setup() {
   pinMode(MOT_R,OUTPUT); digitalWrite(MOT_R,LOW); // AIN2
   pinMode(MOT_PWM,OUTPUT); digitalWrite(MOT_PWM,LOW); // PWMA
 
-  // Initialize the motor speed/direction controller
+  #ifndef STEPPER
+  // Initialize the PWM motor speed/direction controller
   ledcSetup(MOT_PWM,20000,8); // 20 KHz, 8 bit resolution
   ledcAttachPin(MOT_PWM,0);
   ledcWrite(MOT_PWM,0); // Set the speed to zero [0..255]
+  #else
+  
+  #endif
+  setMotorDirection(1);
 
   // Initialize the location/position detection sensor
   IrReceiver.begin(IR_RCV,ENABLE_LED_FEEDBACK);
@@ -179,6 +185,30 @@ void setup() {
 
 }
 //------------------------------------------------------------------------------------------------
+void setMotorSpeed(byte Percent) {
+  motorSpeed = round(Percent * 2.55);
+  #ifndef STEPPER
+  ledcWrite(MOT_PWM,motorSpeed);
+  #else
+
+  #endif
+}
+//------------------------------------------------------------------------------------------------
+void setMotorDirection(byte Direction) {
+  motorDirection = Direction;
+  #ifndef STEPPER
+  if (Direction == 1) {
+    digitalWrite(MOT_F,HIGH);
+    digitalWrite(MOT_R,LOW);
+  } else {
+    digitalWrite(MOT_F,LOW);
+    digitalWrite(MOT_R,HIGH);
+  }
+  #else
+
+  #endif
+}
+//------------------------------------------------------------------------------------------------
 // External function includes are used here to reduce the overall size of the main sketch.
 // Go ahead and call it non-standard, but I don't like spaghetti code that goes on forever.
 #include "lcc_api.h" // Inline function library for the LCC message processing functions.
@@ -193,12 +223,24 @@ void loop() {
   // Play .wav file from SPIFFS one time if one isn't already playing
   //if (! Sound.isRunning()) Sound.connecttoFS(SPIFFS,"/test.wav"); 
 
-  // Keep the loaded .wav file playing repeatedly
-  //Sound.loop();
+  // Play the last sound effect endlessly if requested in the command
+  if ((SFX) && (sfxLoop)) Sound.loop();
 
   // Shut down the motor if either limit switch has been tripped
-  if ((digitalRead(LIMIT_1) == 0) || (digitalRead(LIMIT_2) == 0)) {
-
+  if ((motorSpeed > 0) && ((digitalRead(LIMIT_1) == 0) || (digitalRead(LIMIT_2) == 0))) {
+    setMotorSpeed(0);
+    targetSpeed = 0;
+    progressFactor = 0;
+    String Status;
+    if (digitalRead(LIMIT_1) == 0) {
+      Status = "/limit/0";
+    } else {
+      Status = "/limit/1";
+    }
+    // Send the status notification to mission control
+    Serial2.print("AT+SEND=1," + String(Status.length()) + "," + Status + "\r\n");
+    delay(100);
+    Serial2.readStringUntil('\n'); // Purge the +OK response
   }
 
   // Handle new location transponder detection
@@ -207,9 +249,13 @@ void loop() {
     uint32_t Location = lastLocation;
     newLocation = false;
     interrupts();
-    // Phone home to report the current location
-
+    // Send the location update to mission control
+    String Status = "/location/" + String(Location);
+    Serial2.print("AT+SEND=1," + String(Status.length()) + "," + Status + "\r\n");
+    delay(100);
+    Serial2.readStringUntil('\n'); // Purge the +OK response
     // Check for any actions associated with this location
+
   }
 
   // Handle new commands received from mission control
@@ -229,7 +275,7 @@ void loop() {
 }
 //------------------------------------------------------------------------------------------------
 /*
-// Location trasmitter code
+// Location transponder code
 
 #include <IRremote.hpp>
 
