@@ -67,31 +67,25 @@ inline void runCommand(String Cmd) { // Execute a queued LCC mission control com
   // parts[1] : The command type identifier
   // parts[2..(partCount-1)] : Any additional parameters for the command type 
   if (parts[1] == "location") {
-    // /ID/location/pin
-
+    //ID/location/pin
     //if (partCount == 3)
   } else if (parts[1] == "motor") {
-    // /ID/motor/direction/speed/progression/duration
-
+    //ID/motor/direction/speed/progression/duration
     //if (partCount == 6) setupMotor(/direction/speed/progression/duration);
   } else if (parts[1] == "reboot") {
-    // /ID/reboot
+    //ID/reboot
     if (partCount == 2) ESP.restart();
   } else if (parts[1] == "repeat") {
-    // /ID/repeat/cmd-or-script/db-id
-
+    //ID/repeat/cmd-or-script/db-id
     //if (partCount == 4);
   } else if (parts[1] == "sound") {
-    // /ID/sound/wav/loop
-
+    //ID/sound/wav/loop
     //if (partCount == 4);
   } else if (parts[1] == "stepper") {
-    // /ID/stepper/direction/speed/resolution/steps
-
+    //ID/stepper/direction/speed/resolution/steps
     //if (partCount == 6) setupStepper(/direction/speed/resolution/steps);
   } else if (parts[1] == "switch") {
-    // /ID/switch/gpio/state
-
+    //ID/switch/gpio/state
     //if (partCount == 4);
   }
 }
