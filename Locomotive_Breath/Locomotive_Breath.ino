@@ -191,6 +191,8 @@ void setup() {
 
   // Initialize the main loop() 1 second timer
   lastCheck = millis();
+
+  if (Serial) Serial.println(F("Locomotive Breath now initialized and running"));
 }
 //------------------------------------------------------------------------------------------------
 void beaconCheck(int Pin) { // Stop the motor if a registered location transponder is detected
