@@ -16,8 +16,8 @@ CREATE TABLE commands (
   `progression` INT(11) DEFAULT NULL,
   `steps` INT(11) DEFAULT NULL,
   `wav` VARCHAR(255) DEFAULT NULL,
-  `loop` INT(11) DEFAULT NULL,
-  `location_id` INT(11) DEFAULT NULL
+  `location_id` INT(11) DEFAULT NULL,
+  `repeat` BOOLEAN DEFAULT FALSE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 ALTER TABLE `commands` MODIFY `ID` INT(11) NOT NULL AUTO_INCREMENT;
@@ -28,7 +28,7 @@ CREATE TABLE devices (
   `dev_name` VARCHAR(255) DEFAULT NULL,
   `dev_type` INT(11) DEFAULT NULL,
   `last_loc` INT(11) DEFAULT NULL,
-  `enabled` BOOLEAN DEFAULT FALSE
+  `cmd_repeat` BOOLEAN DEFAULT FALSE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 ALTER TABLE `devices` MODIFY `ID` INT(11) NOT NULL AUTO_INCREMENT;
