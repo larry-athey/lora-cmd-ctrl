@@ -75,7 +75,7 @@ inline void setupSound(String FileName, byte Loop) { // Set up sound effect back
   // Play .wav file from SPIFFS one time if one isn't already playing
   //if (! Sound.isRunning()) Sound.connecttoFS(SPIFFS,"/test.wav");
   if (SFX) {
-    wavFile = FileName;
+    wavFile = "/" + FileName;
     if (Loop == 1) {
       sfxLoop = true;
     } else {
