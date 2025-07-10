@@ -50,13 +50,29 @@ inline void runCommand(String Cmd) { // Execute a queued LCC mission control com
   // parts[0] : Command ID tag (md5 hash of "LoRa_Address|Command")
   // parts[1] : The command type identifier
   // parts[2..(partCount-1)] : Any additional parameters for the command type 
-  if (parts[1] == "motor") {
-    //if (partCount == 2) Result = getDeviceName(parts[0].toInt());
+  if (parts[1] == "location") {
+    // /ID/location/ID
+
+    //if (partCount == 3)
+  } else if (parts[1] == "motor") {
+    // /ID/motor/direction/speed/progression/duration
+
+    //if (partCount == 6) Result = getDeviceName(parts[0].toInt());
   } else if (parts[1] == "reboot") {
-    //if (partCount == 4) Result = getDallasTemp(parts[0].toInt(),parts[2],parts[3]);
+    // /ID/reboot
+
+    //if (partCount == 2) Result = rebootDevice();
   } else if (parts[1] == "sound") {
+    // /ID/sound/wav/loop
+
     //if (partCount == 4) Result = getDallasTemp(parts[0].toInt(),parts[2],parts[3]);
+  } else if (parts[1] == "stepper") {
+    // /ID/stepper/direction/speed/resolution/steps
+
+    //if (partCount == 6) Result = getDallasTemp(parts[0].toInt(),parts[2],parts[3]);
   } else if (parts[1] == "switch") {
+    // /ID/switch/gpio/state
+
     //if (partCount == 4) Result = getDallasTemp(parts[0].toInt(),parts[2],parts[3]);
   }
 }
