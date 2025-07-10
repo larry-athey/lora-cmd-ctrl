@@ -83,6 +83,7 @@ bool sfxLoop = false;            // True if a sound effect command is supposed t
 byte motorDirection = 1;         // Motor direction, 0 = reverse, 1 = forward
 byte progressDir = 0;            // Motor speed progress direction, 0 = down, 1 = up
 byte targetSpeed = 0;            // Motor target speed [0..100]
+int Locations[16];               // Location transponder queue of ID numbers to stop at
 int LoRa_Address = 100;          // Device address [1..65535], 1 is reserved for mission control
 int LoRa_Network = 18;           // Network ID [0..15], 18 is valid but often never used
 unsigned long cmdCount = 0;      // Counts the number of received mission control commands
@@ -183,6 +184,19 @@ void setup() {
   delay(200);
   echoRYLR998();
 
+  // Zero out the location detection queue
+  for (byte i = 0; i <= 15; i ++) Location[i] = 0;
+}
+//------------------------------------------------------------------------------------------------
+void beaconCheck(int Pin) { // Stop the motor if a registered location transponder is detected
+  for (byte i = 0; i <= 15; i ++) {
+    if (Pin == Location[i]) {
+      setMotorSpeed(0);
+      targetSpeed = 0;
+      progressFactor = 0;
+      Location[i] = 0;
+    }
+  }
 }
 //------------------------------------------------------------------------------------------------
 void setMotorSpeed(byte Percent) { // Set the motor speed
@@ -254,8 +268,8 @@ void loop() {
     Serial2.print("AT+SEND=1," + String(Status.length()) + "," + Status + "\r\n");
     delay(100);
     Serial2.readStringUntil('\n'); // Purge the +OK response
-    // Check for any actions associated with this location
-
+    // Check for a stop action associated with this location
+    beaconCheck(Location);
   }
 
   #ifdef STEPPER
