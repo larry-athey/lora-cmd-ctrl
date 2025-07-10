@@ -241,9 +241,10 @@ void loop() {
 
   // Handle the sound effects as necessary
   if (SFX) {
-    if ((wavFile != "") && (! Sound.isRunning())) {
-      Sound.connecttoFS(SPIFFS,"/test.wav");
-      wavFile = "";
+    if (wavFile.length() > 0) {
+      Sound.stopSong();
+      Sound.connecttoFS(SPIFFS,wavFile.c_str());
+      wavFile.clear();
     }
     if (sfxLoop) Sound.loop();
   }
