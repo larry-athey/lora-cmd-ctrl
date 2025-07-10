@@ -87,12 +87,14 @@ int Locations[16];               // Location transponder queue of ID numbers to 
 int LoRa_Address = 100;          // Device address [1..65535], 1 is reserved for mission control
 int LoRa_Network = 18;           // Network ID [0..15], 18 is valid but often never used
 unsigned long cmdCount = 0;      // Counts the number of received mission control commands
+unsigned long lastCheck = 0;     // Used to track 1-second checks in the main loop()
 unsigned long motorTimestamp = 0;// Timestamp of the last motor command execution
 unsigned long targetRuntime = 0; // Timestamp of the motor end run (0 = indefinite runtime)
 float motorSpeed = 0.0;          // Current motor speed [0..100]
 float progressFactor = 0.0;      // How much (percent) to change the motor speed per second
 String Commands[16];             // Command queue for caching mission control commands
 String LoRa_PW = "1A2B3C4D";     // 8 character hex domain password, much like a WiFi password
+String wavFile = "";             // File name of the sound effect to load
 //------------------------------------------------------------------------------------------------
 volatile uint32_t lastLocation = 0; // Store the last received location ID
 volatile bool newLocation = false;  // Flag to indicate a new location has been detected
@@ -186,6 +188,9 @@ void setup() {
 
   // Zero out the location detection queue
   for (byte i = 0; i <= 15; i ++) Locations[i] = 0;
+
+  // Initialize the main loop() 1 second timer
+  lastCheck = millis();
 }
 //------------------------------------------------------------------------------------------------
 void beaconCheck(int Pin) { // Stop the motor if a registered location transponder is detected
@@ -232,13 +237,16 @@ void loop() {
   if (CurrentTime > 4200000000) {
     // Reboot the system if we're reaching the maximum long integer value of CurrentTime (49 days)
     ESP.restart();
+  } 
+
+  // Handle the sound effects as necessary
+  if (SFX) {
+    if ((wavFile != "") && (! Sound.isRunning())) {
+      Sound.connecttoFS(SPIFFS,"/test.wav");
+      wavFile = "";
+    }
+    if (sfxLoop) Sound.loop();
   }
-
-  // Play .wav file from SPIFFS one time if one isn't already playing
-  //if (! Sound.isRunning()) Sound.connecttoFS(SPIFFS,"/test.wav"); 
-
-  // Play the last sound effect endlessly if requested in the command
-  if ((SFX) && (sfxLoop)) Sound.loop();
 
   // Shut down the motor if either limit switch has been tripped
   if ((motorSpeed > 0) && ((digitalRead(LIMIT_1) == 0) || (digitalRead(LIMIT_2) == 0))) {
@@ -270,6 +278,28 @@ void loop() {
     Serial2.readStringUntil('\n'); // Purge the +OK response
     // Check for a stop action associated with this location
     beaconCheck(Location);
+  }
+
+  // Shut down the motor if a target runtime has been set and met
+  if ((targetRuntime > 0) && (CurrentTime >= targetRuntime)) {
+    setMotorSpeed(0);
+    targetSpeed = 0;
+    progressFactor = 0;
+  }
+
+  // Handle motor speed progression
+  if (motorSpeed != targetSpeed) {
+    if (CurrentTime - lastCheck >= 1000) {
+      float Update = 0;
+      if (progressDir == 1) {
+        Update = motorSpeed + progressFactor;
+        if (Update > 100) Update = 100;
+      } else {
+        Update = motorSpeed - progressFactor;
+        if (Update < 0) Update = 0;
+      }
+      setMotorSpeed(round(Update));
+    }
   }
 
   #ifdef STEPPER
