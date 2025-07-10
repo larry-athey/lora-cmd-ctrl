@@ -4,7 +4,10 @@
 // Inline functions used for modular unit organization
 //------------------------------------------------------------------------------------------------
 inline void sendRepeatRequest(String Request, String ID) { // Request a repeat of the last command/script
-
+  String Status = "/" + Request + "/" + ID;
+  Serial2.print("AT+SEND=1," + String(Status.length()) + "," + Status + "\r\n");
+  delay(100);
+  Serial2.readStringUntil('\n'); // Purge the +OK response
 }
 //------------------------------------------------------------------------------------------------
 inline void setupLocation(int Pin) { // Add a transponder pin to the locations queue
@@ -17,7 +20,43 @@ inline void setupLocation(int Pin) { // Add a transponder pin to the locations q
 }
 //------------------------------------------------------------------------------------------------
 inline void setupMotor(byte Direction, byte Speed, int Progression, int Duration) { // Set up motor background process
+  unsigned long motorTimestamp = millis();
 
+  if ((motorSpeed > 0) && (Direction != motorDirection)) {
+    setMotorSpeed(0);
+    while (millis() < motorTimestamp + 2000) {
+      if ((SFX) && (sfxLoop)) Sound.loop(); // Play any looping sound effect while we wait
+    }
+    motorTimestamp += 2000;
+  }
+  motorDirection = Direction;
+
+  if (Duration > 0) {
+    targetRuntime = motorTimestamp + (Duration * 1000);
+  } else {
+    targetRuntime = 0;
+  }
+
+  targetSpeed = Speed;
+  if (Progression > 0) {
+    if (motorSpeed == 0) {
+      progressFactor = 100 / Progression;
+      progressDir = 1;
+    } else {
+      if (Speed > motorSpeed) {
+        byte Change = Speed - motorSpeed;
+        progressFactor = Change / Progression;
+        progressDir = 1;
+      } else {
+        byte Change = motorSpeed - Speed;
+        progressFactor = Change / Progression;
+        progressDir = 0;
+      }
+    }
+  } else {
+    setMotorSpeed(Speed);
+    progressFactor = 0;
+  }
 }
 //------------------------------------------------------------------------------------------------
 inline void setupStepper(byte Direction, byte Speed, byte Resolution, int Steps) { // Set up stepper background process
@@ -33,11 +72,20 @@ inline void setupStepper(byte Direction, byte Speed, byte Resolution, int Steps)
 }
 //------------------------------------------------------------------------------------------------
 inline void setupSound(String FileName, byte Loop) { // Set up sound effect background process
-
+  // Play .wav file from SPIFFS one time if one isn't already playing
+  //if (! Sound.isRunning()) Sound.connecttoFS(SPIFFS,"/test.wav");
+  if (SFX) {
+    wavFile = FileName;
+    if (Loop == 1) {
+      sfxLoop = true;
+    } else {
+      sfxLoop = false;
+    }
+  }
 }
 //------------------------------------------------------------------------------------------------
 inline void toggleSwitch(byte gpioPin, byte State) { // Toggle a specific GPIO pin
-
+  digitalWrite(gpioPin,State);
 }
 //------------------------------------------------------------------------------------------------
 inline void runCommand(String Cmd) { // Execute a queued LCC mission control command
