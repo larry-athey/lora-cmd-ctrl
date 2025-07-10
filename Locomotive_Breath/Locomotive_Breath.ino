@@ -185,7 +185,7 @@ void setup() {
 
 }
 //------------------------------------------------------------------------------------------------
-void setMotorSpeed(byte Percent) {
+void setMotorSpeed(byte Percent) { // Set the motor speed
   motorSpeed = round(Percent * 2.55);
   #ifndef STEPPER
   ledcWrite(MOT_PWM,motorSpeed);
@@ -194,7 +194,7 @@ void setMotorSpeed(byte Percent) {
   #endif
 }
 //------------------------------------------------------------------------------------------------
-void setMotorDirection(byte Direction) {
+void setMotorDirection(byte Direction) { // Set the motor direction
   motorDirection = Direction;
   #ifndef STEPPER
   if (Direction == 1) {
@@ -258,6 +258,10 @@ void loop() {
 
   }
 
+  #ifdef STEPPER
+
+  #endif
+
   // Handle new commands received from mission control
   if ((Serial2) && (Serial2.available())) {
     String Msg = handleCommand();    
@@ -270,7 +274,7 @@ void loop() {
     }
   }
 
-  // Run the next command (if any) in the queue
+  // Execute the next command (if any) in the queue
   processQueue();
 }
 //------------------------------------------------------------------------------------------------
