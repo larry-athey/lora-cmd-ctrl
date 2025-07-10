@@ -3,12 +3,67 @@
 //
 // Inline functions used for modular unit organization
 //------------------------------------------------------------------------------------------------
-inline void runCommand(String Cmd) { // Execute an LCC command
+inline void runCommand(String Cmd) { // Execute a queued LCC mission control command
+  Cmd.trim();
+  if (Cmd.length() == 0) return;
 
+  // Remove any trailing slashes if they exist
+  while (Cmd.endsWith("/")) {
+    Cmd = Cmd.substring(0,Cmd.length() - 1);
+  }
+
+  // Count "/" delimiters
+  int delimiterCount = 0;
+  for (int i = 0; i < Cmd.length(); i ++) {
+    if (Cmd[i] == '/') delimiterCount++;
+  }
+
+  // Create an array for the parts
+  String parts[delimiterCount + 1];
+  int partCount = 0;
+  int startIndex = 0;
+
+  // Split the Cmd string
+  while (startIndex < Cmd.length()) {
+    int endIndex = Cmd.indexOf('/',startIndex);
+    if (endIndex == -1) {
+      parts[partCount] = Cmd.substring(startIndex);
+      break;
+    }
+    parts[partCount] = Cmd.substring(startIndex,endIndex);
+    partCount ++;
+    startIndex = endIndex + 1;
+  }
+
+  if (parts[0].length() == 0) {
+    for (int i = 0; i < partCount; i ++) {
+      parts[i] = parts[i + 1];
+    }
+  }
+
+  // Send the command execution start notice to mission control
+  String Status = "/exec/" + parts[0];
+  Serial2.print("AT+SEND=1," + String(Status.length()) + "," + Status + "\r\n");
+  delay(100);
+  Serial2.readStringUntil('\n'); // Purge the +OK response
+
+  // parts[0] : Command ID tag (md5 hash of "LoRa_Address|Command")
+  // parts[1] : The command type identifier
+  // parts[2..(partCount-1)] : Any additional parameters for the command type 
+  if (parts[1] == "motor") {
+    //if (partCount == 2) Result = getDeviceName(parts[0].toInt());
+  } else if (parts[1] == "reboot") {
+    //if (partCount == 4) Result = getDallasTemp(parts[0].toInt(),parts[2],parts[3]);
+  } else if (parts[1] == "sound") {
+    //if (partCount == 4) Result = getDallasTemp(parts[0].toInt(),parts[2],parts[3]);
+  } else if (parts[1] == "switch") {
+    //if (partCount == 4) Result = getDallasTemp(parts[0].toInt(),parts[2],parts[3]);
+  }
 }
 //------------------------------------------------------------------------------------------------
 inline void processQueue() { // Process the next command in the FIFO queue
   if (Commands[0].length() > 0) {
+    if (Serial) Serial.println("Executing: " + Commands[0]);
     runCommand(Commands[0]);
     for (byte i = 0; i <= 14; i ++) { // Remove the processed command from the queue
       Commands[i] = Commands[i + 1];
@@ -28,7 +83,7 @@ inline void queueCommand(String Cmd) { // Add a command to the next empty slot i
 //------------------------------------------------------------------------------------------------
 inline String handleCommand() { // Handle commands sent from mission control
   String incoming = Serial2.readStringUntil('\n');
-  if (Serial) Serial.println("Raw Msg: " + incoming);
+  if (Serial) Serial.println("Raw Cmd: " + incoming);
   // Check if the message is a received LoRa message
   if (incoming.startsWith("+RCV")) {
     // Parse the Result: +RCV=SenderID,length,message,RSSI,SNR
