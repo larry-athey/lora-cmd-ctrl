@@ -3,6 +3,14 @@
 //
 // Inline functions used for modular unit organization
 //------------------------------------------------------------------------------------------------
+inline void sendRepeatRequest(String Request, String ID) {
+
+}
+//------------------------------------------------------------------------------------------------
+inline void setupLocation(int Pin) {
+
+}
+//------------------------------------------------------------------------------------------------
 inline void setupMotor(byte Direction, byte Speed, int Progression, int Duration) {
 
 }
@@ -17,6 +25,14 @@ inline void setupStepper(byte Direction, byte Speed, byte Resolution, int Steps)
   5. Low	Low	High	1/16 step
   6. High	Low	High	1/32 step
   */
+}
+//------------------------------------------------------------------------------------------------
+inline void setupSound(String FileName, byte Loop) {
+
+}
+//------------------------------------------------------------------------------------------------
+inline void toggleSwitch(byte gpioPin, byte State) {
+
 }
 //------------------------------------------------------------------------------------------------
 inline void runCommand(String Cmd) { // Execute a queued LCC mission control command
@@ -68,25 +84,25 @@ inline void runCommand(String Cmd) { // Execute a queued LCC mission control com
   // parts[2..(partCount-1)] : Any additional parameters for the command type 
   if (parts[1] == "location") {
     //ID/location/pin
-    //if (partCount == 3)
+    if (partCount == 3) setupLocation(parts[2].toInt());
   } else if (parts[1] == "motor") {
     //ID/motor/direction/speed/progression/duration
-    //if (partCount == 6) setupMotor(/direction/speed/progression/duration);
+    if (partCount == 6) setupMotor(parts[2].toInt(),parts[3].toInt(),parts[4].toInt(),parts[5].toInt());
   } else if (parts[1] == "reboot") {
     //ID/reboot
     if (partCount == 2) ESP.restart();
   } else if (parts[1] == "repeat") {
-    //ID/repeat/cmd-or-script/db-id
-    //if (partCount == 4);
+    //ID/repeat/cmd-or-script/cmd-hash or script-id
+    if (partCount == 4) sendRepeatRequest(parts[2],parts[3]);
   } else if (parts[1] == "sound") {
     //ID/sound/wav/loop
-    //if (partCount == 4);
+    if (partCount == 4) setupSound(parts[2],parts[3].toInt());
   } else if (parts[1] == "stepper") {
     //ID/stepper/direction/speed/resolution/steps
-    //if (partCount == 6) setupStepper(/direction/speed/resolution/steps);
+    if (partCount == 6) setupStepper(parts[2].toInt(),parts[3].toInt(),parts[4].toInt(),parts[5].toInt());
   } else if (parts[1] == "switch") {
     //ID/switch/gpio/state
-    //if (partCount == 4);
+    if (partCount == 4) toggleSwitch(parts[2].toInt(),parts[3].toInt());
   }
 }
 //------------------------------------------------------------------------------------------------
