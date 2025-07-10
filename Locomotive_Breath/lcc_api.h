@@ -51,7 +51,7 @@ inline void runCommand(String Cmd) { // Execute a queued LCC mission control com
   // parts[1] : The command type identifier
   // parts[2..(partCount-1)] : Any additional parameters for the command type 
   if (parts[1] == "location") {
-    // /ID/location/ID
+    // /ID/location/pin
 
     //if (partCount == 3)
   } else if (parts[1] == "motor") {
@@ -60,8 +60,7 @@ inline void runCommand(String Cmd) { // Execute a queued LCC mission control com
     //if (partCount == 6) Result = getDeviceName(parts[0].toInt());
   } else if (parts[1] == "reboot") {
     // /ID/reboot
-
-    //if (partCount == 2) Result = rebootDevice();
+    if (partCount == 2) ESP.restart();;
   } else if (parts[1] == "sound") {
     // /ID/sound/wav/loop
 
