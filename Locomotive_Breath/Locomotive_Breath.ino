@@ -292,10 +292,10 @@ void loop() {
   if (motorSpeed != targetSpeed) {
     if (CurrentTime - lastCheck >= 1000) {
       float Update = 0;
-      if (progressDir == 1) {
+      if ((progressDir == 1) && (motorSpeed < targetSpeed)) {
         Update = motorSpeed + progressFactor;
         if (Update > 100) Update = 100;
-      } else {
+      } else if ((progressDir == 0) && (motorSpeed > targetSpeed)) {
         Update = motorSpeed - progressFactor;
         if (Update < 0) Update = 0;
       }
