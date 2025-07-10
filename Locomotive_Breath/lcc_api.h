@@ -3,6 +3,22 @@
 //
 // Inline functions used for modular unit organization
 //------------------------------------------------------------------------------------------------
+inline void setupMotor(byte Direction, byte Speed, int Progression, int Duration) {
+
+}
+//------------------------------------------------------------------------------------------------
+inline void setupStepper(byte Direction, byte Speed, byte Resolution, int Steps) {
+  /*
+     M0	M1	M2	Step Size
+  1. Low	Low	Low	Full step
+  2. High	Low	Low	1/2 step
+  3. Low	High	Low	1/4 step
+  4. High	High	Low	1/8 step
+  5. Low	Low	High	1/16 step
+  6. High	Low	High	1/32 step
+  */
+}
+//------------------------------------------------------------------------------------------------
 inline void runCommand(String Cmd) { // Execute a queued LCC mission control command
   Cmd.trim();
   if (Cmd.length() == 0) return;
@@ -57,7 +73,7 @@ inline void runCommand(String Cmd) { // Execute a queued LCC mission control com
   } else if (parts[1] == "motor") {
     // /ID/motor/direction/speed/progression/duration
 
-    //if (partCount == 6);
+    //if (partCount == 6) setupMotor(/direction/speed/progression/duration);
   } else if (parts[1] == "reboot") {
     // /ID/reboot
     if (partCount == 2) ESP.restart();;
@@ -68,7 +84,7 @@ inline void runCommand(String Cmd) { // Execute a queued LCC mission control com
   } else if (parts[1] == "stepper") {
     // /ID/stepper/direction/speed/resolution/steps
 
-    //if (partCount == 6);
+    //if (partCount == 6) setupStepper(/direction/speed/resolution/steps);
   } else if (parts[1] == "switch") {
     // /ID/switch/gpio/state
 
