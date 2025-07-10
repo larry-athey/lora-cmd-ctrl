@@ -57,22 +57,22 @@ inline void runCommand(String Cmd) { // Execute a queued LCC mission control com
   } else if (parts[1] == "motor") {
     // /ID/motor/direction/speed/progression/duration
 
-    //if (partCount == 6) Result = getDeviceName(parts[0].toInt());
+    //if (partCount == 6);
   } else if (parts[1] == "reboot") {
     // /ID/reboot
     if (partCount == 2) ESP.restart();;
   } else if (parts[1] == "sound") {
     // /ID/sound/wav/loop
 
-    //if (partCount == 4) Result = getDallasTemp(parts[0].toInt(),parts[2],parts[3]);
+    //if (partCount == 4);
   } else if (parts[1] == "stepper") {
     // /ID/stepper/direction/speed/resolution/steps
 
-    //if (partCount == 6) Result = getDallasTemp(parts[0].toInt(),parts[2],parts[3]);
+    //if (partCount == 6);
   } else if (parts[1] == "switch") {
     // /ID/switch/gpio/state
 
-    //if (partCount == 4) Result = getDallasTemp(parts[0].toInt(),parts[2],parts[3]);
+    //if (partCount == 4);
   }
 }
 //------------------------------------------------------------------------------------------------
