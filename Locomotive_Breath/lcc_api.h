@@ -180,6 +180,12 @@ inline void queueCommand(String Cmd) { // Add a command to the next empty slot i
 }
 //------------------------------------------------------------------------------------------------
 inline String handleCommand() { // Handle commands sent from mission control
+  // Prevent motor/stepper control commands from overlapping
+  #ifndef STEPPER
+  if (motorSpeed != targetSpeed) return "";
+  #else
+
+  #endif
   String incoming = Serial2.readStringUntil('\n');
   if (Serial) Serial.println("Raw Cmd: " + incoming);
   // Check if the message is a received LoRa message
