@@ -59,9 +59,9 @@
 
 #include "Audio.h"               // MAX98357 support library, From ESP32-audioI2S v2.0.0
 #include "SPIFFS.h"              // Flash memory library that allows it to work as a file system
+#include "Adafruit_NeoPixel.h"   // Used for the heartbeat/pulse LED since there is no pilot light
 //------------------------------------------------------------------------------------------------
-Audio Sound;                     // Create the sound effects system object
-//------------------------------------------------------------------------------------------------
+#define LED_PIN 21               // WS2812 LED on GPIO21
 // GPIO Left (USB top)
 #define LIMIT_1 1                // Limit switch 1 (forward)
 #define LIMIT_2 2                // Limit switch 2 (reverse)
@@ -78,8 +78,12 @@ Audio Sound;                     // Create the sound effects system object
 #define BUS_2 8                  // Audio WS or DRV8825 direction pin, or SDA for I2C
 #define BUS_3 7                  // Audio DOUT or DRV8825 sleep pin, unused for I2C
 //------------------------------------------------------------------------------------------------
+Audio Sound;                     // Set up the sound effects system object
+Adafruit_NeoPixel pixels(1,LED_PIN,NEO_RGB + NEO_KHZ800); // Set up the heartbeat/pulse LED
+//------------------------------------------------------------------------------------------------
 bool SFX = false;                // True if the sound effects system successfully initialized
 bool sfxLoop = false;            // True if a sound effect command is supposed to play endlessly
+byte pulseIndex = 1;             // Tracks the color changes for the heartbeat/pulse LED
 byte motorDirection = 1;         // Motor direction, 0 = reverse, 1 = forward
 byte progressDir = 0;            // Motor speed progress direction, 0 = down, 1 = up
 byte targetSpeed = 0;            // Motor target speed [0..100]
@@ -124,6 +128,13 @@ void setup() {
   Serial2.setRxBufferSize(1024);
   Serial2.begin(115200,SERIAL_8N1,RX2,TX2);
   delay(500);
+
+  // Initialize the heartbeat/pulse LED
+  pixels.begin();
+  pixels.setBrightness(25); // These things run stupidly hot
+  pixels.clear();
+  pixels.setPixelColor(0,pixels.Color(0,0,255));
+  pixels.show();
 
   // Intialize the GPIO pins
   pinMode(LIMIT_1,INPUT_PULLUP); // Probably not of much use in a model train locomotive
@@ -230,6 +241,27 @@ void setMotorDirection(byte Direction) { // Set the motor direction
   #endif
 }
 //------------------------------------------------------------------------------------------------
+void pulseLED() { // Update the color on the heartbeat/pulse LED
+  pulseIndex ++;
+  if (pulseIndex > 7) pulseIndex = 1;
+  if (pulseIndex == 1) {
+    pixels.setPixelColor(0,pixels.Color(0,0,255));
+  } else if (pulseIndex == 2) {
+    pixels.setPixelColor(0,pixels.Color(0,255,255));
+  } else if (pulseIndex == 3) {
+    pixels.setPixelColor(0,pixels.Color(0,255,0));
+  } else if (pulseIndex == 4) {
+    pixels.setPixelColor(0,pixels.Color(255,255,0));
+  } else if (pulseIndex == 5) {
+    pixels.setPixelColor(0,pixels.Color(255,0,0));
+  } else if (pulseIndex == 6) {
+    pixels.setPixelColor(0,pixels.Color(255,0,255));
+  } else if (pulseIndex == 7) {
+    pixels.setPixelColor(0,pixels.Color(255,255,255));
+  }
+  pixels.show();
+}
+//------------------------------------------------------------------------------------------------
 // External function includes are used here to reduce the overall size of the main sketch.
 // Go ahead and call it non-standard, but I don't like spaghetti code that goes on forever.
 #include "lcc_api.h" // Inline function library for the LCC message processing functions.
@@ -283,16 +315,19 @@ void loop() {
     beaconCheck(Location);
   }
 
+  #ifndef STEPPER
   // Shut down the motor if a target runtime has been set and met
   if ((targetRuntime > 0) && (CurrentTime >= targetRuntime)) {
     setMotorSpeed(0);
     targetSpeed = 0;
     progressFactor = 0;
   }
+  #endif
 
-  // Handle motor speed progression
-  if (motorSpeed != targetSpeed) {
-    if (CurrentTime - lastCheck >= 1000) {
+  if (CurrentTime - lastCheck >= 1000) {
+    #ifndef STEPPER
+    // Handle motor speed progression
+    if (motorSpeed != targetSpeed) {
       float Update = 0;
       if ((progressDir == 1) && (motorSpeed < targetSpeed)) {
         Update = motorSpeed + progressFactor;
@@ -303,6 +338,9 @@ void loop() {
       }
       setMotorSpeed(round(Update));
     }
+    #endif
+    pulseLED();
+    lastCheck = CurrentTime;
   }
 
   #ifdef STEPPER
