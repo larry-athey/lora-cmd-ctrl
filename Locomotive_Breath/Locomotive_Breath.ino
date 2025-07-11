@@ -241,7 +241,7 @@ void setMotorDirection(byte Direction) { // Set the motor direction
   #endif
 }
 //------------------------------------------------------------------------------------------------
-void pulseLED() { // Update the color on the heartbeat/pulse LED
+void pulseLED() { // Update the color of the heartbeat/pulse LED
   pulseIndex ++;
   if (pulseIndex > 7) pulseIndex = 1;
   if (pulseIndex == 1) {
