@@ -72,8 +72,6 @@ inline void setupStepper(byte Direction, byte Speed, byte Resolution, int Steps)
 }
 //------------------------------------------------------------------------------------------------
 inline void setupSound(String FileName, byte Loop) { // Set up sound effect background process
-  // Play .wav file from SPIFFS one time if one isn't already playing
-  //if (! Sound.isRunning()) Sound.connecttoFS(SPIFFS,"/test.wav");
   if (SFX) {
     wavFile = "/" + FileName;
     if (Loop == 1) {
@@ -85,7 +83,11 @@ inline void setupSound(String FileName, byte Loop) { // Set up sound effect back
 }
 //------------------------------------------------------------------------------------------------
 inline void toggleSwitch(byte gpioPin, byte State) { // Toggle a specific GPIO pin
+  #ifndef MCP23017
   digitalWrite(gpioPin,State);
+  #else
+  mcp.digitalWrite(gpioPin,State);
+  #endif
 }
 //------------------------------------------------------------------------------------------------
 inline void runCommand(String Cmd) { // Execute a queued LCC mission control command
@@ -160,6 +162,12 @@ inline void runCommand(String Cmd) { // Execute a queued LCC mission control com
 }
 //------------------------------------------------------------------------------------------------
 inline void processQueue() { // Process the next command in the FIFO queue
+  // Prevent new motor/stepper control commands from cancelling incomplete ones
+  #ifndef STEPPER
+  if (motorSpeed != targetSpeed) return "";
+  #else
+  if (currentPosition != targetPosition) return "";
+  #endif
   if (Commands[0].length() > 0) {
     if (Serial) Serial.println("Executing: " + Commands[0]);
     runCommand(Commands[0]);
@@ -180,12 +188,6 @@ inline void queueCommand(String Cmd) { // Add a command to the next empty slot i
 }
 //------------------------------------------------------------------------------------------------
 inline String handleCommand() { // Handle commands sent from mission control
-  // Prevent motor/stepper control commands from overlapping
-  #ifndef STEPPER
-  if (motorSpeed != targetSpeed) return "";
-  #else
-
-  #endif
   String incoming = Serial2.readStringUntil('\n');
   if (Serial) Serial.println("Raw Cmd: " + incoming);
   // Check if the message is a received LoRa message
