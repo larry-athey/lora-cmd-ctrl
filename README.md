@@ -43,4 +43,4 @@ Sound files (.wav) can be stored in flash memory and played back as needed. Thes
 The LCC mission control server can schedule individual commands or scripts to run at specific times. However, in the case of single board computers such as the Raspberry Pi _(or clones)_ this requires the addition of a real time clock module to be added.
 
 ### Scripting
-The LCC remote control commands are completely open ended and are easy to create. These commands can be sent as a single shot instance, or they may run in a sequence, both of which can also run repeatedly.
+The LCC remote control commands are completely open ended and are easy to create. These commands can be sent as a single shot instance, or they may run in a sequence, both of which can also run repeatedly. Each LCC receiver module has a cache to hold 15 commands at a time.
