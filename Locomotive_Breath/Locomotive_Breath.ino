@@ -332,9 +332,11 @@ void loop() {
       if ((progressDir == 1) && (motorSpeed < targetSpeed)) {
         Update = motorSpeed + progressFactor;
         if (Update > 100) Update = 100;
+        if (Update > targetSpeed) Update = targetSpeed;
       } else if ((progressDir == 0) && (motorSpeed > targetSpeed)) {
         Update = motorSpeed - progressFactor;
         if (Update < 0) Update = 0;
+        if (Update < targetSpeed) Update = targetSpeed;
       }
       setMotorSpeed(round(Update));
     }
