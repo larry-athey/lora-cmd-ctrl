@@ -37,7 +37,7 @@ The LCC receiver module uses two GPIO pins for limit sensing so that the motor w
 The LCC receiver module can be any variety of ESP32, the switching capabilities are only limited by the number of exposed GPIO pins. If you have a large number of switching needs per receiver, you may use an MCP23017 I2C 16 port GPIO expansion module.
 
 ### Remote WAV Playback
-Sound files (.wav) can be stored in flash memory and played back as needed. These are useful for greetings, sound effects, warnings, etc. This requires a MAX98357 sound module and speaker attached. Sound files can play in one shot or in a continuous loop.
+Sound files (.wav) can be stored in flash memory and played back as needed. These are useful for greetings, sound effects, warnings, etc. This requires a MAX98357 sound module and speaker attached. Sound files can play as a single shot or in a continuous loop.
 
 ### Scheduling
 The LCC mission control server can schedule individual commands or scripts to run at specific times. However, in the case of single board computers such as the Raspberry Pi _(or clones)_ this requires the addition of a real time clock module to be added.
