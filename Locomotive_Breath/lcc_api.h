@@ -20,6 +20,7 @@ inline void setupLocation(int Pin) { // Add a transponder pin to the locations q
 }
 //------------------------------------------------------------------------------------------------
 inline void setupMotor(byte Direction, byte Speed, int Progression, int Duration) { // Set up motor background process
+  #ifndef STEPPER
   unsigned long motorTimestamp = millis();
 
   if ((motorSpeed > 0) && (Direction != motorDirection)) {
@@ -57,6 +58,7 @@ inline void setupMotor(byte Direction, byte Speed, int Progression, int Duration
     setMotorSpeed(Speed);
     progressFactor = 0;
   }
+  #endif
 }
 //------------------------------------------------------------------------------------------------
 inline void setupStepper(byte Direction, byte Speed, byte Resolution, int Steps) { // Set up stepper background process
@@ -69,6 +71,9 @@ inline void setupStepper(byte Direction, byte Speed, byte Resolution, int Steps)
   5. Low	Low	High	1/16 step
   6. High	Low	High	1/32 step
   */
+  #ifdef STEPPER
+
+  #endif
 }
 //------------------------------------------------------------------------------------------------
 inline void setupSound(String FileName, byte Loop) { // Set up sound effect background process
