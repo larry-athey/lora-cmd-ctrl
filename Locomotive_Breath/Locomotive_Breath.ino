@@ -91,8 +91,11 @@ int Locations[16];               // Location transponder queue of ID numbers to 
 int LoRa_Address = 100;          // Device address [1..65535], 1 is reserved for mission control
 int LoRa_Network = 18;           // Network ID [0..15], 18 is valid but often never used
 unsigned long cmdCount = 0;      // Counts the number of received mission control commands
+unsigned long cmdPos = 0;        // Stepper current command position of the last command
+unsigned long currentPos = 0;    // Stepper current position reflected in total 1/32 steps
 unsigned long lastCheck = 0;     // Used to track 1-second checks in the main loop()
 unsigned long motorTimestamp = 0;// Timestamp of the last motor command execution
+unsigned long targetPos = 0;     // Stepper target position of the last command
 unsigned long targetRuntime = 0; // Timestamp of the motor end run (0 = indefinite runtime)
 float motorSpeed = 0.0;          // Current motor speed [0..100]
 float progressFactor = 0.0;      // How much (percent) to change the motor speed per second
