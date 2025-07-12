@@ -20,6 +20,9 @@ inline void setupLocation(int Pin) { // Add a transponder pin to the locations q
 }
 //------------------------------------------------------------------------------------------------
 inline void setupMotor(byte Direction, byte Speed, int Progression, int Duration) { // Set up motor background process
+  #ifdef MCP23017
+  return
+  #endif
   #ifndef STEPPER
   unsigned long motorTimestamp = millis();
 
