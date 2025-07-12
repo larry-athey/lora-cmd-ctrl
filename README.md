@@ -14,11 +14,11 @@ LoRa WAN networking runs at a lower frequency than WiFi and Bluetooth, so it doe
 
 Due to the lower frequency and near zero RF noise/congestion, this system works over incredibly long ranges with no additional infrastructure needed. For example, the mission control modem could be mounted on a rooftop and communicate with clients well over a mile away.
 
-This system is intended for any purpose where remote control of motorized devices and remote switching is needed, without the need for an internet connection or WiFi infrastructure. Network password protection prevents nefarious actors from tampering with your devices by setting up their own mission control server.
+This system is intended for any personal application where remote control of motorized devices and remote switching is wanted without the need for WiFi infrastructure and where internet exposure is unwanted. 
 
 ### Use Cases
 - Lighting/Fan/Pump automation
-- Solar panel position automation
+- Antenna and solar panel positioning
 - Conveyor automation
 - Irrigation automation
 - Motorized seasonal decorations
