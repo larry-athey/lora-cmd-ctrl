@@ -65,6 +65,7 @@ inline void setupMotor(byte Direction, byte Speed, int Progression, int Duration
 }
 //------------------------------------------------------------------------------------------------
 inline void setupStepper(byte Direction, byte Speed, byte Resolution, int Steps) { // Set up stepper background process
+  #ifdef STEPPER
   /*
      M0	M1	M2	Step Size
   1. Low	Low	Low	Full step
@@ -74,8 +75,6 @@ inline void setupStepper(byte Direction, byte Speed, byte Resolution, int Steps)
   5. Low	Low	High	1/16 step
   6. High	Low	High	1/32 step
   */
-  #ifdef STEPPER
-
   #endif
 }
 //------------------------------------------------------------------------------------------------
