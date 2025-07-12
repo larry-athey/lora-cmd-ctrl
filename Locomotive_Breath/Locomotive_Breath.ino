@@ -53,12 +53,22 @@
 //
 // NOTE: The location transponder MCU can actually run up to 11 unique LED transmitters.
 //------------------------------------------------------------------------------------------------
+//#define MCP23017               // Can only be used with a stepper, not a brushed DC motor
+//#define STEPPER                // No sound effects possible when using a stepper
+//------------------------------------------------------------------------------------------------
 #define DISABLE_CODE_FOR_TRANSMITTER
 #define SEND_LEDC_CHANNEL 0      // Fallback to satisfy compiler
 #include "IRremote.hpp"          // IR remote controller library, for location/position detection
 
+#ifndef MCP23017
+#include "Adafruit_MCP23X17.h"   // MCP23017 I2C 16 port GPIO expansion module library
+#endif
+
+#ifndef STEPPER
 #include "Audio.h"               // MAX98357 support library, From ESP32-audioI2S v2.0.0
 #include "SPIFFS.h"              // Flash memory library that allows it to work as a file system
+#endif
+
 #include "Adafruit_NeoPixel.h"   // Used for the heartbeat/pulse LED since there is no pilot light
 //------------------------------------------------------------------------------------------------
 #define LED_PIN 21               // WS2812 LED on GPIO21
@@ -72,13 +82,15 @@
 // GPIO Right (USB top)
 #define TX2 13                   // To RYLR998 RX pin
 #define RX2 12                   // To RYLR998 TX pin
-#define MOT_F 11                 // H-Bridge forward pin or user defined if using a stepper
-#define MOT_R 10                 // H-Bridge reverse pin or user defined if using a stepper
-#define BUS_1 9                  // Audio BCLK or DRV8825 step pin, or SCL for I2C
-#define BUS_2 8                  // Audio WS or DRV8825 direction pin, or SDA for I2C
-#define BUS_3 7                  // Audio DOUT or DRV8825 sleep pin, unused for I2C
+#define MOT_F 11                 // H-Bridge forward pin or user defined if using a stepper, or SCL for I2C
+#define MOT_R 10                 // H-Bridge reverse pin or user defined if using a stepper, or SDA for I2C
+#define BUS_1 9                  // Audio BCLK or DRV8825 step pin
+#define BUS_2 8                  // Audio WS or DRV8825 direction pin
+#define BUS_3 7                  // Audio DOUT or DRV8825 sleep pin
 //------------------------------------------------------------------------------------------------
+#ifndef STEPPER
 Audio Sound;                     // Set up the sound effects system object
+#endif
 Adafruit_NeoPixel pixels(1,LED_PIN,NEO_RGB + NEO_KHZ800); // Set up the heartbeat/pulse LED
 //------------------------------------------------------------------------------------------------
 bool SFX = false;                // True if the sound effects system successfully initialized
@@ -91,11 +103,12 @@ int Locations[16];               // Location transponder queue of ID numbers to 
 int LoRa_Address = 100;          // Device address [1..65535], 1 is reserved for mission control
 int LoRa_Network = 18;           // Network ID [0..15], 18 is valid but often never used
 unsigned long cmdCount = 0;      // Counts the number of received mission control commands
-unsigned long cmdPos = 0;        // Stepper current command position of the last command
+unsigned long cmdPos = 0;        // Stepper current command position of the last executed command
 unsigned long currentPos = 0;    // Stepper current position reflected in total 1/32 steps
 unsigned long lastCheck = 0;     // Used to track 1-second checks in the main loop()
 unsigned long motorTimestamp = 0;// Timestamp of the last motor command execution
-unsigned long targetPos = 0;     // Stepper target position of the last command
+unsigned long stepCheck = 0;     // Used for stepper pulse time keeping in the main loop()
+unsigned long targetPos = 0;     // Stepper target position of the last executed command
 unsigned long targetRuntime = 0; // Timestamp of the motor end run (0 = indefinite runtime)
 float motorSpeed = 0.0;          // Current motor speed [0..100]
 float progressFactor = 0.0;      // How much (percent) to change the motor speed per second
@@ -148,6 +161,17 @@ void setup() {
   pinMode(MOT_R,OUTPUT); digitalWrite(MOT_R,LOW); // AIN2
   pinMode(MOT_PWM,OUTPUT); digitalWrite(MOT_PWM,LOW); // PWMA
 
+  #ifdef MCP23017
+  // Inidialize I2C
+  Wire.begin(MOT_R,MOT_F);
+  // Initialize MCP23017
+  mcp.begin_I2C(0x20);
+  for (int i = 0; i <= 15; i ++) {
+    mcp.pinMode(i,OUTPUT);
+    mcp.digitalWrite(i,LOW);
+  }
+  #endif
+
   #ifndef STEPPER
   // Initialize the PWM motor speed/direction controller
   ledcSetup(MOT_PWM,20000,8); // 20 KHz, 8 bit resolution
@@ -164,6 +188,7 @@ void setup() {
   // Attach interrupt to the IR receiver pin
   attachInterrupt(digitalPinToInterrupt(IR_RCV),handleIRInterrupt,CHANGE);
 
+  #ifndef STEPPER
   // Initialize the sound effects system
   if (SPIFFS.begin(true)) {
     SFX = true;
@@ -172,6 +197,7 @@ void setup() {
   } else {
     Serial.println(F("Sound effects system failed to start"));
   }
+  #endif
 
   // Initialize the RYLR998 modem
   if (Serial) Serial.println(F("Initializing the RYLR998 modem..."));
@@ -270,12 +296,14 @@ void pulseLED() { // Update the color of the heartbeat/pulse LED
 #include "lcc_api.h" // Inline function library for the LCC message processing functions.
 //------------------------------------------------------------------------------------------------
 void loop() {
+  unsigned long stepperTime = micros();
   unsigned long CurrentTime = millis();
   if (CurrentTime > 4200000000) {
     // Reboot the system if we're reaching the maximum long integer value of CurrentTime (49 days)
     ESP.restart();
   } 
 
+  #ifndef STEPPER
   // Handle the sound effects as necessary
   if (SFX) {
     if (wavFile.length() > 0) {
@@ -285,6 +313,7 @@ void loop() {
     }
     if (sfxLoop) Sound.loop();
   }
+  #endif
 
   // Shut down the motor if either limit switch has been tripped
   if ((motorSpeed > 0) && ((digitalRead(LIMIT_1) == 0) || (digitalRead(LIMIT_2) == 0))) {
