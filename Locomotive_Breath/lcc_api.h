@@ -169,9 +169,9 @@ inline void runCommand(String Cmd) { // Execute a queued LCC mission control com
 inline void processQueue() { // Process the next command in the FIFO queue
   // Prevent new motor/stepper control commands from cancelling incomplete ones
   #ifndef STEPPER
-  if (motorSpeed != targetSpeed) return "";
+  if (motorSpeed != targetSpeed) return;
   #else
-  if (cmdPos != targetPos) return "";
+  if (cmdPos != targetPos) return;
   #endif
   if (Commands[0].length() > 0) {
     if (Serial) Serial.println("Executing: " + Commands[0]);
