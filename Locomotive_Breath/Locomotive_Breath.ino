@@ -54,7 +54,8 @@
 // NOTE: The location transponder MCU can actually run up to 11 unique LED transmitters.
 //------------------------------------------------------------------------------------------------
 //#define MCP23017               // Can only be used with a stepper, not a brushed DC motor
-//#define STEPPER                // No sound effects possible when using a stepper
+//#define STEPPER                // No sound effects possible when using a stepper, define this if
+                                 // an MCP23017 is used so accidental motor commands don't bork it
 //------------------------------------------------------------------------------------------------
 #define DISABLE_CODE_FOR_TRANSMITTER
 #define SEND_LEDC_CHANNEL 0      // Fallback to satisfy compiler
