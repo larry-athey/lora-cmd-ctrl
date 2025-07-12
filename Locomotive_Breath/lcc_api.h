@@ -143,7 +143,7 @@ inline void runCommand(String Cmd) { // Execute a queued LCC mission control com
 
   // parts[0] : Command ID tag (md5 hash of "LoRa_Address|Command")
   // parts[1] : The command type identifier
-  // parts[2..(partCount-1)] : Any additional parameters for the command type 
+  // parts[2..(partCount-1)] : Any additional parameters for the command type
   if (parts[1] == "location") {
     //ID/location/pin
     if (partCount == 3) setupLocation(parts[2].toInt());
