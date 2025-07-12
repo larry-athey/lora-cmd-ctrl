@@ -19,8 +19,8 @@ This system is intended for any personal application where remote control of mot
 ### Use Cases
 - Lighting/Fan/Pump automation
 - Antenna and solar panel positioning
-- Conveyor automation
-- Irrigation automation
+- Conveyor and gate automation
+- Irrigation system automation
 - Motorized seasonal decorations
 - Model railroad automation
 
