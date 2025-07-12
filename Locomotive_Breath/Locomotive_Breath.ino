@@ -250,6 +250,7 @@ void beaconCheck(int Pin) { // Stop the motor if a registered location transpond
 //------------------------------------------------------------------------------------------------
 void setMotorSpeed(byte Percent) { // Set the motor speed
   motorSpeed = round(Percent * 2.55);
+  if (Serial) Serial.println("Set motor speed: " + String(Percent));
   #ifndef STEPPER
   ledcWrite(MOT_PWM,motorSpeed);
   #else
@@ -328,6 +329,7 @@ void loop() {
     } else {
       Status = "/limit/1";
     }
+    if (Serial) Serial.println("Limit switch tripped: " + Status);
     // Send the status notification to mission control
     Serial2.print("AT+SEND=1," + String(Status.length()) + "," + Status + "\r\n");
     delay(100);
@@ -342,6 +344,7 @@ void loop() {
     interrupts();
     // Send the location update to mission control
     String Status = "/location/" + String(Location);
+    if (Serial) Serial.println("Location transponder detected: " + Status);
     Serial2.print("AT+SEND=1," + String(Status.length()) + "," + Status + "\r\n");
     delay(100);
     Serial2.readStringUntil('\n'); // Purge the +OK response

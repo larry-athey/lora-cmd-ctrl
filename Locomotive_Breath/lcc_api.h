@@ -149,6 +149,7 @@ inline void runCommand(String Cmd) { // Execute a queued LCC mission control com
     if (partCount == 3) setupLocation(parts[2].toInt());
   } else if (parts[1] == "motor") {
     //ID/motor/direction/speed/progression/duration
+    //md5hash1/motor/1/80/30/0
     if (partCount == 6) setupMotor(parts[2].toInt(),parts[3].toInt(),parts[4].toInt(),parts[5].toInt());
   } else if (parts[1] == "reboot") {
     //ID/reboot

@@ -128,7 +128,7 @@ def check_outbound_messages(ser, db):
     """Check for and send outbound messages."""
     try:
         with db.cursor() as cursor:
-            sql = "SELECT ID, address, msg FROM outbound WHERE sent = FALSE"
+            sql = "SELECT ID, address, msg FROM outbound WHERE sent = 0"
             cursor.execute(sql)
             messages = cursor.fetchall()
             for msg in messages:
