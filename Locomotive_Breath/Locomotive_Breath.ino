@@ -58,7 +58,7 @@
                                  // an MCP23017 is used so accidental motor commands don't bork it
 //------------------------------------------------------------------------------------------------
 #define DISABLE_CODE_FOR_TRANSMITTER
-#define SEND_LEDC_CHANNEL 0      // Fallback to satisfy compiler
+#define SEND_LEDC_CHANNEL 0
 #include "IRremote.hpp"          // IR remote controller library, for location/position detection
 
 #ifndef MCP23017
@@ -155,7 +155,7 @@ void setup() {
 
   // Intialize the GPIO pins
   pinMode(LIMIT_1,INPUT_PULLUP); // Probably not of much use in a model train locomotive
-  pinMode(LIMIT_2,INPUT_PULLUP); // "                                                  "
+  pinMode(LIMIT_2,INPUT_PULLUP); // Convert these to outputs if you need additional ones
   pinMode(OUT_1,OUTPUT); digitalWrite(OUT_1,LOW); // Interior lights
   pinMode(OUT_2,OUTPUT); digitalWrite(OUT_2,LOW); // Exterior lights
   pinMode(MOT_F,OUTPUT); digitalWrite(MOT_F,LOW); // AIN1 (Standby is pulled high to enable the driver)
