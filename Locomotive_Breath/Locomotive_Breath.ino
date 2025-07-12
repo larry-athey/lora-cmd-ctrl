@@ -76,7 +76,7 @@
 // GPIO Left (USB top)
 #define LIMIT_1 1                // Limit switch 1 (forward)
 #define LIMIT_2 2                // Limit switch 2 (reverse)
-#define IR_RCV 3                 // TSOP34838 output pin
+#define IR_RCV 3                 // TSOP34838 input pin
 #define OUT_1 4                  // Output 1 or DRV8825 M0
 #define OUT_2 5                  // Output 2 or DRV8825 M1
 #define MOT_PWM 6                // H-Bridge PWM or DRV8825 M2
@@ -154,6 +154,7 @@ void setup() {
   pixels.show();
 
   // Intialize the GPIO pins
+  pinMode(IR_RCV,INPUT_PULLUP);
   pinMode(LIMIT_1,INPUT_PULLUP); // Probably not of much use in a model train locomotive
   pinMode(LIMIT_2,INPUT_PULLUP); // Convert these to outputs if you need additional ones
   pinMode(OUT_1,OUTPUT); digitalWrite(OUT_1,LOW); // Interior lights
