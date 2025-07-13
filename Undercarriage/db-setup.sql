@@ -15,6 +15,7 @@ CREATE TABLE commands (
   `duration` INT(11) DEFAULT NULL,
   `progression` INT(11) DEFAULT NULL,
   `steps` INT(11) DEFAULT NULL,
+  `resolution` TINYINT(4) DEFAULT NULL,
   `wav` VARCHAR(255) DEFAULT NULL,
   `location_id` INT(11) DEFAULT NULL,
   `repeat` TINYINT(4) DEFAULT 0
