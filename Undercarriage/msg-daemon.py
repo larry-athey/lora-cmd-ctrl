@@ -131,6 +131,7 @@ def process_inbound_message(ser, db):
 def check_outbound_messages(ser, db):
     """Check for and send outbound messages."""
     try:
+        db.commit()
         with db.cursor() as cursor:
             sql = "SELECT ID, address, msg FROM outbound WHERE sent = 0"
             cursor.execute(sql)
