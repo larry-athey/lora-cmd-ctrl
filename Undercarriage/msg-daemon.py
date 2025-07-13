@@ -96,11 +96,11 @@ def send_lora_message(ser, address, msg):
         length = len(msg_bytes)
         command = f"AT+SEND={address},{length},{msg}\r\n"
         ser.write(command.encode('utf-8'))
-        timestamp = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         print(f"[{timestamp}] Sent: {command.strip()}")
         # Read response (e.g., +OK)
         response = ser.readline().decode('utf-8').strip()
-        timestamp = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         print(f"[{timestamp}] Response: {response}")
         # Wait 1 second after each message to prevent data loss on the receiving end
         time.sleep(1)
@@ -118,7 +118,7 @@ def process_inbound_message(ser, db):
             match = re.match(r'\+RCV=(\d+),(\d+),([^,]+),-?\d+,-?\d+', line)
             if match:
                 address, _, msg = match.groups()
-                timestamp = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+                timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 print(f"[{timestamp}] Received: address={address}, msg={msg}")
                 # Store in inbound table
                 with db.cursor() as cursor:
@@ -142,7 +142,7 @@ def check_outbound_messages(ser, db):
                         sql = "UPDATE outbound SET sent = TRUE WHERE ID = %s"
                         cursor.execute(sql, (msg['ID'],))
                     db.commit()
-                    timestamp = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+                    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                     print(f"[{timestamp}] Marked message ID {msg['ID']} as sent")
     except Exception as e:
         print(f"Error checking outbound messages: {e}")
@@ -163,7 +163,7 @@ def main():
         sys.exit(1)
 
     # Main loop
-    timestamp = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     print(f"\r\n[{timestamp}] LCC message daemon now operational")
     while True:
         try:
