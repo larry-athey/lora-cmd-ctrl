@@ -5,6 +5,7 @@
 # This is the daemon that handles all inbound and outbound messages (commands and responses).
 # A MySQL database is the communications conduit between the web UI and the RYLR998 modem.
 #----------------------------------------------------------------------------------------------
+from datetime import datetime
 import serial
 import MySQLdb
 import MySQLdb.cursors
@@ -95,10 +96,12 @@ def send_lora_message(ser, address, msg):
         length = len(msg_bytes)
         command = f"AT+SEND={address},{length},{msg}\r\n"
         ser.write(command.encode('utf-8'))
-        print(f"Sent: {command.strip()}")
+        timestamp = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+        print(f"[{timestamp}] Sent: {command.strip()}")
         # Read response (e.g., +OK)
         response = ser.readline().decode('utf-8').strip()
-        print(f"Response: {response}")
+        timestamp = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+        print(f"[{timestamp}] Response: {response}")
         # Wait 1 second after each message to prevent data loss on the receiving end
         time.sleep(1)
         return response.startswith('+OK')
@@ -115,7 +118,8 @@ def process_inbound_message(ser, db):
             match = re.match(r'\+RCV=(\d+),(\d+),([^,]+),-?\d+,-?\d+', line)
             if match:
                 address, _, msg = match.groups()
-                print(f"Received: address={address}, msg={msg}")
+                timestamp = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+                print(f"[{timestamp}] Received: address={address}, msg={msg}")
                 # Store in inbound table
                 with db.cursor() as cursor:
                     sql = "INSERT INTO inbound (address, msg, creation) VALUES (%s, %s, NOW())"
@@ -138,7 +142,8 @@ def check_outbound_messages(ser, db):
                         sql = "UPDATE outbound SET sent = TRUE WHERE ID = %s"
                         cursor.execute(sql, (msg['ID'],))
                     db.commit()
-                    print(f"Marked message ID {msg['ID']} as sent")
+                    timestamp = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+                    print(f"[{timestamp}] Marked message ID {msg['ID']} as sent")
     except Exception as e:
         print(f"Error checking outbound messages: {e}")
 #----------------------------------------------------------------------------------------------
@@ -158,7 +163,8 @@ def main():
         sys.exit(1)
 
     # Main loop
-    print("LCC message daemon now operational")
+    timestamp = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+    print(f"\r\n[{timestamp}] LCC message daemon now operational")
     while True:
         try:
             # Check for inbound messages
@@ -167,10 +173,10 @@ def main():
             # Check for outbound messages
             check_outbound_messages(serial_conn, db)
             # Sleep to avoid CPU overload
-            time.sleep(5)
+            time.sleep(2.5)
         except Exception as e:
             print(f"Main loop error: {e}")
-            time.sleep(5)  # Wait before retrying
+            time.sleep(2.5)  # Wait before retrying
 #----------------------------------------------------------------------------------------------
 if __name__ == "__main__":
     main()
