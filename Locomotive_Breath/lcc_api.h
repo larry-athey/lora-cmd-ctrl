@@ -41,7 +41,7 @@ inline void setupMotor(byte Direction, float Speed, int Progression, int Duratio
     targetRuntime = 0;
   }
 
-  targetSpeed = Speed;
+  targetSpeed = round(Speed);
   if (Progression > 0) {
     if (motorSpeed == 0) {
       progressFactor = Speed / Progression;
@@ -61,7 +61,12 @@ inline void setupMotor(byte Direction, float Speed, int Progression, int Duratio
     setMotorSpeed(Speed);
     progressFactor = 0;
   }
-  if (Serial) Serial.println("Motor progress factor: " + String(progressFactor));
+  if (Serial) {
+    Serial.println("Motor target speed: " + String(targetSpeed) + "%");
+    Serial.println("Progress time: " + String(Progression) + " seconds");
+    Serial.println("Progress factor: " + String(progressFactor));
+    Serial.println("Progress direction: " + String(progressDir));
+  }
   #endif
 }
 //------------------------------------------------------------------------------------------------
