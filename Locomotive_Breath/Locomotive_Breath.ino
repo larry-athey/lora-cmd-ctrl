@@ -176,7 +176,7 @@ void setup() {
 
   #ifndef STEPPER
   // Initialize the PWM motor speed/direction controller
-  ledcSetup(MOT_PWM,20000,8); // 20 KHz, 8 bit resolution
+  ledcSetup(0,20000,8); // 20 KHz, 8 bit resolution
   ledcAttachPin(MOT_PWM,0);
   ledcWrite(MOT_PWM,0); // Set the speed to zero [0..255]
   #else
