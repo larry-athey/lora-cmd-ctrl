@@ -213,7 +213,7 @@ inline void queueCommand(String Cmd) { // Add a command to the next empty slot i
 //------------------------------------------------------------------------------------------------
 inline String handleCommand() { // Handle commands sent from mission control
   String incoming = Serial2.readStringUntil('\n');
-  if (Serial) Serial.println("Raw Cmd: " + incoming);
+  if (Serial) Serial.println("LoRa message: " + incoming);
   // Check if the message is a received LoRa message
   if (incoming.startsWith("+RCV")) {
     // Parse the Result: +RCV=SenderID,length,message,RSSI,SNR
