@@ -27,8 +27,10 @@ CREATE TABLE devices (
   `ID` INT AUTO_INCREMENT PRIMARY KEY,
   `address` VARCHAR(10) DEFAULT NULL,
   `dev_name` VARCHAR(255) DEFAULT NULL,
+  `status` VARCHAR(255) DEFAULT NULL,
   `dev_type` INT(11) DEFAULT NULL,
   `last_loc` INT(11) DEFAULT NULL,
+  `favorites` TEXT DEFAULT NULL,
   `cmd_repeat` TINYINT(4) DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
