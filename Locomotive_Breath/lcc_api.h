@@ -35,7 +35,7 @@ inline void setupMotor(byte Direction, float Speed, int Progression, int Duratio
     }
     motorTimestamp += 2000;
   }
-  motorDirection = Direction;
+  setMotorDirection(Direction);
 
   if (Duration > 0) {
     targetRuntime = motorTimestamp + (Duration * 1000);
