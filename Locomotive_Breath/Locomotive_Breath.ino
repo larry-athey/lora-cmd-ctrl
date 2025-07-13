@@ -99,7 +99,6 @@ bool sfxLoop = false;            // True if a sound effect command is supposed t
 byte pulseIndex = 1;             // Tracks the color changes for the heartbeat/pulse LED
 byte motorDirection = 1;         // Motor direction, 0 = reverse, 1 = forward
 byte progressDir = 0;            // Motor speed progress direction, 0 = down, 1 = up
-byte targetSpeed = 0;            // Motor target speed [0..100]
 int Locations[16];               // Location transponder queue of ID numbers to stop at
 int LoRa_Address = 100;          // Device address [1..65535], 1 is reserved for mission control
 int LoRa_Network = 18;           // Network ID [0..15], 18 is valid but often never used
@@ -113,6 +112,7 @@ unsigned long targetPos = 0;     // Stepper target position of the last executed
 unsigned long targetRuntime = 0; // Timestamp of the motor end run (0 = indefinite runtime)
 float motorSpeed = 0.0;          // Current motor speed [0..100]
 float progressFactor = 0.0;      // How much (percent) to change the motor speed per second
+float targetSpeed = 0.0;         // Motor target speed [0..100]
 String Commands[16];             // Command queue for caching mission control commands
 String LoRa_PW = "1A2B3C4D";     // 8 character hex domain password, much like a WiFi password
 String wavFile = "";             // File name of the sound effect to load
@@ -248,11 +248,11 @@ void beaconCheck(int Pin) { // Stop the motor if a registered location transpond
   }
 }
 //------------------------------------------------------------------------------------------------
-void setMotorSpeed(byte Percent) { // Set the motor speed
-  motorSpeed = round(Percent * 2.55);
-  if (Serial) Serial.println("Set motor speed: " + String(Percent));
+void setMotorSpeed(float Percent) { // Set the motor speed
+  motorSpeed = Percent;
+  if (Serial) Serial.println("Set motor speed: " + String(Percent) + "%");
   #ifndef STEPPER
-  ledcWrite(MOT_PWM,motorSpeed);
+  ledcWrite(MOT_PWM,round(motorSpeed * 2.55));
   #else
 
   #endif
@@ -372,10 +372,10 @@ void loop() {
         if (Update > targetSpeed) Update = targetSpeed;
       } else if ((progressDir == 0) && (motorSpeed > targetSpeed)) {
         Update = motorSpeed - progressFactor;
-        if (Update < 0) Update = 0;
+        if (Update < 1) Update = 0;
         if (Update < targetSpeed) Update = targetSpeed;
       }
-      setMotorSpeed(round(Update));
+      setMotorSpeed(Update);
     }
     #endif
     pulseLED();
