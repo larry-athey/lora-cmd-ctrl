@@ -66,7 +66,7 @@ inline void setupMotor(byte Direction, float Speed, int Progression, int Duratio
   if (Serial) {
     Serial.println("Motor target speed: " + String(targetSpeed) + "%");
     Serial.println("Progress time: " + String(Progression) + " seconds");
-    Serial.println("Progress factor: " + String(progressFactor));
+    Serial.println("Progress factor: " + String(progressFactor) + "%");
     Serial.println("Progress direction: " + String(progressDir));
   }
   #endif
