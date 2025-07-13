@@ -147,7 +147,7 @@ inline void runCommand(String Cmd) { // Execute a queued LCC mission control com
   delay(100);
   Serial2.readStringUntil('\n'); // Purge the +OK response
 
-  // parts[0] : Command ID tag (md5 hash of "LoRa_Address|Command")
+  // parts[0] : Command ID tag (md5 hash of "LoRa_Address|Timestamp")
   // parts[1] : The command type identifier
   // parts[2..(partCount-1)] : Any additional parameters for the command type
   if (parts[1] == "location") {
@@ -155,7 +155,7 @@ inline void runCommand(String Cmd) { // Execute a queued LCC mission control com
     if (partCount == 3) setupLocation(parts[2].toInt());
   } else if (parts[1] == "motor") {
     //ID/motor/direction/speed/progression/duration
-    //md5hash1/motor/1/80/30/0
+    //b7f352dccb4372aff00d768a4728a64a/motor/1/80/30/0
     if (partCount == 6) setupMotor(parts[2].toInt(),parts[3].toInt(),parts[4].toInt(),parts[5].toInt());
   } else if (parts[1] == "reboot") {
     //ID/reboot
