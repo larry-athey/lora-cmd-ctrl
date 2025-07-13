@@ -19,7 +19,7 @@ inline void setupLocation(int Pin) { // Add a transponder pin to the locations q
   }
 }
 //------------------------------------------------------------------------------------------------
-inline void setupMotor(byte Direction, byte Speed, int Progression, int Duration) { // Set up motor background process
+inline void setupMotor(byte Direction, float Speed, int Progression, int Duration) { // Set up motor background process
   #ifdef MCP23017
   return
   #endif
@@ -44,15 +44,15 @@ inline void setupMotor(byte Direction, byte Speed, int Progression, int Duration
   targetSpeed = Speed;
   if (Progression > 0) {
     if (motorSpeed == 0) {
-      progressFactor = 100 / Progression;
+      progressFactor = Speed / Progression;
       progressDir = 1;
     } else {
       if (Speed > motorSpeed) {
-        byte Change = Speed - motorSpeed;
+        float Change = Speed - motorSpeed;
         progressFactor = Change / Progression;
         progressDir = 1;
       } else {
-        byte Change = motorSpeed - Speed;
+        float Change = motorSpeed - Speed;
         progressFactor = Change / Progression;
         progressDir = 0;
       }
@@ -61,6 +61,7 @@ inline void setupMotor(byte Direction, byte Speed, int Progression, int Duration
     setMotorSpeed(Speed);
     progressFactor = 0;
   }
+  if (Serial) Serial.println("Motor progress factor: " + String(progressFactor));
   #endif
 }
 //------------------------------------------------------------------------------------------------

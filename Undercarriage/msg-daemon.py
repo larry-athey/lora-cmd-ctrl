@@ -112,7 +112,7 @@ def process_inbound_message(ser, db):
         line = ser.readline().decode('utf-8').strip()
         if line.startswith('+RCV='):
             # Parse +RCV=<address>,<length>,<msg>,<RSSI>,<SNR>
-            match = re.match(r'\+RCV=(\d+),(\d+),(.+?,-?\d+,-?\d+)', line)
+            match = re.match(r'\+RCV=(\d+),(\d+),([^,]+),-?\d+,-?\d+', line)
             if match:
                 address, _, msg = match.groups()
                 print(f"Received: address={address}, msg={msg}")
