@@ -218,7 +218,7 @@ inline String handleCommand() { // Handle commands sent from mission control
         if (thirdComma > secondComma) {
           String message = incoming.substring(secondComma + 1,thirdComma);
           cmdCount ++;
-          if (Serial) Serial.println("S" + String(cmdCount) + "<-: " + message);
+          if (Serial) Serial.println("Command " + String(cmdCount) + ": " + message);
           queueCommand(message);
           return message; // Return the command
         }
