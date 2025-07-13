@@ -5,6 +5,7 @@
 //------------------------------------------------------------------------------------------------
 inline void sendRepeatRequest(String Request, String ID) { // Request a repeat of the last command/script
   String Status = "/" + Request + "/" + ID;
+  if (Serial) Serial.println("Requesting repeat: " + Status);
   Serial2.print("AT+SEND=1," + String(Status.length()) + "," + Status + "\r\n");
   delay(100);
   Serial2.readStringUntil('\n'); // Purge the +OK response
@@ -14,6 +15,7 @@ inline void setupLocation(int Pin) { // Add a transponder pin to the locations q
   for (byte i = 0; i <= 15; i ++) {
     if (Locations[i] == 0) {
       Locations[i] = Pin;
+      if (Serial) Serial.println("Location pin added: " + String(Pin));
       break;
     }
   }
@@ -92,6 +94,10 @@ inline void setupSound(String FileName, byte Loop) { // Set up sound effect back
     } else {
       sfxLoop = false;
     }
+    if (Serial) {
+      Serial.println("Sound file loaded: " + FileName);
+      Serial.println("Playback loop: " + String(Loop));
+    }
   }
 }
 //------------------------------------------------------------------------------------------------
@@ -101,6 +107,10 @@ inline void toggleSwitch(byte gpioPin, byte State) { // Toggle a specific GPIO p
   #else
   mcp.digitalWrite(gpioPin,State);
   #endif
+  if (Serial) {
+    Serial.println("Toggling GPIO pin: " + String(gpioPin));
+    Serial.println("Current state: " + String(State));
+  }
 }
 //------------------------------------------------------------------------------------------------
 inline void runCommand(String Cmd) { // Execute a queued LCC mission control command
