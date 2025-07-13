@@ -358,6 +358,12 @@ void loop() {
     setMotorSpeed(0);
     targetSpeed = 0;
     progressFactor = 0;
+    // Send the runtime end status to mission control
+    String Status = "/runtime/end";
+    if (Serial) Serial.println("Status: " + Status);
+    Serial2.print("AT+SEND=1," + String(Status.length()) + "," + Status + "\r\n");
+    delay(100);
+    Serial2.readStringUntil('\n'); // Purge the +OK response
   }
   #endif
 
