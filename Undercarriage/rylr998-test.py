@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 #----------------------------------------------------------------------------------------------
-
+# LCC (LoRa Command and Control) | (CopyLeft) 2025-Present | Larry Athey (https://panhandleponics.com)
+#
+# This is a test utility that allows you to send and receive messages from the command line.
 #----------------------------------------------------------------------------------------------
 import serial
 import time
