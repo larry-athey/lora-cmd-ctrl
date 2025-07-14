@@ -178,7 +178,7 @@ void setup() {
   // Initialize the PWM motor speed/direction controller
   ledcSetup(0,20000,8); // 20 KHz, 8 bit resolution
   ledcAttachPin(MOT_PWM,0);
-  ledcWrite(MOT_PWM,0); // Set the speed to zero [0..255]
+  ledcWrite(0,0); // Set the speed to zero [0..255]
   #else
   
   #endif
@@ -252,7 +252,7 @@ void setMotorSpeed(float Percent) { // Set the motor speed
   motorSpeed = Percent;
   if (Serial) Serial.println("Set motor speed: " + String(Percent) + "%");
   #ifndef STEPPER
-  ledcWrite(MOT_PWM,round(motorSpeed * 2.55));
+  ledcWrite(0,round(motorSpeed * 2.55));
   #else
 
   #endif
