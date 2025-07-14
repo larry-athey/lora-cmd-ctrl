@@ -175,6 +175,7 @@ inline void runCommand(String Cmd) { // Execute a queued LCC mission control com
     if (partCount == 4) sendRepeatRequest(parts[2],parts[3]);
   } else if (parts[1] == "sound") {
     //ID/sound/wav/loop
+    //a7f352dccb4372aff00d768a4728a64a/sound/startup.wav/0
     if (partCount == 4) setupSound(parts[2],parts[3].toInt());
   } else if (parts[1] == "stepper") {
     //ID/stepper/direction/speed/resolution/steps

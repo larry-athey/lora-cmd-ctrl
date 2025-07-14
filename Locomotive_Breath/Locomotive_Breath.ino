@@ -195,7 +195,8 @@ void setup() {
   if (SPIFFS.begin(true)) {
     SFX = true;
     Sound.setPinout(BUS_1,BUS_2,BUS_3);
-    Sound.setVolume(10); // [0..21]
+    Sound.setVolume(17); // [0..21]
+    Serial.println(F("Sound effects system initialized"));
   } else {
     Serial.println(F("Sound effects system failed to start"));
   }
@@ -235,6 +236,10 @@ void setup() {
   lastCheck = millis();
 
   if (Serial) Serial.println(F("Locomotive Breath now initialized and running"));
+  if (SFX) {
+    Sound.connecttoFS(SPIFFS,"/startup.wav");
+    wavFile.clear();
+  }
 }
 //------------------------------------------------------------------------------------------------
 void beaconCheck(int Pin) { // Stop the motor if a registered location transponder is detected
