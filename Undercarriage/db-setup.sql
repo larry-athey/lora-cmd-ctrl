@@ -73,6 +73,7 @@ CREATE TABLE schedule (
   `start_hour` TINYINT(4) DEFAULT NULL,
   `start_min` TINYINT(4) DEFAULT NULL,
   `days` VARCHAR(12) DEFAULT NULL,
+  `last_run` TIMESTAMP DEFAULT NULL,
   `disabled` TINYINT(4) DEFAULT 0,
   `script` INT(11) DEFAULT NULL,
   `command` INt(11) DEFAULT NULL
