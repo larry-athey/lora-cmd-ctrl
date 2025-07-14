@@ -242,15 +242,17 @@ void setup() {
   }
 }
 //------------------------------------------------------------------------------------------------
-void beaconCheck(int Pin) { // Stop the motor if a registered location transponder is detected
+bool beaconCheck(int Pin) { // Stop the motor if a registered location transponder is detected
   for (byte i = 0; i <= 15; i ++) {
     if (Pin == Locations[i]) {
       setMotorSpeed(0);
       targetSpeed = 0;
       progressFactor = 0;
       Locations[i] = 0;
+      return true;
     }
   }
+  return false;
 }
 //------------------------------------------------------------------------------------------------
 void setMotorSpeed(float Percent) { // Set the motor speed
@@ -347,14 +349,17 @@ void loop() {
     uint32_t Location = lastLocation;
     newLocation = false;
     interrupts();
-    // Send the location update to mission control
-    String Status = "/location/" + String(Location);
+    // Send the location update and stop status to mission control
+    String Status;
+    if (beaconCheck(Location)) {
+      Status = "/location/" + String(Location) + "/1";
+    } else {
+      Status = "/location/" + String(Location) + "/0";
+    }
     if (Serial) Serial.println("Location transponder detected: " + Status);
     Serial2.print("AT+SEND=1," + String(Status.length()) + "," + Status + "\r\n");
     delay(100);
     Serial2.readStringUntil('\n'); // Purge the +OK response
-    // Check for a stop action associated with this location
-    beaconCheck(Location);
   }
 
   #ifndef STEPPER
