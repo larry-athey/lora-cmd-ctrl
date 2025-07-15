@@ -313,11 +313,10 @@ void loop() {
   // Handle the sound effects as necessary
   if (SFX) {
     if (wavFile.length() > 0) {
-      //Sound.stopSong();
-      //Sound.connecttoFS(LittleFS,wavFile.c_str());
+      myDFPlayer.play(2); // Plays a file as a single shot
+      if (sfxLoop) myDFPlayer.loop(1); // Loops a file 001.mp3 or 001.wav
       wavFile.clear();
     }
-    //if (sfxLoop) Sound.loop();
   }
   #endif
 
