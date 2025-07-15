@@ -86,16 +86,16 @@ inline void setupStepper(byte Direction, byte Speed, byte Resolution, int Steps)
   #endif
 }
 //------------------------------------------------------------------------------------------------
-inline void setupSound(String FileName, byte Loop) { // Set up sound effect background process
+inline void setupSound(String FileNumber, byte Loop) { // Set up sound effect background process
   if (SFX) {
-    wavFile = "/" + FileName;
+    wavFile = FileNumber;
     if (Loop == 1) {
       sfxLoop = true;
     } else {
       sfxLoop = false;
     }
     if (Serial) {
-      Serial.println("Sound file loaded: " + FileName);
+      Serial.println("Sound file loaded: " + FileNumber);
       Serial.println("Playback loop: " + String(Loop));
     }
   }
@@ -174,8 +174,8 @@ inline void runCommand(String Cmd) { // Execute a queued LCC mission control com
     //ID/repeat/cmd-or-script/cmd-hash or script-id
     if (partCount == 4) sendRepeatRequest(parts[2],parts[3]);
   } else if (parts[1] == "sound") {
-    //ID/sound/wav/loop
-    //a7f352dccb4372aff00d768a4728a64a/sound/startup.wav/0
+    //ID/sound/file-number/loop
+    //a7f352dccb4372aff00d768a4728a64a/sound/1/0
     if (partCount == 4) setupSound(parts[2],parts[3].toInt());
   } else if (parts[1] == "stepper") {
     //ID/stepper/direction/speed/resolution/steps
