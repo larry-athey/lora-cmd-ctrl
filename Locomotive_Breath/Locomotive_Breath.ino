@@ -237,8 +237,12 @@ void setup() {
 
   if (Serial) Serial.println(F("Locomotive Breath now initialized and running"));
   if (SFX) {
-    Sound.connecttoFS(LittleFS,"/startup.wav");
-    wavFile.clear();
+    if (Sound.connecttoFS(LittleFS,"/startup.wav")) {
+      wavFile.clear();
+    } else {
+      Serial.println(F("Sound effect system failed to play startup.wav"));
+      SFX = false;
+    }
   }
 }
 //------------------------------------------------------------------------------------------------
