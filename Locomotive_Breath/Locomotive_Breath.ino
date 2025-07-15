@@ -11,13 +11,13 @@
 // (or larger) locomotive body to accomplish everything that you can do with a DCC/WCC locomotive
 // for not a whole lot of money. These components are as follows:
 //
-//   ESP32-S3 Mini       - $10.00
-//   Reyax RYLR998 Modem - $12.00
-//   TB6612FNG H-Bridge  - $3.50
-//   TSOP34838 IR Rcvr   - $1.00
-//   MAX98357 Audio Mod  - $2.00
-//   10x15mm Speaker     - $0.80
-//   3.3v 3A Regulator   - $0.70
+//   ESP32-S3 Mini        - $10.00
+//   Reyax RYLR998 Modem  - $12.00
+//   TB6612FNG H-Bridge   - $3.50
+//   TSOP34838 IR Rcvr    - $1.00
+//   WWZMDiB Audio Module - $2.00
+//   10x15mm Speaker      - $0.80
+//   3.3v 3A Regulator    - $0.70
 //
 // Roughly $30 in parts to convert any brand of model train locomotive to have all of the features
 // found in a full blown DCC enabled locomotive with sound effects. You want color changing LEDs?
@@ -66,8 +66,7 @@
 #endif
 
 #ifndef STEPPER
-#include "LittleFS.h"            // Flash memory library that allows it to work as a file system
-#include "Audio.h"               // MAX98357 support library, From ESP32-audioI2S v2.0.0
+#include "DFRobotDFPlayerMini.h" // From https://github.com/DFRobot/DFRobotDFPlayerMini
 #endif
 
 #include "Adafruit_NeoPixel.h"   // Used for the heartbeat/pulse LED since there is no pilot light
@@ -85,12 +84,12 @@
 #define RX2 12                   // To RYLR998 TX pin
 #define MOT_F 11                 // H-Bridge forward pin or user defined if using a stepper, or SCL for I2C
 #define MOT_R 10                 // H-Bridge reverse pin or user defined if using a stepper, or SDA for I2C
-#define BUS_1 9                  // Audio BCLK or DRV8825 step pin
-#define BUS_2 8                  // Audio WS or DRV8825 direction pin
-#define BUS_3 7                  // Audio DOUT or DRV8825 sleep pin
+#define BUS_1 9                  // DFRobot TX or DRV8825 step pin
+#define BUS_2 8                  // DFRobot RX or DRV8825 direction pin
+#define BUS_3 7                  // Spare NeoPixel bus or DRV8825 sleep pin
 //------------------------------------------------------------------------------------------------
 #ifndef STEPPER
-Audio Sound;                     // Set up the sound effects system object
+DFRobotDFPlayerMini myDFPlayer;  // Set up the sound effects system object
 #endif
 Adafruit_NeoPixel pixels(1,LED_PIN,NEO_RGB + NEO_KHZ800); // Set up the heartbeat/pulse LED
 //------------------------------------------------------------------------------------------------
@@ -190,18 +189,6 @@ void setup() {
   // Attach interrupt to the IR receiver pin
   attachInterrupt(digitalPinToInterrupt(IR_RCV),handleIRInterrupt,CHANGE);
 
-  #ifndef STEPPER
-  // Initialize the sound effects system
-  if (LittleFS.begin()) {
-    SFX = true;
-    Sound.setPinout(BUS_1,BUS_2,BUS_3);
-    Sound.setVolume(21); // [0..21]
-    Serial.println(F("Sound effects system initialized"));
-  } else {
-    Serial.println(F("Sound effects system failed to start"));
-  }
-  #endif
-
   // Initialize the RYLR998 modem
   if (Serial) Serial.println(F("Initializing the RYLR998 modem..."));
   Serial2.print(F("AT+FACTORY\r\n"));
@@ -229,6 +216,19 @@ void setup() {
   delay(200);
   echoRYLR998();
 
+  #ifndef STEPPER
+  // Initialize the sound effects system
+  Serial1.begin(9600,SERIAL_8N1,BUS_2,BUS_1);
+  if (Serial) Serial.println(F("Initializing DFPlayer Mini..."));
+  if (! myDFPlayer.begin(Serial1)) {
+    if (Serial) Serial.println(F("Unable to initialize DFPlayer Mini"));
+  } else {
+    if (Serial) Serial.println(F("DFPlayer Mini successfully started"));
+    myDFPlayer.volume(20); // [0..30]
+    SFX = true;
+  }
+  #endif
+
   // Zero out the location detection queue
   for (byte i = 0; i <= 15; i ++) Locations[i] = 0;
 
@@ -236,14 +236,6 @@ void setup() {
   lastCheck = millis();
 
   if (Serial) Serial.println(F("Locomotive Breath now initialized and running"));
-  if (SFX) {
-    if (Sound.connecttoFS(LittleFS,"/startup.wav")) {
-      wavFile.clear();
-    } else {
-      Serial.println(F("Sound effect system failed to play startup.wav"));
-      SFX = false;
-    }
-  }
 }
 //------------------------------------------------------------------------------------------------
 bool beaconCheck(int Pin) { // Stop the motor if a registered location transponder is detected
@@ -321,11 +313,11 @@ void loop() {
   // Handle the sound effects as necessary
   if (SFX) {
     if (wavFile.length() > 0) {
-      Sound.stopSong();
-      Sound.connecttoFS(LittleFS,wavFile.c_str());
+      //Sound.stopSong();
+      //Sound.connecttoFS(LittleFS,wavFile.c_str());
       wavFile.clear();
     }
-    if (sfxLoop) Sound.loop();
+    //if (sfxLoop) Sound.loop();
   }
   #endif
 

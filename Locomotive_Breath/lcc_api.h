@@ -31,7 +31,7 @@ inline void setupMotor(byte Direction, float Speed, int Progression, int Duratio
   if ((motorSpeed > 0) && (Direction != motorDirection)) {
     setMotorSpeed(0);
     while (millis() < motorTimestamp + 2000) {
-      if ((SFX) && (sfxLoop)) Sound.loop(); // Play any looping sound effect while we wait
+      delay(10);
     }
     motorTimestamp += 2000;
   }
