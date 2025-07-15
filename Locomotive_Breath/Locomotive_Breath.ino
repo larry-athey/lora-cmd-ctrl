@@ -66,8 +66,8 @@
 #endif
 
 #ifndef STEPPER
+#include "LittleFS.h"            // Flash memory library that allows it to work as a file system
 #include "Audio.h"               // MAX98357 support library, From ESP32-audioI2S v2.0.0
-#include "SPIFFS.h"              // Flash memory library that allows it to work as a file system
 #endif
 
 #include "Adafruit_NeoPixel.h"   // Used for the heartbeat/pulse LED since there is no pilot light
@@ -192,10 +192,10 @@ void setup() {
 
   #ifndef STEPPER
   // Initialize the sound effects system
-  if (SPIFFS.begin(true)) {
+  if (LittleFS.begin()) {
     SFX = true;
     Sound.setPinout(BUS_1,BUS_2,BUS_3);
-    Sound.setVolume(17); // [0..21]
+    Sound.setVolume(21); // [0..21]
     Serial.println(F("Sound effects system initialized"));
   } else {
     Serial.println(F("Sound effects system failed to start"));
@@ -237,7 +237,7 @@ void setup() {
 
   if (Serial) Serial.println(F("Locomotive Breath now initialized and running"));
   if (SFX) {
-    Sound.connecttoFS(SPIFFS,"/startup.wav");
+    Sound.connecttoFS(LittleFS,"/startup.wav");
     wavFile.clear();
   }
 }
@@ -318,7 +318,7 @@ void loop() {
   if (SFX) {
     if (wavFile.length() > 0) {
       Sound.stopSong();
-      Sound.connecttoFS(SPIFFS,wavFile.c_str());
+      Sound.connecttoFS(LittleFS,wavFile.c_str());
       wavFile.clear();
     }
     if (sfxLoop) Sound.loop();
