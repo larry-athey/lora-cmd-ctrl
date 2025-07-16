@@ -1,0 +1,18 @@
+#!/bin/bash
+
+cd /usr/share/lcc
+
+sleep 0.9
+
+while [ true ]; do
+  ScriptStart=$(date +%s)
+  ./logic-processor.php
+  ScriptEnd=$(date +%s)
+  Runtime=$(($ScriptEnd - $ScriptStart))
+  echo "Script Runtime: $Runtime seconds"
+  if [ $Runtime -lt 3 ]; then
+    Delay=$((3 - $Runtime))
+    echo "Sleeping $Delay seconds"
+    sleep $Delay
+  fi
+done

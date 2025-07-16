@@ -1,0 +1,39 @@
+#!/bin/bash
+
+chown -R www-data:www-data /var/www/html
+chmod g+w -R /var/www/html
+
+chown -R www-data:www-data /usr/share/lcc
+chmod g+w -R /usr/share/lcc
+
+cd /usr/share/lcc
+
+Hour=$(date +%H)
+Min=$(date +%M)
+
+if [ "$Hour" == "00" ] && [ "$Min" == "15" ]; then
+  pkill -f /usr/share/lcc/lcc-logic-loop
+  ./lcc-db-maint.php
+  sleep 15
+fi
+
+./scheduler.php
+
+LoopFailure=0
+
+ps cax | grep [m]sg-daemon.py
+if [ $? -ne 0 ]; then
+  LoopFailure=1
+fi
+
+ps cax | grep [l]cc-logic-loop
+if [ $? -ne 0 ]; then
+  LoopFailure=1
+fi
+
+if [ $LoopFailure -eq 1 ]; then
+  pkill -f /usr/share/lcc/msg-daemon.py
+  pkill -f /usr/share/lcc/logic-logic-loop
+  /usr/share/lcc/msg-daemon.py &
+  /usr/share/lcc/lcc-logic-loop &
+fi
