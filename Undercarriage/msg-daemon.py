@@ -174,10 +174,10 @@ def main():
             # Check for outbound messages
             check_outbound_messages(serial_conn, db)
             # Sleep to avoid CPU overload
-            time.sleep(2.5)
+            time.sleep(2)
         except Exception as e:
             print(f"Main loop error: {e}")
-            time.sleep(2.5)  # Wait before retrying
+            time.sleep(2)  # Wait before retrying
 #----------------------------------------------------------------------------------------------
 if __name__ == "__main__":
     main()

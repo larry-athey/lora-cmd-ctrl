@@ -70,27 +70,33 @@ require_once("html.php");
 <?php
 $DBcnx = mysqli_connect(DB_HOST,DB_USER,DB_PASS,DB_NAME);
 
+echo(drawMenu($DBcnx) . "\n");
+
 if (isset($_GET["cmd"])) {
   if ($_GET["cmd"] == 0) {
     echo(sendCommand($DBcnx,100,"/motor/1/0/15/0"));
   } elseif ($_GET["cmd"] == 1) {
-    echo(sendCommand($DBcnx,100,"/motor/1/80/30/0"));
-  } elseif ($_GET["cmd"] == 2) {
     echo(sendCommand($DBcnx,100,"/motor/1/25/30/0"));
+  } elseif ($_GET["cmd"] == 2) {
+    echo(sendCommand($DBcnx,100,"/motor/1/50/30/0"));
   } elseif ($_GET["cmd"] == 3) {
-    echo(sendCommand($DBcnx,100,"/sound/startup.wav/1"));
+    echo(sendCommand($DBcnx,100,"/motor/1/75/30/0"));
+  } elseif ($_GET["cmd"] == 4) {
+    echo(sendCommand($DBcnx,100,"/motor/1/100/30/0"));
+  } elseif ($_GET["cmd"] == 5) {
+    echo(sendCommand($DBcnx,100,"/sound/1/0"));
   }
 }
 
-echo(DrawMenu($DBcnx) . "\n");
-
-$Content  = "<div class=\"container-fluid\" style=\"align: left;\">";
+$Content  = "<div class=\"container-fluid\" style=\"align: left; margin-top: 0.5em;\">";
 $Content .=   "<div class=\"row\">";
 
 if (! isset($_GET["page"])) {
 
 } else {
-
+  if ($_GET["page"] == "devices") {
+    $Content .= showDevices($DBcnx);
+  }
 }
 
 $Content .=   "</div>";
