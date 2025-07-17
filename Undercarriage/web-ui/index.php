@@ -96,6 +96,8 @@ if (! isset($_GET["page"])) {
 } else {
   if ($_GET["page"] == "devices") {
     $Content .= showDevices($DBcnx);
+  } elseif ($_GET["page"] == "edit_device") {
+    $Content .= editDevice($DBcnx);
   }
 }
 
