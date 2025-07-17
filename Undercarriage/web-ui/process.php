@@ -13,6 +13,16 @@ if (isset($_GET["delete_command"])) {
 //---------------------------------------------------------------------------------------------------
 elseif (isset($_POST["edit_device"])) {
 
+/*
+$Result = mysqli_query($DBcnx, "INSERT INTO mbb_misc (misc_name, source) VALUES ('$misc_name', '$source')");
+if ($Result) {
+    $new_id = mysqli_insert_id($DBcnx); // Get the ID of the inserted record
+    echo "New record ID: $new_id";
+} else {
+    echo "Insert failed: " . mysqli_error($DBcnx);
+}
+*/
+
 }
 //---------------------------------------------------------------------------------------------------
 mysqli_close($DBcnx);
