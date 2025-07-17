@@ -39,6 +39,38 @@ function drawMenu($DBcnx) {
   return $Content;
 }
 //---------------------------------------------------------------------------------------------------
+function editDevice($DBcnx) {
+  if ($_GET["ID"] > 0) {
+    $Result = mysqli_query($DBcnx,"SELECT * FROM devices WHERE ID=" . $_GET["ID"]);
+    $RS = mysqli_fetch_assoc($Result);
+  } else {
+    $RS["address"]    = "";
+    $RS["dev_name"]   = "";
+    $RS["dev_type"]   = 0;
+    $RS["favorites"]  = "";
+    $RS["cmd_repeat"] = 0;
+  }
+
+  $Content  = "<div style=\"width: 31em; margin-left: 0.25em; margin-top: 0.5em;\">";
+  $Content .=   "<form id=\"edit_device\" method=\"post\" action=\"/process.php\">";
+  $Content .=   "<div class=\"card\" style=\"width: 100%; margin-bottom: 0.5em;\">";
+  $Content .=     "<div class=\"card-body\">";
+  $Content .=       "<div>";
+  $Content .=         "<label for=\"dev_name\" class=\"form-label fw-bolder\">Device Name</label>";
+  $Content .=         "<input type=\"text\" class=\"form-control fw-bolder\" id=\"dev_name\" name=\"dev_name\" maxlength=\"255\" value=\"" . $RS["dev_name"] . "\">";
+  $Content .=       "</div>";
+  $Content .=       "<div style=\"margin-top: 0.5em;\">";
+  $Content .=         "<label for=\"address\" class=\"form-label fw-bolder\">LoRa WAN Address [2..65535]</label>";
+  $Content .=         "<input type=\"number\" class=\"form-control fw-bolder\" id=\"address\" name=\"address\" min=\"2\" max=\"65535\" step=\"1\" value=\"" . $RS["address"] . "\">";
+  $Content .=       "</div>";
+
+  $Content .=     "</div>";
+  $Content .=   "</div>";
+  $Content .=   "</form>";
+  $Content .= "</div>";
+  return $Content;
+}
+//---------------------------------------------------------------------------------------------------
 function showDevices($DBcnx) {
   $Counter  = 0;
   $Content  = "<div style=\"width: 31em; margin-left: 0.25em;\">";
@@ -50,7 +82,7 @@ function showDevices($DBcnx) {
     $Content .= "<div class=\"card\" style=\"width: 100%; margin-bottom: 0.5em;\">";
     $Content .=   "<div class=\"card-body\">";
     $Content .=     "<p class=\"fw-bolder mb-0\">" . $RS["dev_name"] . "</p>";
-    $Content .=     "<p class=\"mb-0\" style=\"float: right;\"><a href=\"?page=delete_confirm&ID=" . $RS["ID"] . "\" class=\"btn btn-danger fw-bolder\" name=\"delete_device\" style=\"--bs-btn-padding-y: .10rem; --bs-btn-padding-x: .75rem; --bs-btn-font-size: .75rem;\">Delete</a>&nbsp;&nbsp;&nbsp;&nbsp;";
+    $Content .=     "<p class=\"mb-0\" style=\"float: right;\"><a href=\"?page=delete_confirm&type=1&ID=" . $RS["ID"] . "\" class=\"btn btn-danger fw-bolder\" name=\"delete_device\" style=\"--bs-btn-padding-y: .10rem; --bs-btn-padding-x: .75rem; --bs-btn-font-size: .75rem;\">Delete</a>&nbsp;&nbsp;&nbsp;&nbsp;";
     $Content .=     "<a href=\"?page=edit_device&ID=" . $RS["ID"] . "\" class=\"btn btn-primary fw-bolder\" name=\"edit_device\" style=\"--bs-btn-padding-y: .10rem; --bs-btn-padding-x: .75rem; --bs-btn-font-size: .75rem;\">Edit</a></p>";
     $Content .=   "</div>";
     $Content .= "</div>";
