@@ -44,6 +44,7 @@ function editDevice($DBcnx) {
     $Result = mysqli_query($DBcnx,"SELECT * FROM devices WHERE ID=" . $_GET["ID"]);
     $RS = mysqli_fetch_assoc($Result);
   } else {
+    $RS["ID"]         = 0;
     $RS["address"]    = "";
     $RS["dev_name"]   = "";
     $RS["dev_type"]   = 0;
@@ -52,18 +53,36 @@ function editDevice($DBcnx) {
   }
 
   $Content  = "<div style=\"width: 31em; margin-left: 0.25em; margin-top: 0.5em;\">";
-  $Content .=   "<form id=\"edit_device\" method=\"post\" action=\"/process.php\">";
+  $Content .=   "<form id=\"device_editor\" method=\"post\" action=\"/process.php\">";
+  $Content .=   "<input type=\"hidden\" id=\"ID\" name=\"ID\" value=\"" . $RS["ID"] . "\">";
   $Content .=   "<div class=\"card\" style=\"width: 100%; margin-bottom: 0.5em;\">";
+  $Content .=     "<div class=\"card-header\"><span class=\"text-muted fw-bolder\">Edit Device</span></div>";
   $Content .=     "<div class=\"card-body\">";
   $Content .=       "<div>";
   $Content .=         "<label for=\"dev_name\" class=\"form-label fw-bolder\">Device Name</label>";
   $Content .=         "<input type=\"text\" class=\"form-control fw-bolder\" id=\"dev_name\" name=\"dev_name\" maxlength=\"255\" value=\"" . $RS["dev_name"] . "\">";
   $Content .=       "</div>";
   $Content .=       "<div style=\"margin-top: 0.5em;\">";
+  $Content .=         "<label for=\"dev_type\" class=\"form-label fw-bolder\">Device Type</label>";
+  $Content .=         deviceSelector($RS["dev_type"],"dev_type");
+  $Content .=       "</div>";
+  $Content .=       "<div style=\"margin-top: 0.5em;\">";
   $Content .=         "<label for=\"address\" class=\"form-label fw-bolder\">LoRa WAN Address [2..65535]</label>";
   $Content .=         "<input type=\"number\" class=\"form-control fw-bolder\" id=\"address\" name=\"address\" min=\"2\" max=\"65535\" step=\"1\" value=\"" . $RS["address"] . "\">";
   $Content .=       "</div>";
-
+  $Content .=       "<div style=\"margin-top: 0.5em;\">";
+  $Content .=         "<label for=\"cmd_repeat\" class=\"form-label fw-bolder\">Honor Command Repeat Requests</label>";
+  $Content .=         YNSelector($RS["cmd_repeat"],"cmd_repeat");
+  $Content .=       "</div>";
+  $Content .=       "<div style=\"margin-top: 0.5em;\">";
+  $Content .=         "<label for=\"favorites\" class=\"form-label fw-bolder\">Favorite Commands (ctrl/cmd+click to select)</label>";
+  $Content .=         favoriteSelector($DBcnx,$RS["favorites"],$RS["dev_type"]);
+  $Content .=       "</div>";
+  $Content .=     "</div>";
+  $Content .=     "<div class=\"border-bottom\"></div>";
+  $Content .=     "<div style=\"margin-top: 1em;\">";
+  $Content .=       "<p style=\"float: right; margin-right: 1em;\"><a href=\"?page=devices\" class=\"btn btn-danger fw-bolder\" name=\"cancel\" style=\"--bs-btn-padding-y: .10rem; --bs-btn-padding-x: .75rem; --bs-btn-font-size: .75rem;\">Cancel</a>&nbsp;&nbsp;&nbsp;&nbsp;";
+  $Content .=       "<button type=\"submit\" class=\"btn btn-primary fw-bolder\" name=\"edit_device\" id=\"edit_device\" style=\"--bs-btn-padding-y: .10rem; --bs-btn-padding-x: .75rem; --bs-btn-font-size: .75rem;\">Save</button></p>";
   $Content .=     "</div>";
   $Content .=   "</div>";
   $Content .=   "</form>";
