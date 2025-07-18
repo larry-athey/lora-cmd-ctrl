@@ -12,12 +12,11 @@ Hour=$(date +%H)
 Min=$(date +%M)
 
 if [ "$Hour" == "00" ] && [ "$Min" == "15" ]; then
-  pkill -f /usr/share/lcc/lcc-logic-loop
+  pkill -f /usr/share/lcc/msg-daemon.py
+  pkill -f /usr/share/lcc/lcc-bash-loop
   ./lcc-db-maint.php
   sleep 15
 fi
-
-./scheduler.php
 
 LoopFailure=0
 
@@ -26,14 +25,14 @@ if [ $? -ne 0 ]; then
   LoopFailure=1
 fi
 
-ps cax | grep [l]cc-logic-loop
+ps cax | grep [l]cc-bash-loop
 if [ $? -ne 0 ]; then
   LoopFailure=1
 fi
 
 if [ $LoopFailure -eq 1 ]; then
   pkill -f /usr/share/lcc/msg-daemon.py
-  pkill -f /usr/share/lcc/logic-logic-loop
+  pkill -f /usr/share/lcc/lcc-bash-loop
   /usr/share/lcc/msg-daemon.py &
-  /usr/share/lcc/lcc-logic-loop &
+  /usr/share/lcc/lcc-bash-loop &
 fi

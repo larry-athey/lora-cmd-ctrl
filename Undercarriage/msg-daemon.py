@@ -13,6 +13,7 @@ import time
 import re
 import signal
 import sys
+import subprocess
 
 # MySQL configuration
 DB_CONFIG = {
@@ -173,11 +174,15 @@ def main():
                 process_inbound_message(serial_conn, db)
             # Check for outbound messages
             check_outbound_messages(serial_conn, db)
+            # Execute the LCC logic processor script
+            output = subprocess.run("/usr/share/lcc/logic-processor.php", shell=True, capture_output=True, text=True).stdout
+            if output:
+                print(output)
             # Sleep to avoid CPU overload
-            time.sleep(2)
+            time.sleep(1)
         except Exception as e:
             print(f"Main loop error: {e}")
-            time.sleep(2)  # Wait before retrying
+            time.sleep(1)  # Wait before retrying
 #----------------------------------------------------------------------------------------------
 if __name__ == "__main__":
     main()
