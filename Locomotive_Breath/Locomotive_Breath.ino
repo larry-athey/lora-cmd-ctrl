@@ -98,7 +98,7 @@ bool sfxLoop = false;            // True if a sound effect command is supposed t
 byte pulseIndex = 1;             // Tracks the color changes for the heartbeat/pulse LED
 byte motorDirection = 1;         // Motor direction, 0 = reverse, 1 = forward
 byte progressDir = 0;            // Motor speed progress direction, 0 = down, 1 = up
-int Locations[16];               // Location transponder queue of ID numbers to stop at
+int Locations[16];               // Queue for caching location transponder ID numbers
 int LoRa_Address = 100;          // Device address [1..65535], 1 is reserved for mission control
 int LoRa_Network = 18;           // Network ID [0..15], 18 is valid but often never used
 unsigned long cmdCount = 0;      // Counts the number of received mission control commands
@@ -112,7 +112,7 @@ unsigned long targetRuntime = 0; // Timestamp of the motor end run (0 = indefini
 float motorSpeed = 0.0;          // Current motor speed [0..100]
 float progressFactor = 0.0;      // How much (percent) to change the motor speed per second
 float targetSpeed = 0.0;         // Motor target speed [0..100]
-String Commands[16];             // Command queue for caching mission control commands
+String Commands[17];             // Queue for caching up to 16 commands plus 1 repeat command
 String LoRa_PW = "1A2B3C4D";     // 8 character hex domain password, much like a WiFi password
 String wavFile = "";             // File name of the sound effect to load
 //------------------------------------------------------------------------------------------------
@@ -238,7 +238,7 @@ void setup() {
   if (Serial) Serial.println(F("Locomotive Breath now initialized and running"));
 }
 //------------------------------------------------------------------------------------------------
-bool beaconCheck(int Pin) { // Stop the motor if a registered location transponder is detected
+bool beaconCheck(int Pin) { // Perform any registered actions based on the current location beacon
   for (byte i = 0; i <= 15; i ++) {
     if (Pin == Locations[i]) {
       setMotorSpeed(0);
