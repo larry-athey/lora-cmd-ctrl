@@ -11,10 +11,13 @@ inline void sendRepeatRequest(String Request, String ID) { // Request a repeat o
   Serial2.readStringUntil('\n'); // Purge the +OK response
 }
 //------------------------------------------------------------------------------------------------
-inline void setupLocation(int Pin) { // Add a transponder pin to the locations queue
+inline void setupLocation(int Pin) { // Add a transponder pin and action to the Locations queue
+  // Locations[i][0] = Pin
+  // Locations[i][1] = Action Type
+  // Locations[i][2] = Action Data
   for (byte i = 0; i <= 15; i ++) {
     if (Locations[i] == 0) {
-      Locations[i] = Pin;
+      Locations[i][0] = Pin;
       if (Serial) Serial.println("Location pin added: " + String(Pin));
       break;
     }
