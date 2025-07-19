@@ -31,7 +31,7 @@ if (mysqli_num_rows($Result) > 0) {
       $Data = explode("/",trim($Outbound["msg"],"/"));
       array_shift($Data);
       $Update = mysqli_query($DBcnx,"UPDATE outbound SET ack=2 WHERE ID=" . $Outbound["ID"]);
-      $Update = mysqli_query($DBcnx,"UPDATE devices SET status='Last Command: /" . implode("/",$Data) . "' WHERE address=" . $Outbound["address"]);
+      $Update = mysqli_query($DBcnx,"UPDATE devices SET status='[CMD] /" . implode("/",$Data) . "' WHERE address=" . $Outbound["address"]);
     }
   }
 }

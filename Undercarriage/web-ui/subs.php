@@ -63,8 +63,12 @@ function favoriteSelector($DBcnx,$List,$DevType) {
 //---------------------------------------------------------------------------------------------------
 function getCommandName($DBcnx,$ID) {
   $Result = mysqli_query($DBcnx,"SELECT * FROM commands WHERE ID=$ID");
-  $Cmd = mysqli_fetch_assoc($Result);
-  return $Cmd["cmd_name"];
+  if (mysqli_num_rows($Result) > 0) {
+    $Cmd = mysqli_fetch_assoc($Result);
+    return $Cmd["cmd_name"];
+  } else {
+    return "Unknown";
+  }
 }
 //---------------------------------------------------------------------------------------------------
 function getDeviceType($ID) {
@@ -75,10 +79,24 @@ function getDeviceType($ID) {
   else {return "Unknown";}
 }
 //---------------------------------------------------------------------------------------------------
+function getLocationName($DBcnx,$ID) {
+  $Result = mysqli_query($DBcnx,"SELECT * FROM locations WHERE ID=$ID");
+  if (mysqli_num_rows($Result) > 0) {
+    $Scr = mysqli_fetch_assoc($Result);
+    return $Scr["loc_name"];
+  } else {
+    return "Unknown";
+  }
+}
+//---------------------------------------------------------------------------------------------------
 function getScriptName($DBcnx,$ID) {
   $Result = mysqli_query($DBcnx,"SELECT * FROM scripts WHERE ID=$ID");
-  $Scr = mysqli_fetch_assoc($Result);
-  return $Scr["scr_name"];
+  if (mysqli_num_rows($Result) > 0) {
+    $Scr = mysqli_fetch_assoc($Result);
+    return $Scr["scr_name"];
+  } else {
+    return "Unknown";
+  }
 }
 //---------------------------------------------------------------------------------------------------
 function InStr($Needle,$Haystack) {
@@ -90,12 +108,28 @@ function InStr($Needle,$Haystack) {
   }
 }
 //---------------------------------------------------------------------------------------------------
+function IntToYN($Int) {
+  if ($Int == 1) {
+    return "Yes";
+  } else {
+    return "No";
+  }
+}
+//---------------------------------------------------------------------------------------------------
+function IntToYNC($Int) {
+  if ($Int == 1) {
+    return "<span class=\"text-success\">Yes</span>";
+  } else {
+    return "<span class=\"text-danger\">No</span>";
+  }
+}
+//---------------------------------------------------------------------------------------------------
 function sendCommand($DBcnx,$Address,$Command) {
   $ID = md5($Address . "|" . time());
   $Result = mysqli_query($DBcnx,"INSERT INTO outbound (address,msg) VALUES ('$Address','/" . $ID . $Command . "')");
   return "<pre>$Address - /" . $ID . $Command . "</pre>\n";
 }
-//---------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------
 function OnOffSelector($Selected,$ID) {
   if ($Selected == 0) {
     $S0 = "selected";

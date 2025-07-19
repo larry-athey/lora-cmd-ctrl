@@ -111,5 +111,57 @@ function showDevices($DBcnx) {
   $Content .= "</div>";
   return $Content;
 }
-//---------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------
+function showHomePage($DBcnx) {
+  $Counter = 0;
+  $Content = "";
+  if (isset($_GET["filter"])) {
+    $Result = mysqli_query($DBcnx,"SELECT * FROM devices WHERE dev_type=" . $_GET["filter"] . " ORDER BY dev_name");
+  } else {
+    $Result = mysqli_query($DBcnx,"SELECT * FROM devices ORDER BY dev_name");
+  }
+  while ($RS = mysqli_fetch_assoc($Result)) {
+    $Counter ++;
+    $Content .= "<div style=\"width: 29em; margin-left: 0.25em; margin-top: 0.5em;\">";
+    $Content .=   "<div class=\"card\" style=\"width: 100%; margin-bottom: 0.5em;\">";
+    $Content .=     "<div class=\"card-header\"><span class=\"text-muted fw-bolder\">" . $RS["dev_name"] . "</span></div>";
+    $Content .=     "<div class=\"card-body\">";
+    $Content .=       "<div class=\"row\">";
+    $Content .=         "<div class=\"col-5 text-secondary-emphasis\">Honor Repeats:</div>";
+    $Content .=         "<div class=\"col-7\" style=\"text-align: right;\">" . IntToYNC($RS["cmd_repeat"]) . "</div>";
+    $Content .=       "</div>";
+    $Content .=       "<div class=\"row\">";
+    $Content .=         "<div class=\"col-5 text-secondary-emphasis\">Last Location:</div>";
+    $Content .=         "<div class=\"col-7\" style=\"text-align: right;\">" . getLocationName($DBcnx,$RS["last_loc"]) . "</div>";
+    $Content .=       "</div>";
+    $Content .=       "<div class=\"row\">";
+    $Content .=         "<div class=\"col-5 text-secondary-emphasis\">Status:</div>";
+    $Content .=         "<div class=\"col-7\" style=\"text-align: right;\">" . $RS["status"] . "</div>";
+    $Content .=       "</div>";
+    $Content .=     "</div>";
+    $Content .=     "<div class=\"border-bottom\"></div>";
+    $Content .=     "<div class=\"row\" style=\"margin-top: 0.5em; margin-bottom: 0.5em; margin-left: 1em; margin-right: 1em;\">";
+    $Content .=       "<div class=\"col\"><button class=\"btn btn-sm btn-success\">CTRL</button></div>";
+    $Content .=       "<div class=\"col\"><button class=\"btn btn-sm btn-primary\">CMD</button></div>";
+    $Content .=       "<div class=\"col\"><button class=\"btn btn-sm btn-warning\">SCR</button></div>";
+    $Content .=       "<div class=\"col\"><button class=\"btn btn-sm btn-danger\">PANIC</button></div>";
+    $Content .=     "</div>";
+    $Content .=     "<div class=\"border-bottom\"></div>";
+    $Content .=     "<div class=\"row\" style=\"margin-top: 0.25em; margin-bottom: 0.25em; margin-left: 1em; margin-right: 0em;\">";
+    if (trim(" " . $RS["favorites"]) != "") {
+      $Data = explode("|",$RS["favorites"]);
+      for ($x = 0; $x <= (count($Data) - 1); $x ++) {
+        $Content .=   "<div class=\"row\"><div class=\"col\"><button class=\"btn btn-sm btn-secondary\" style=\" width: 100%; --bs-btn-padding-y: .10rem; --bs-btn-padding-x: .75rem; --bs-btn-font-size: .75rem; margin-top: .25rem; margin-bottom: .25rem;\">" . getCommandName($DBcnx,$Data[$x]) . "</button></div></div>";
+      }
+    } else {
+      $Content .=     "<div class=\"text-secondary-emphasis\"><i>No favorite commands selected</i></div>";
+    }
+    $Content .=     "</div>";
+    $Content .=   "</div>";
+    $Content .= "</div>";
+  }
+  if ($Counter == 0) $Content .= "<p class=\"fw-bolder\">No devices found...</p>";
+  return $Content;
+}
+//---------------------------------------------------------------------------------------------------
 ?>

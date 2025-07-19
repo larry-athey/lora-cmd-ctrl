@@ -92,7 +92,7 @@ $Content  = "<div class=\"container-fluid\" style=\"align: left; margin-top: 0.5
 $Content .=   "<div class=\"row\">";
 
 if (! isset($_GET["page"])) {
-
+  $Content .= showHomePage($DBcnx);
 } else {
   if ($_GET["page"] == "devices") {
     $Content .= showDevices($DBcnx);
