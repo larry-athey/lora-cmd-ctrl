@@ -98,7 +98,7 @@ bool sfxLoop = false;            // True if a sound effect command is supposed t
 byte pulseIndex = 1;             // Tracks the color changes for the heartbeat/pulse LED
 byte motorDirection = 1;         // Motor direction, 0 = reverse, 1 = forward
 byte progressDir = 0;            // Motor speed progress direction, 0 = down, 1 = up
-int Locations[16];               // Queue for caching location transponder ID numbers
+int Locations[16][3];            // Queue for caching location ID numbers and associated actions
 int LoRa_Address = 100;          // Device address [1..65535], 1 is reserved for mission control
 int LoRa_Network = 18;           // Network ID [0..15], 18 is valid but often never used
 unsigned long cmdCount = 0;      // Counts the number of received mission control commands
@@ -230,7 +230,11 @@ void setup() {
   #endif
 
   // Zero out the location detection queue
-  for (byte i = 0; i <= 15; i ++) Locations[i] = 0;
+  for (byte i = 0; i <= 15; i ++) {
+    Locations[i][0] = 0;
+    Locations[i][1] = 0;
+    Locations[i][2] = 0;
+  }
 
   // Initialize the main loop() 1 second timer
   lastCheck = millis();
@@ -240,11 +244,11 @@ void setup() {
 //------------------------------------------------------------------------------------------------
 bool beaconCheck(int Pin) { // Perform any registered actions based on the current location beacon
   for (byte i = 0; i <= 15; i ++) {
-    if (Pin == Locations[i]) {
+    if (Pin == Locations[i][0]) {
       setMotorSpeed(0);
       targetSpeed = 0;
       progressFactor = 0;
-      Locations[i] = 0;
+      Locations[i][0] = 0;
       return true;
     }
   }
