@@ -29,7 +29,7 @@ CREATE TABLE devices (
   `address` VARCHAR(5) DEFAULT NULL,
   `dev_name` VARCHAR(255) DEFAULT NULL,
   `status` VARCHAR(255) DEFAULT NULL,
-  `dev_type` INT(11) DEFAULT NULL,
+  `dev_type` TINYINT(4) DEFAULT NULL,
   `last_loc` INT(11) DEFAULT 0,
   `favorites` TEXT DEFAULT NULL,
   `cmd_repeat` TINYINT(4) DEFAULT 0
