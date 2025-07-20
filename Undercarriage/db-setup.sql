@@ -19,6 +19,8 @@ CREATE TABLE commands (
   `resolution` TINYINT(4) DEFAULT NULL,
   `sound` INT(11) DEFAULT NULL,
   `location_id` INT(11) DEFAULT NULL,
+  `location_action` INT(11) DEFAULT NULL,
+  `location_data` INT(11) DEFAULT NULL,
   `repeat` TINYINT(4) DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
