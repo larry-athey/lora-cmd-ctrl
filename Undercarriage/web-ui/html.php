@@ -114,7 +114,23 @@ function showDevices($DBcnx) {
 //---------------------------------------------------------------------------------------------------
 function showHomePage($DBcnx) {
   $Counter = 0;
-  $Content = "";
+  $Content  = "<div class=\"modal fade\" id=\"dynamicModal\" tabindex=\"-1\" aria-labelledby=\"dynamicModalLabel\" aria-hidden=\"true\">";
+  $Content .=   "<div class=\"modal-dialog\">";
+  $Content .=     "<div class=\"modal-content\">";
+  $Content .=       "<div class=\"modal-header\">";
+  $Content .=         "<h5 class=\"modal-title\" id=\"dynamicModalLabel\">Form Title</h5>";
+  $Content .=         "<button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"modal\" aria-label=\"Close\"></button>";
+  $Content .=       "</div>";
+  $Content .=       "<div id=\"modalContent\" class=\"modal-body\">";
+  $Content .=         "<div id=\"form-content\">Loading...</div>";
+  $Content .=       "</div>";
+  $Content .=       "<div class=\"modal-footer\" style=\"vertical-align: bottom;\">";
+  $Content .=         "<button type=\"button\" class=\"btn btn-sm btn-primary fw-bolder\" id=\"submit_button\">&nbsp;Submit&nbsp;</button>";
+  $Content .=       "</div>";
+  $Content .=     "</div>";
+  $Content .=   "</div>";
+  $Content .= "</div>\n";
+
   if (isset($_GET["filter"])) {
     $Result = mysqli_query($DBcnx,"SELECT * FROM devices WHERE dev_type=" . $_GET["filter"] . " ORDER BY dev_name");
   } else {
@@ -141,17 +157,17 @@ function showHomePage($DBcnx) {
     $Content .=     "</div>";
     $Content .=     "<div class=\"border-bottom\"></div>";
     $Content .=     "<div class=\"row\" style=\"margin-top: 0.5em; margin-bottom: 0.5em; margin-left: 1em; margin-right: 1em;\">";
-    $Content .=       "<div class=\"col\"><button class=\"btn btn-sm btn-success\">CTRL</button></div>";
-    $Content .=       "<div class=\"col\"><button class=\"btn btn-sm btn-primary\">CMD</button></div>";
-    $Content .=       "<div class=\"col\"><button class=\"btn btn-sm btn-warning\">SCR</button></div>";
-    $Content .=       "<div class=\"col\"><button class=\"btn btn-sm btn-danger\">PANIC</button></div>";
+    $Content .=       "<div class=\"col\"><button class=\"btn btn-sm btn-success fw-bolder\" onClick=\"LoadForm('Device Control','1','" . $RS["address"] . "')\">CTRL</button></div>";
+    $Content .=       "<div class=\"col\"><button class=\"btn btn-sm btn-primary fw-bolder\" onClick=\"LoadForm('Send Command','2','" . $RS["address"] . "')\">CMD</button></div>";
+    $Content .=       "<div class=\"col\"><button class=\"btn btn-sm btn-warning fw-bolder\" onClick=\"LoadForm('Send Script','3','" . $RS["address"] . "')\">SCR</button></div>";
+    $Content .=       "<div class=\"col\"><button class=\"btn btn-sm btn-danger fw-bolder\" onClick=\"LoadForm('Reboot Device','4','" . $RS["address"] . "')\">PANIC</button></div>";
     $Content .=     "</div>";
     $Content .=     "<div class=\"border-bottom\"></div>";
     $Content .=     "<div class=\"row\" style=\"margin-top: 0.25em; margin-bottom: 0.25em; margin-left: 1em; margin-right: 0em;\">";
     if (trim(" " . $RS["favorites"]) != "") {
       $Data = explode("|",$RS["favorites"]);
       for ($x = 0; $x <= (count($Data) - 1); $x ++) {
-        $Content .=   "<div class=\"row\"><div class=\"col\"><button class=\"btn btn-sm btn-secondary\" style=\" width: 100%; --bs-btn-padding-y: .10rem; --bs-btn-padding-x: .75rem; --bs-btn-font-size: .75rem; margin-top: .25rem; margin-bottom: .25rem;\">" . getCommandName($DBcnx,$Data[$x]) . "</button></div></div>";
+        $Content .=   "<div class=\"row\"><div class=\"col\"><button class=\"btn btn-sm btn-secondary fw-bolder\" style=\" width: 100%; --bs-btn-padding-y: .10rem; --bs-btn-padding-x: .75rem; --bs-btn-font-size: .75rem; margin-top: .25rem; margin-bottom: .25rem;\">" . getCommandName($DBcnx,$Data[$x]) . "</button></div></div>";
       }
     } else {
       $Content .=     "<div class=\"text-secondary-emphasis\"><i>No favorite commands selected</i></div>";
@@ -160,7 +176,43 @@ function showHomePage($DBcnx) {
     $Content .=   "</div>";
     $Content .= "</div>";
   }
-  if ($Counter == 0) $Content .= "<p class=\"fw-bolder\">No devices found...</p>";
+  if ($Counter == 0) {
+    $Content .= "<p class=\"fw-bolder\">No devices found...</p>";
+  } else {
+    $Content .= "<div id=\"hiddenDiv\" style=\"display: none;\"></div>\n";
+    $Content .= "\n<script type=\"text/javascript\">\n";
+
+    $Content .= "jQuery(document).ready(function() {\n";
+    $Content .= "  jQuery('#submit_button').on('click',function() {\n";
+    $Content .= "    var formData = jQuery('#modalForm').serialize();\n";
+    $Content .= "    jQuery.ajax({\n";
+    $Content .= "      type: 'POST',\n";
+    $Content .= "      url: './modal-post.php',\n";
+    $Content .= "      data: formData,\n";
+    $Content .= "      success: function(response) {\n";
+    $Content .= "        jQuery('#form-content').html('<p>Form submitted successfully</p>');\n";
+    $Content .= "        jQuery('#dynamicModal').modal('hide');\n";
+    $Content .= "      },\n";
+    $Content .= "      error: function(xhr,status,error) {\n";
+    $Content .= "        jQuery('#form-content').html('<p>An error occurred: ' + error + '</p>');\n";
+    $Content .= "      }\n";
+    $Content .= "    });\n";
+    $Content .= "  });\n";
+    $Content .= "});\n\n";
+
+    $Content .= "function LoadForm(FormTitle,ID,dev_addr) {\n";
+    $Content .= "  jQuery('#form-content').load('./modal-form.php?ID=' + ID + '&address=' + dev_addr,function(response,status,xhr) {\n";
+    $Content .= "    if (status === 'success') {\n";
+    $Content .= "      jQuery('#dynamicModalLabel').html(FormTitle);\n";
+    $Content .= "    } else {\n";
+    $Content .= "      jQuery('#form-content').html('Failed to load `' + FormTitle + '` form content');\n";
+    $Content .= "    }\n";
+    $Content .= "    jQuery('#dynamicModal').modal('show');\n";
+    $Content .= "    jQuery('.modal-backdrop').css('opacity','0.4');\n";
+    $Content .= "  });\n";
+    $Content .= "};\n";
+    $Content .= "</script>\n";
+  }
   return $Content;
 }
 //---------------------------------------------------------------------------------------------------

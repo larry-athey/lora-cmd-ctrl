@@ -127,7 +127,7 @@ function IntToYNC($Int) {
 function sendCommand($DBcnx,$Address,$Command) {
   $ID = md5($Address . "|" . time());
   $Result = mysqli_query($DBcnx,"INSERT INTO outbound (address,msg) VALUES ('$Address','/" . $ID . $Command . "')");
-  return "<pre>$Address - /" . $ID . $Command . "</pre>\n";
+  return "<pre>cmd://" . $ID . $Command . ":$Address</pre>\n";
 }
 //---------------------------------------------------------------------------------------------------
 function OnOffSelector($Selected,$ID) {
