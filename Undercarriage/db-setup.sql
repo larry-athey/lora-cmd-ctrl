@@ -18,10 +18,10 @@ CREATE TABLE commands (
   `steps` INT(11) DEFAULT NULL,
   `resolution` TINYINT(4) DEFAULT NULL,
   `sound` INT(11) DEFAULT NULL,
+  `repeat` TINYINT(4) DEFAULT 0,
   `location_id` INT(11) DEFAULT NULL,
   `location_action` INT(11) DEFAULT NULL,
-  `location_data` INT(11) DEFAULT NULL,
-  `repeat` TINYINT(4) DEFAULT 0
+  `location_data` INT(11) DEFAULT NULL  
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 ALTER TABLE `commands` MODIFY `ID` INT(11) NOT NULL AUTO_INCREMENT;
