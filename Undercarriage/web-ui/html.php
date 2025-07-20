@@ -42,41 +42,41 @@ function drawMenu($DBcnx) {
 function editDevice($DBcnx) {
   if ($_GET["ID"] > 0) {
     $Result = mysqli_query($DBcnx,"SELECT * FROM devices WHERE ID=" . $_GET["ID"]);
-    $RS = mysqli_fetch_assoc($Result);
+    $Dev = mysqli_fetch_assoc($Result);
   } else {
-    $RS["ID"]         = 0;
-    $RS["address"]    = "";
-    $RS["dev_name"]   = "";
-    $RS["dev_type"]   = 0;
-    $RS["favorites"]  = "";
-    $RS["cmd_repeat"] = 0;
+    $Dev["ID"]         = 0;
+    $Dev["address"]    = "";
+    $Dev["dev_name"]   = "";
+    $Dev["dev_type"]   = 0;
+    $Dev["favorites"]  = "";
+    $Dev["cmd_repeat"] = 0;
   }
 
   $Content  = "<div style=\"width: 31em; margin-left: 0.25em; margin-top: 0.5em;\">";
   $Content .=   "<form id=\"device_editor\" method=\"post\" action=\"/process.php\">";
-  $Content .=   "<input type=\"hidden\" id=\"ID\" name=\"ID\" value=\"" . $RS["ID"] . "\">";
+  $Content .=   "<input type=\"hidden\" id=\"ID\" name=\"ID\" value=\"" . $Dev["ID"] . "\">";
   $Content .=   "<div class=\"card\" style=\"width: 100%; margin-bottom: 0.5em;\">";
   $Content .=     "<div class=\"card-header\"><span class=\"text-muted fw-bolder\">Edit Device</span></div>";
   $Content .=     "<div class=\"card-body\">";
   $Content .=       "<div>";
   $Content .=         "<label for=\"dev_name\" class=\"form-label fw-bolder\">Device Name</label>";
-  $Content .=         "<input type=\"text\" class=\"form-control fw-bolder\" id=\"dev_name\" name=\"dev_name\" maxlength=\"255\" value=\"" . $RS["dev_name"] . "\">";
+  $Content .=         "<input type=\"text\" class=\"form-control fw-bolder\" id=\"dev_name\" name=\"dev_name\" maxlength=\"255\" value=\"" . $Dev["dev_name"] . "\">";
   $Content .=       "</div>";
   $Content .=       "<div style=\"margin-top: 0.5em;\">";
   $Content .=         "<label for=\"dev_type\" class=\"form-label fw-bolder\">Device Type</label>";
-  $Content .=         deviceSelector($RS["dev_type"],"dev_type");
+  $Content .=         deviceSelector($Dev["dev_type"],"dev_type");
   $Content .=       "</div>";
   $Content .=       "<div style=\"margin-top: 0.5em;\">";
   $Content .=         "<label for=\"address\" class=\"form-label fw-bolder\">LoRa WAN Address [2..65535]</label>";
-  $Content .=         "<input type=\"number\" class=\"form-control fw-bolder\" id=\"address\" name=\"address\" min=\"2\" max=\"65535\" step=\"1\" value=\"" . $RS["address"] . "\">";
+  $Content .=         "<input type=\"number\" class=\"form-control fw-bolder\" id=\"address\" name=\"address\" min=\"2\" max=\"65535\" step=\"1\" value=\"" . $Dev["address"] . "\">";
   $Content .=       "</div>";
   $Content .=       "<div style=\"margin-top: 0.5em;\">";
   $Content .=         "<label for=\"cmd_repeat\" class=\"form-label fw-bolder\">Honor Command Repeat Requests</label>";
-  $Content .=         YNSelector($RS["cmd_repeat"],"cmd_repeat");
+  $Content .=         YNSelector($Dev["cmd_repeat"],"cmd_repeat");
   $Content .=       "</div>";
   $Content .=       "<div style=\"margin-top: 0.5em;\">";
   $Content .=         "<label for=\"favorites\" class=\"form-label fw-bolder\">Favorite Commands (ctrl/cmd+click to select)</label>";
-  $Content .=         favoriteSelector($DBcnx,$RS["favorites"],$RS["dev_type"]);
+  $Content .=         favoriteSelector($DBcnx,$Dev["favorites"],$Dev["dev_type"]);
   $Content .=       "</div>";
   $Content .=     "</div>";
   $Content .=     "<div class=\"border-bottom\"></div>";
@@ -96,13 +96,13 @@ function showDevices($DBcnx) {
   $Content .= "<a href=\"?page=edit_device&ID=0\" class=\"btn btn-outline-secondary fw-bolder\" style=\"width: 100%; margin-top: 0.5em; margin-bottom: 0.5em; margin-right: 0.5em;\" name=\"create_program\">Create New Device</a><br>";
 
   $Result = mysqli_query($DBcnx,"SELECT * FROM devices ORDER BY dev_name");
-  while ($RS = mysqli_fetch_assoc($Result)) {
+  while ($Dev = mysqli_fetch_assoc($Result)) {
     $Counter ++;
     $Content .= "<div class=\"card\" style=\"width: 100%; margin-bottom: 0.5em;\">";
     $Content .=   "<div class=\"card-body\">";
-    $Content .=     "<p class=\"fw-bolder mb-0\">" . $RS["dev_name"] . "</p>";
-    $Content .=     "<p class=\"mb-0\" style=\"float: right;\"><a href=\"?page=delete_confirm&type=1&ID=" . $RS["ID"] . "\" class=\"btn btn-danger fw-bolder\" name=\"delete_device\" style=\"--bs-btn-padding-y: .10rem; --bs-btn-padding-x: .75rem; --bs-btn-font-size: .75rem;\">Delete</a>&nbsp;&nbsp;&nbsp;&nbsp;";
-    $Content .=     "<a href=\"?page=edit_device&ID=" . $RS["ID"] . "\" class=\"btn btn-primary fw-bolder\" name=\"edit_device\" style=\"--bs-btn-padding-y: .10rem; --bs-btn-padding-x: .75rem; --bs-btn-font-size: .75rem;\">Edit</a></p>";
+    $Content .=     "<p class=\"fw-bolder mb-0\">" . $Dev["dev_name"] . "</p>";
+    $Content .=     "<p class=\"mb-0\" style=\"float: right;\"><a href=\"?page=delete_confirm&type=1&ID=" . $Dev["ID"] . "\" class=\"btn btn-danger fw-bolder\" name=\"delete_device\" style=\"--bs-btn-padding-y: .10rem; --bs-btn-padding-x: .75rem; --bs-btn-font-size: .75rem;\">Delete</a>&nbsp;&nbsp;&nbsp;&nbsp;";
+    $Content .=     "<a href=\"?page=edit_device&ID=" . $Dev["ID"] . "\" class=\"btn btn-primary fw-bolder\" name=\"edit_device\" style=\"--bs-btn-padding-y: .10rem; --bs-btn-padding-x: .75rem; --bs-btn-font-size: .75rem;\">Edit</a></p>";
     $Content .=   "</div>";
     $Content .= "</div>";
   }
@@ -136,38 +136,38 @@ function showHomePage($DBcnx) {
   } else {
     $Result = mysqli_query($DBcnx,"SELECT * FROM devices ORDER BY dev_name");
   }
-  while ($RS = mysqli_fetch_assoc($Result)) {
+  while ($Dev = mysqli_fetch_assoc($Result)) {
     $Counter ++;
     $Content .= "<div style=\"width: 29em; margin-left: 0.25em; margin-top: 0.5em;\">";
     $Content .=   "<div class=\"card\" style=\"width: 100%; margin-bottom: 0.5em;\">";
-    $Content .=     "<div class=\"card-header\"><span class=\"text-muted fw-bolder\">" . $RS["dev_name"] . "</span></div>";
+    $Content .=     "<div class=\"card-header\"><span class=\"text-muted fw-bolder\">" . $Dev["dev_name"] . "</span></div>";
     $Content .=     "<div class=\"card-body\">";
     $Content .=       "<div class=\"row\">";
     $Content .=         "<div class=\"col-5 text-secondary-emphasis\">Honor Repeats:</div>";
-    $Content .=         "<div class=\"col-7\" style=\"text-align: right;\">" . IntToYNC($RS["cmd_repeat"]) . "</div>";
+    $Content .=         "<div class=\"col-7\" style=\"text-align: right;\">" . IntToYNC($Dev["cmd_repeat"]) . "</div>";
     $Content .=       "</div>";
     $Content .=       "<div class=\"row\">";
     $Content .=         "<div class=\"col-5 text-secondary-emphasis\">Last Location:</div>";
-    $Content .=         "<div class=\"col-7\" style=\"text-align: right;\">" . getLocationName($DBcnx,$RS["last_loc"]) . "</div>";
+    $Content .=         "<div class=\"col-7\" style=\"text-align: right;\">" . getLocationName($DBcnx,$Dev["last_loc"]) . "</div>";
     $Content .=       "</div>";
     $Content .=       "<div class=\"row\">";
     $Content .=         "<div class=\"col-5 text-secondary-emphasis\">Status:</div>";
-    $Content .=         "<div class=\"col-7\" style=\"text-align: right;\">" . $RS["status"] . "</div>";
+    $Content .=         "<div class=\"col-7\" style=\"text-align: right;\">" . $Dev["status"] . "</div>";
     $Content .=       "</div>";
     $Content .=     "</div>";
     $Content .=     "<div class=\"border-bottom\"></div>";
     $Content .=     "<div class=\"row\" style=\"margin-top: 0.5em; margin-bottom: 0.5em; margin-left: 1em; margin-right: 1em;\">";
-    $Content .=       "<div class=\"col\"><button class=\"btn btn-sm btn-success fw-bolder\" onClick=\"LoadForm('Device Control','1','" . $RS["address"] . "')\">CTRL</button></div>";
-    $Content .=       "<div class=\"col\"><button class=\"btn btn-sm btn-primary fw-bolder\" onClick=\"LoadForm('Send Command','2','" . $RS["address"] . "')\">CMD</button></div>";
-    $Content .=       "<div class=\"col\"><button class=\"btn btn-sm btn-warning fw-bolder\" onClick=\"LoadForm('Send Script','3','" . $RS["address"] . "')\">SCR</button></div>";
-    $Content .=       "<div class=\"col\"><button class=\"btn btn-sm btn-danger fw-bolder\" onClick=\"LoadForm('Reboot Device','4','" . $RS["address"] . "')\">PANIC</button></div>";
+    $Content .=       "<div class=\"col\"><button class=\"btn btn-sm btn-success fw-bolder\" onClick=\"LoadForm('Device Control','1','" . $Dev["address"] . "')\">CTRL</button></div>";
+    $Content .=       "<div class=\"col\"><button class=\"btn btn-sm btn-primary fw-bolder\" onClick=\"LoadForm('Send Command','2','" . $Dev["address"] . "')\">CMD</button></div>";
+    $Content .=       "<div class=\"col\"><button class=\"btn btn-sm btn-warning fw-bolder\" onClick=\"LoadForm('Send Script','3','" . $Dev["address"] . "')\">SCR</button></div>";
+    $Content .=       "<div class=\"col\"><button class=\"btn btn-sm btn-danger fw-bolder\" onClick=\"LoadForm('Reboot Device','4','" . $Dev["address"] . "')\">PANIC</button></div>";
     $Content .=     "</div>";
     $Content .=     "<div class=\"border-bottom\"></div>";
     $Content .=     "<div class=\"row\" style=\"margin-top: 0.25em; margin-bottom: 0.25em; margin-left: 1em; margin-right: 0em;\">";
-    if (trim(" " . $RS["favorites"]) != "") {
-      $Data = explode("|",$RS["favorites"]);
+    if (trim(" " . $Dev["favorites"]) != "") {
+      $Data = explode("|",$Dev["favorites"]);
       for ($x = 0; $x <= (count($Data) - 1); $x ++) {
-        $Content .=   "<div class=\"row\"><div class=\"col\"><button class=\"btn btn-sm btn-secondary fw-bolder\" style=\" width: 100%; --bs-btn-padding-y: .10rem; --bs-btn-padding-x: .75rem; --bs-btn-font-size: .75rem; margin-top: .25rem; margin-bottom: .25rem;\">" . getCommandName($DBcnx,$Data[$x]) . "</button></div></div>";
+        $Content .=   "<div class=\"row\"><div class=\"col\"><button onClick=\"FavoriteCommand('" . $Dev["address"] . "','$Data[$x]')\" class=\"btn btn-sm btn-secondary fw-bolder\" style=\" width: 100%; --bs-btn-padding-y: .10rem; --bs-btn-padding-x: .75rem; --bs-btn-font-size: .75rem; margin-top: .25rem; margin-bottom: .25rem;\">" . getCommandName($DBcnx,$Data[$x]) . "</button></div></div>";
       }
     } else {
       $Content .=     "<div class=\"text-secondary-emphasis\"><i>No favorite commands selected</i></div>";
@@ -179,8 +179,12 @@ function showHomePage($DBcnx) {
   if ($Counter == 0) {
     $Content .= "<p class=\"fw-bolder\">No devices found...</p>";
   } else {
-    $Content .= "<div id=\"hiddenDiv\" style=\"display: none;\"></div>\n";
+    $Content .= "\n\n<div id=\"hiddenDiv\" style=\"display: none;\"></div>\n";
     $Content .= "\n<script type=\"text/javascript\">\n";
+
+    $Content .= "function FavoriteCommand(Address,ID) {\n";
+    $Content .= "  jQuery('#hiddenDiv').load('./modal-post.php?address=' + Address + '&cmd_id=' + ID);\n";
+    $Content .= "}\n\n";
 
     $Content .= "jQuery(document).ready(function() {\n";
     $Content .= "  jQuery('#submit_button').on('click',function() {\n";
@@ -211,7 +215,7 @@ function showHomePage($DBcnx) {
     $Content .= "    jQuery('.modal-backdrop').css('opacity','0.4');\n";
     $Content .= "  });\n";
     $Content .= "};\n";
-    $Content .= "</script>\n";
+    $Content .= "</script>\n\n";
   }
   return $Content;
 }

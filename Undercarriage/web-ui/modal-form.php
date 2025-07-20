@@ -13,9 +13,27 @@ $Content .= "<input type=\"hidden\" name=\"address\" value=\"" . $_GET["address"
 if ($_GET["ID"] == 1) {
 
 } elseif ($_GET["ID"] == 2) {
-
+  $Result = mysqli_query($DBcnx,"SELECT * FROM commands ORDER BY cmd_name");
+  if (mysqli_num_rows($Result) > 0) {
+    $Content  = "<select class=\"form-control form-select fw-bolder\" style=\"width: 100%;\" size=\"1\" id=\"command\" name=\"command\">";
+    while ($Cmd = mysqli_fetch_assoc($Result)) {
+      $Content .= "<option value=\"" . $Cmd["ID"] . "\">" . $Cmd["cmd_name"] . "</option>";
+    }
+    $Content .= "</select>";
+  } else {
+    $Content .= "<div class=\"text-danger fw-bolder\">No custom commands found</div>";
+  }
 } elseif ($_GET["ID"] == 3) {
-
+  $Result = mysqli_query($DBcnx,"SELECT * FROM scripts ORDER BY scr_name");
+  if (mysqli_num_rows($Result) > 0) {
+    $Content  = "<select class=\"form-control form-select fw-bolder\" style=\"width: 100%;\" size=\"1\" id=\"$script\" name=\"script\">";
+    while ($Scr = mysqli_fetch_assoc($Result)) {
+      $Content .= "<option value=\"" . $Scr["ID"] . "\">" . $Scr["cmd_name"] . "</option>";
+    }
+    $Content .= "</select>";
+  } else {
+    $Content .= "<div class=\"text-danger fw-bolder\">No custom scripts found</div>";
+  }
 } elseif ($_GET["ID"] == 4) {
   $Content .= "<input type=\"hidden\" name=\"reboot\" value=\"1\">";
   $Content .= "<div class=\"fw-bolder\">Click the Submit button below to reboot <span class=\"text-success\">" . $Dev["dev_name"] . "</span></div>";

@@ -15,6 +15,19 @@ define("DB_NAME","LCC");
 define("DB_USER","lccdbuser");
 define("DB_PASS","LoRaCmdCtrl");
 //---------------------------------------------------------------------------------------------------
+function createMessage($DBcnx,$ID) {
+  $Result = mysqli_query($DBcnx,"SELECT * FROM commands WHERE ID=$ID");
+  $Cmd = mysqli_fetch_assoc($Result);
+  $Msg = "";
+
+  if ($Cmd["cmd_type"] == 1) { // Motor Control
+    $Msg = "/motor/" . $Cmd["direction"] . "/" . $Cmd["speed"] . "/" . $Cmd["progression"] . "/" . $Cmd["duration"] . "|" . $Cmd["repeat"];
+  } elseif ($Cmd["cmd_type"] == 2) { // Stepper Control
+
+  }
+  return $Msg;
+}
+//---------------------------------------------------------------------------------------------------
 function deviceSelector($Selected,$ID) {
   $Content  = "<select class=\"form-control form-select fw-bolder\" style=\"width: 100%;\" size=\"1\" id=\"$ID\" name=\"$ID\">";
   for ($x = 0; $x <= 4; $x ++) {
