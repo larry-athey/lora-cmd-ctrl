@@ -15,6 +15,23 @@ define("DB_NAME","LCC");
 define("DB_USER","lccdbuser");
 define("DB_PASS","LoRaCmdCtrl");
 //---------------------------------------------------------------------------------------------------
+function AjaxRefreshJS($ID,$RandID,$Delay) {
+  $Content  = "\n<script type=\"text/javascript\">\n";
+  //$Content .= "  // Random $Delay milliseconds refresh time per card so things\n";
+  //$Content .= "  // don't have such a robotic look by updating simultaneously.\n";
+  $Content .= "  jQuery(document).ready(function() {\n";
+  $Content .= "    RandomDelay = $Delay + Math.floor(Math.random() * 500) + 1;\n";
+  $Content .= "    function refresh() {\n";
+  $Content .= "      jQuery('#$RandID').load('./ajax.php?ID=$ID');\n";
+  $Content .= "    }\n";
+  $Content .= "    setInterval(function() {\n";
+  $Content .= "      refresh()\n";
+  $Content .= "    },RandomDelay);\n";
+  $Content .= "  });\n";
+  $Content .= "</script>\n";
+  return $Content;
+}
+//---------------------------------------------------------------------------------------------------
 function createMessage($DBcnx,$ID) {
   $Result = mysqli_query($DBcnx,"SELECT * FROM commands WHERE ID=$ID");
   $Cmd = mysqli_fetch_assoc($Result);
@@ -74,6 +91,16 @@ function favoriteSelector($DBcnx,$List,$DevType) {
   return $Content;
 }
 //---------------------------------------------------------------------------------------------------
+function generateRandomString($length = 10) {
+  $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  $charactersLength = strlen($characters);
+  $randomString = '';
+  for ($i = 0; $i < $length; $i++) {
+    $randomString .= $characters[rand(0, $charactersLength - 1)];
+  }
+  return $randomString;
+}
+//---------------------------------------------------------------------------------------------------
 function getCommandName($DBcnx,$ID) {
   $Result = mysqli_query($DBcnx,"SELECT * FROM commands WHERE ID=$ID");
   if (mysqli_num_rows($Result) > 0) {
@@ -82,6 +109,25 @@ function getCommandName($DBcnx,$ID) {
   } else {
     return "Unknown";
   }
+}
+//---------------------------------------------------------------------------------------------------
+function getDeviceStats($DBcnx,$Address) {
+  $Result = mysqli_query($DBcnx,"SELECT * FROM devices WHERE address=$Address");
+  $Dev = mysqli_fetch_assoc($Result);
+  $Content  =       "<div class=\"row\">";
+  $Content .=         "<div class=\"col-5 text-secondary-emphasis\">Honor Repeats:</div>";
+  $Content .=         "<div class=\"col-7\" style=\"text-align: right;\">" . IntToYNC($Dev["cmd_repeat"]) . "</div>";
+  $Content .=       "</div>";
+  $Content .=       "<div class=\"row\">";
+  $Content .=         "<div class=\"col-5 text-secondary-emphasis\">Last Location:</div>";
+  $Content .=         "<div class=\"col-7\" style=\"text-align: right;\">" . getLocationName($DBcnx,$Dev["last_loc"]) . "</div>";
+  $Content .=       "</div>";
+  $Content .=       "<div class=\"row\">";
+  $Content .=         "<div class=\"col-5 text-secondary-emphasis\">Status:</div>";
+  $Content .=         "<div class=\"col-7\" style=\"text-align: right;\">" . $Dev["status"] . "</div>";
+  $Content .=       "</div>";
+  $Content .=     "</div>";
+  return $Content;
 }
 //---------------------------------------------------------------------------------------------------
 function getDeviceType($ID) {

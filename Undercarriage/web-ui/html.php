@@ -138,23 +138,15 @@ function showHomePage($DBcnx) {
   }
   while ($Dev = mysqli_fetch_assoc($Result)) {
     $Counter ++;
+    $RandID   = "dev_" . generateRandomString();
     $Content .= "<div style=\"width: 29em; margin-left: 0.25em; margin-top: 0.5em;\">";
     $Content .=   "<div class=\"card\" style=\"width: 100%; margin-bottom: 0.5em;\">";
     $Content .=     "<div class=\"card-header\"><span class=\"text-muted fw-bolder\">" . $Dev["dev_name"] . "</span></div>";
-    $Content .=     "<div class=\"card-body\">";
-    $Content .=       "<div class=\"row\">";
-    $Content .=         "<div class=\"col-5 text-secondary-emphasis\">Honor Repeats:</div>";
-    $Content .=         "<div class=\"col-7\" style=\"text-align: right;\">" . IntToYNC($Dev["cmd_repeat"]) . "</div>";
-    $Content .=       "</div>";
-    $Content .=       "<div class=\"row\">";
-    $Content .=         "<div class=\"col-5 text-secondary-emphasis\">Last Location:</div>";
-    $Content .=         "<div class=\"col-7\" style=\"text-align: right;\">" . getLocationName($DBcnx,$Dev["last_loc"]) . "</div>";
-    $Content .=       "</div>";
-    $Content .=       "<div class=\"row\">";
-    $Content .=         "<div class=\"col-5 text-secondary-emphasis\">Status:</div>";
-    $Content .=         "<div class=\"col-7\" style=\"text-align: right;\">" . $Dev["status"] . "</div>";
-    $Content .=       "</div>";
-    $Content .=     "</div>";
+    $Content .=     "<div class=\"card-body\" id=\"device_stats\">";
+    $Content .=        AjaxRefreshJS("device_stats&address=" . $Dev["address"],$RandID,1000);
+    $Content .=        "<div id=\"$RandID\">";
+    $Content .=        getDeviceStats($DBcnx,$Dev["address"]);
+    $Content .=        "</div>";
     $Content .=     "<div class=\"border-bottom\"></div>";
     $Content .=     "<div class=\"row\" style=\"margin-top: 0.5em; margin-bottom: 0.5em; margin-left: 1em; margin-right: 1em;\">";
     $Content .=       "<div class=\"col\"><button class=\"btn btn-sm btn-success fw-bolder\" onClick=\"LoadForm('Device Control','1','" . $Dev["address"] . "')\">CTRL</button></div>";
