@@ -41,8 +41,36 @@ function createMessage($DBcnx,$ID) {
     $Msg = "/motor/" . $Cmd["direction"] . "/" . $Cmd["speed"] . "/" . $Cmd["progression"] . "/" . $Cmd["duration"] . "|" . $Cmd["repeat"];
   } elseif ($Cmd["cmd_type"] == 2) { // Stepper Control
 
+  } elseif ($Cmd["cmd_type"] == 3) { // Sound effect
+
+  } elseif ($Cmd["cmd_type"] == 4) { // GPIO output toggle
+
+  } elseif ($Cmd["cmd_type"] == 5) { // Location based action
+
   }
   return $Msg;
+}
+//---------------------------------------------------------------------------------------------------
+function deviceFilter() {
+  if (! isset($_GET["filter"])) $_GET["filter"] = 0;
+  $S1 = "";
+  $S2 = "";
+  $S3 = "";
+  $S4 = "";
+  if ($_GET["filter"] == 1) $S1 = "selected";
+  if ($_GET["filter"] == 2) $S2 = "selected";
+  if ($_GET["filter"] == 3) $S3 = "selected";
+  if ($_GET["filter"] == 4) $S4 = "selected";
+  $Content  = "<form class=\"d-flex\">";
+  $Content .=   "<select class=\"form-select\" onChange=\"window.location.href='?filter=' + this.value\">";
+  $Content .=     "<option value=\"0\">All Devices</option>";
+  $Content .=     "<option $S1 value=\"1\">Brushed Motor Controller</option>";
+  $Content .=     "<option $S2 value=\"2\">Stepper Motor Controller</option>";
+  $Content .=     "<option $S3 value=\"3\">Switching Controller</option>";
+  $Content .=     "<option $S4 value=\"4\">Model Train Locomotives</option>";
+  $Content .=   "</select>";
+  $Content .= "</form>";
+  return $Content;
 }
 //---------------------------------------------------------------------------------------------------
 function deviceSelector($Selected,$ID) {
@@ -68,7 +96,7 @@ function favoriteSelector($DBcnx,$List,$DevType) {
   $Result = mysqli_query($DBcnx,"SELECT * FROM commands ORDER BY cmd_name");
   if (mysqli_num_rows($Result) > 0) {
     while ($Cmd = mysqli_fetch_assoc($Result)) {
-      if ($Cmd["cmd_type"] == $DevType) {
+      if ($Cmd["cmd_class"] == $DevType) {
         $Match = false;
         if (isset($Favorites)) {
           for ($x = 0; $x <= (count($Favorites) - 1); $x ++) {
@@ -116,7 +144,7 @@ function getDeviceStats($DBcnx,$Address) {
   $Dev = mysqli_fetch_assoc($Result);
   $Content  =       "<div class=\"row\">";
   $Content .=         "<div class=\"col-5 text-secondary-emphasis\">Honor Repeats:</div>";
-  $Content .=         "<div class=\"col-7\" style=\"text-align: right;\">" . IntToYNC($Dev["cmd_repeat"]) . "</div>";
+  $Content .=         "<div class=\"col-7\" style=\"text-align: right;\"><a href=\"/index.php?page=edit_device&ID=" . $Dev["ID"] . "\">" . IntToYNC($Dev["cmd_repeat"]) . "</a></div>";
   $Content .=       "</div>";
   $Content .=       "<div class=\"row\">";
   $Content .=         "<div class=\"col-5 text-secondary-emphasis\">Last Location:</div>";
@@ -184,7 +212,8 @@ function IntToYNC($Int) {
 }
 //---------------------------------------------------------------------------------------------------
 function sendCommand($DBcnx,$Address,$Command) {
-  $ID = md5($Address . "|" . time());
+  //$ID = md5($Address . "|" . time());
+  $ID = generateRandomString(32);
   $Result = mysqli_query($DBcnx,"INSERT INTO outbound (address,msg) VALUES ('$Address','/" . $ID . $Command . "')");
   return "<pre>cmd://" . $ID . $Command . ":$Address</pre>\n";
 }

@@ -15,7 +15,7 @@ if ($_GET["ID"] == 1) { // Send manual control
 } elseif ($_GET["ID"] == 2) { // Send command
   $Result = mysqli_query($DBcnx,"SELECT * FROM commands ORDER BY cmd_name");
   if (mysqli_num_rows($Result) > 0) {
-    $Content  = "<select class=\"form-control form-select fw-bolder\" style=\"width: 100%;\" size=\"1\" id=\"command\" name=\"command\">";
+    $Content .= "<select class=\"form-control form-select fw-bolder\" style=\"width: 100%;\" size=\"1\" id=\"command\" name=\"command\">";
     while ($Cmd = mysqli_fetch_assoc($Result)) {
       $Content .= "<option value=\"" . $Cmd["ID"] . "\">" . $Cmd["cmd_name"] . "</option>";
     }
@@ -26,9 +26,9 @@ if ($_GET["ID"] == 1) { // Send manual control
 } elseif ($_GET["ID"] == 3) { // Send script
   $Result = mysqli_query($DBcnx,"SELECT * FROM scripts ORDER BY scr_name");
   if (mysqli_num_rows($Result) > 0) {
-    $Content  = "<select class=\"form-control form-select fw-bolder\" style=\"width: 100%;\" size=\"1\" id=\"$script\" name=\"script\">";
+    $Content .= "<select class=\"form-control form-select fw-bolder\" style=\"width: 100%;\" size=\"1\" id=\"script\" name=\"script\">";
     while ($Scr = mysqli_fetch_assoc($Result)) {
-      $Content .= "<option value=\"" . $Scr["ID"] . "\">" . $Scr["cmd_name"] . "</option>";
+      $Content .= "<option value=\"" . $Scr["ID"] . "\">" . $Scr["scr_name"] . "</option>";
     }
     $Content .= "</select>";
   } else {

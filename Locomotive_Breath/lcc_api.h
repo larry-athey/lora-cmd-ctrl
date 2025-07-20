@@ -160,7 +160,7 @@ inline void runCommand(String Cmd) { // Execute a queued LCC mission control com
   delay(100);
   Serial2.readStringUntil('\n'); // Purge the +OK response
 
-  // parts[0] : Command ID tag (md5 hash of "LoRa_Address|Timestamp")
+  // parts[0] : Command ID tag (32 character random string)
   // parts[1] : The command type identifier
   // parts[2..(partCount-1)] : Any additional parameters for the command type
   if (parts[1] == "location") {
@@ -189,7 +189,7 @@ inline void runCommand(String Cmd) { // Execute a queued LCC mission control com
   }
 }
 //------------------------------------------------------------------------------------------------
-inline void processQueue() { // Process the next command in the FIFO queue
+inline void processQueue() { // Process the next command in the queue (FIFO style handling)
   // Prevent new motor/stepper control commands from cancelling incomplete ones
   #ifndef STEPPER
   if (motorSpeed != targetSpeed) return;
@@ -199,15 +199,15 @@ inline void processQueue() { // Process the next command in the FIFO queue
   if (Commands[0].length() > 0) {
     if (Serial) Serial.println("Executing: " + Commands[0]);
     runCommand(Commands[0]);
-    for (byte i = 0; i <= 14; i ++) { // Remove the processed command from the queue
+    for (byte i = 0; i <= 15; i ++) { // Remove the processed command from the queue
       Commands[i] = Commands[i + 1];
     }
-    Commands[15].clear(); // Add a blank slot to the end of the queue
+    Commands[16].clear(); // Add a blank slot to the end of the queue
   }
 }
 //------------------------------------------------------------------------------------------------
 inline void queueCommand(String Cmd) { // Add a command to the next empty slot in the queue
-  for (byte i = 0; i <= 15; i ++) {
+  for (byte i = 0; i <= 16; i ++) {
     if (Commands[i].length() == 0) {
       Commands[i] = Cmd;
       break;
@@ -215,32 +215,50 @@ inline void queueCommand(String Cmd) { // Add a command to the next empty slot i
   }
 }
 //------------------------------------------------------------------------------------------------
-inline String handleCommand() { // Handle commands sent from mission control
-  String incoming = Serial2.readStringUntil('\n');
-  if (Serial) Serial.println("LoRa message: " + incoming);
-  // Check if the message is a received LoRa message
-  if (incoming.startsWith("+RCV")) {
-    // Parse the Result: +RCV=SenderID,length,message,RSSI,SNR
-    int firstComma = incoming.indexOf(',');
-    if (firstComma > 4) { // Ensure valid +RCV format
-      String senderIDStr = incoming.substring(5,firstComma); // Extract SenderID
-      int senderID = senderIDStr.toInt();
-      // Only process if the sender is the mission control server (ID 1)
-      if (senderID == 1) {
-        int secondComma = incoming.indexOf(',',firstComma + 1);
-        int thirdComma = incoming.indexOf(',',secondComma + 1);
-        if (thirdComma > secondComma) {
-          String message = incoming.substring(secondComma + 1,thirdComma);
-          cmdCount ++;
-          if (Serial) Serial.println("Command " + String(cmdCount) + ": " + message);
-          queueCommand(message);
-          return message; // Return the command
+inline byte queueSize() {
+  byte Size = 0;
+  for (byte i = 0; i <= 16; i ++) {
+    if (Commands[i].length() > 0) Size ++;
+  }
+  return Size;
+}
+//------------------------------------------------------------------------------------------------
+inline byte handleCommand() { // Handle commands sent from mission control
+  byte msgCount = 0;
+  for (byte x = 0; x <= 16; x ++) msgCache[x].clear();
+  delay(1000); // Allow the 2048 byte buffer to fill if a script was sent
+  while (Serial2.available()) {  
+    String incoming = Serial2.readStringUntil('\n');
+    if (Serial) Serial.println("LoRa message: " + incoming);
+    // Check if the message is a received LoRa message
+    if (incoming.startsWith("+RCV")) {
+      // Parse the Result: +RCV=SenderID,length,message,RSSI,SNR
+      int firstComma = incoming.indexOf(',');
+      if (firstComma > 4) { // Ensure valid +RCV format
+        String senderIDStr = incoming.substring(5,firstComma); // Extract SenderID
+        int senderID = senderIDStr.toInt();
+        // Only process if the sender is the mission control server (ID 1)
+        if (senderID == 1) {
+          int secondComma = incoming.indexOf(',',firstComma + 1);
+          int thirdComma = incoming.indexOf(',',secondComma + 1);
+          if (thirdComma > secondComma) {
+            String message = incoming.substring(secondComma + 1,thirdComma);
+            cmdCount ++;
+            if (msgCount < 17) {
+              if (Serial) Serial.println("Caching Command " + String(cmdCount) + ": " + message);
+              if (queueSize() < 17) {
+                queueCommand(message);
+                msgCount ++;
+                msgCache[msgCount - 1] = message;
+              }
+            }
+          }
         }
       }
+    } else {
+      if (Serial) Serial.println(F("Not a valid mission control command"));
     }
-  } else {
-    if (Serial) Serial.println(F("Not a valid mission control command"));
   }
-  return "";
+  return msgCount;
 }
 //------------------------------------------------------------------------------------------------

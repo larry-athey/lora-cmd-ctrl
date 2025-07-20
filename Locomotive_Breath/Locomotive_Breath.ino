@@ -113,6 +113,7 @@ float motorSpeed = 0.0;          // Current motor speed [0..100]
 float progressFactor = 0.0;      // How much (percent) to change the motor speed per second
 float targetSpeed = 0.0;         // Motor target speed [0..100]
 String Commands[17];             // Queue for caching up to 16 commands plus 1 repeat command
+String msgCache[17];             // Temporary holding space for command acknowledgement messages
 String LoRa_PW = "1A2B3C4D";     // 8 character hex domain password, much like a WiFi password
 String wavFile = "";             // File name of the sound effect to load
 //------------------------------------------------------------------------------------------------
@@ -141,7 +142,7 @@ void echoRYLR998() { // Used for debugging RYLR998 output
 //------------------------------------------------------------------------------------------------
 void setup() {
   Serial.begin(115200);
-  Serial2.setRxBufferSize(1024);
+  Serial2.setRxBufferSize(2048);
   Serial2.begin(115200,SERIAL_8N1,RX2,TX2);
   delay(500);
 
@@ -406,13 +407,16 @@ void loop() {
 
   // Handle new commands received from mission control
   if ((Serial2) && (Serial2.available())) {
-    String Msg = handleCommand();    
-    if (Msg.length() > 0) {
-      // Send the command acknowledgement to mission control
-      String Response = "AT+SEND=1," + String(Msg.length()) + "," + Msg;
-      Serial2.print(Response + "\r\n");
-      delay(100);
-      Serial2.readStringUntil('\n'); // Purge the +OK response
+    byte msgCount = handleCommand();    
+    if (msgCount > 0) {
+      // Send the command acknowledgement(s) to mission control
+      for (byte x = 0; x < msgCount; x ++) {
+        String Response = "AT+SEND=1," + String(msgCache[x].length()) + "," + msgCache[x];
+        Serial2.print(Response + "\r\n");
+        delay(100);
+        Serial2.readStringUntil('\n'); // Purge the +OK response
+        delay(400);
+      }
     }
   }
 

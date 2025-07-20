@@ -97,14 +97,16 @@ def send_lora_message(ser, address, msg):
         length = len(msg_bytes)
         command = f"AT+SEND={address},{length},{msg}\r\n"
         ser.write(command.encode('utf-8'))
+        time.sleep(0.1)  # 100 ms delay
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         print(f"[{timestamp}] Sent: {command.strip()}")
+
         # Read response (e.g., +OK)
-        response = ser.readline().decode('utf-8').strip()
+        #response = ser.readline().decode('utf-8').strip()
+        response = ser.read_until(b'\n').decode('utf-8').strip()
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         print(f"[{timestamp}] Response: {response}")
-        # Wait 1 second after each message to prevent data loss on the receiving end
-        time.sleep(1)
+
         return response.startswith('+OK')
     except Exception as e:
         print(f"Error sending message: {e}")
@@ -134,14 +136,18 @@ def check_outbound_messages(ser, db):
     try:
         db.commit()
         with db.cursor() as cursor:
-            sql = "SELECT ID, address, msg FROM outbound WHERE sent = 0"
+            sql = "SELECT ID, address, msg FROM outbound WHERE sent = 0 ORDER BY ID ASC"
             cursor.execute(sql)
             messages = cursor.fetchall()
+            num_rows = cursor.rowcount
+            if num_rows > 0:
+                timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                print(f"[{timestamp}] {num_rows} unsent message(s) found")
             for msg in messages:
                 if send_lora_message(ser, msg['address'], msg['msg']):
                     # Mark as sent
                     with db.cursor() as cursor:
-                        sql = "UPDATE outbound SET sent = TRUE WHERE ID = %s"
+                        sql = "UPDATE outbound SET sent = TRUE, sent_time = NOW() WHERE ID = %s"
                         cursor.execute(sql, (msg['ID'],))
                     db.commit()
                     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")

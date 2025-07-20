@@ -33,6 +33,7 @@ function drawMenu($DBcnx) {
   $Content .=           "<a class=\"nav-link fw-bolder\" aria-current=\"page\" href=\"/index.php?page=logs\">Log&nbsp;Viewer</a>";
   $Content .=         "</li>";
   $Content .=       "</ul>";
+  if (! isset($_GET["page"])) $Content .= deviceFilter();
   $Content .=     "</div>";
   $Content .=   "</div>";
   $Content .= "</nav>";
@@ -131,10 +132,10 @@ function showHomePage($DBcnx) {
   $Content .=   "</div>";
   $Content .= "</div>\n";
 
-  if (isset($_GET["filter"])) {
-    $Result = mysqli_query($DBcnx,"SELECT * FROM devices WHERE dev_type=" . $_GET["filter"] . " ORDER BY dev_name");
-  } else {
+  if ((! isset($_GET["filter"])) || ($_GET["filter"] == 0)) {
     $Result = mysqli_query($DBcnx,"SELECT * FROM devices ORDER BY dev_name");
+  } else {
+    $Result = mysqli_query($DBcnx,"SELECT * FROM devices WHERE dev_type=" . $_GET["filter"] . " ORDER BY dev_name");
   }
   while ($Dev = mysqli_fetch_assoc($Result)) {
     $Counter ++;
