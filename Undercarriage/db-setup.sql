@@ -91,6 +91,7 @@ CREATE TABLE scripts (
   `ID` INT AUTO_INCREMENT PRIMARY KEY,
   `scr_name` VARCHAR(255) DEFAULT NULL,
   `repeat` TINYINT(4) DEFAULT 0,
+  `repeat_id` INT(11) DEFAULT 0,
   `commands` TEXT DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
