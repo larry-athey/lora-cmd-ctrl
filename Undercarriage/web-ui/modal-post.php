@@ -8,7 +8,7 @@ $jsonSuccess = "{\"status\": \"success\",\"message\": \"Operation completed succ
 $jsonFailure = "{\"status\": \"error\",\"message\": \"Operation failed\"}\n";
 //---------------------------------------------------------------------------------------------------
 if ($_POST) {
-  if ($_POST["form-id"] == 1) { // Send manual control
+  if ($_POST["form-id"] == 1) { // CTRL functions moved to 10..14
 
   } elseif ($_POST["form-id"] == 2) { // Send command
     $Temp = createMessage($DBcnx,$_POST["command"]);
@@ -18,7 +18,7 @@ if ($_POST) {
     $Result = mysqli_query($DBcnx, "UPDATE devices SET status='<span class=\"text-primary\">Sent library command</span>' WHERE address='" . $_POST["address"] . "'");
     echo($jsonSuccess);
   } elseif ($_POST["form-id"] == 3) { // Send script (command repeats not sent)
-    $Result = mysqli_query($DBcnx,"SELECT * FROM scripts WHERE ID=" . $_POST["script"]);
+    $Result = mysqli_query($DBcnx, "SELECT * FROM scripts WHERE ID=" . $_POST["script"]);
     $Scr = mysqli_fetch_assoc($Result);
     $Data = explode("|",$Scr["commands"]);
     $SQL = "INSERT INTO outbound (address,msg) VALUES ";
@@ -36,6 +36,22 @@ if ($_POST) {
   } elseif ($_POST["form-id"] == 4) { // Send reboot command
     sendCommand($DBcnx,$_POST["address"],"/reboot");
     $Result = mysqli_query($DBcnx, "UPDATE devices SET status='<span class=\"text-danger\">Sent panic reboot</span>' WHERE address='" . $_POST["address"] . "'");
+    echo($jsonSuccess);
+  } elseif ($_POST["form-id"] >= 10) { // Send CTRL button related commands
+    $Result = mysqli_query($DBcnx, "INSERT INTO commands (cmd_name) VALUES ('Temp Motor Control')");
+    $ID = mysqli_insert_id($DBcnx);
+    if ($_POST["form-id"] == 10) { // Brushed motor control command
+      $direction = $_POST["direction"];
+      $speed = $_POST["speed"];
+      $progression = $_POST["progression"];
+      $duration = $_POST["duration"];
+      $Result = mysqli_query($DBcnx, "UPDATE commands SET cmd_type=1,cmd_class=1,direction=$direction,speed=$speed,progression=$progression,duration=$duration WHERE ID=$ID");
+      $Result = mysqli_query($DBcnx, "UPDATE devices SET status='<span class=\"text-success\">Sent motor control command</span>' WHERE address='" . $_POST["address"] . "'");
+    }
+    $Temp = createMessage($DBcnx,$ID);
+    $Msg = explode("|",$Temp);
+    sendCommand($DBcnx,$_POST["address"],$Msg[0]);
+    $Result = mysqli_query($DBcnx, "DELETE FROM commands WHERE ID=$ID");
     echo($jsonSuccess);
   } else {
     echo($jsonFailure);

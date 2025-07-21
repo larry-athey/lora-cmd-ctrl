@@ -150,7 +150,7 @@ function showHomePage($DBcnx) {
     $Content .=        "</div>";
     $Content .=     "<div class=\"border-bottom\"></div>";
     $Content .=     "<div class=\"row\" style=\"margin-top: 0.5em; margin-bottom: 0.5em; margin-left: 1em; margin-right: 1em;\">";
-    $Content .=       "<div class=\"col\"><button class=\"btn btn-sm btn-success fw-bolder\" onClick=\"LoadForm('Device Control','1','" . $Dev["address"] . "')\">CTRL</button></div>";
+    $Content .=       "<div class=\"col\">" . ctrlButtonMenu($Dev["dev_type"],$Dev["address"]) . "</div>";
     $Content .=       "<div class=\"col\"><button class=\"btn btn-sm btn-primary fw-bolder\" onClick=\"LoadForm('Send Command','2','" . $Dev["address"] . "')\">CMD</button></div>";
     $Content .=       "<div class=\"col\"><button class=\"btn btn-sm btn-warning fw-bolder\" onClick=\"LoadForm('Send Script','3','" . $Dev["address"] . "')\">SCR</button></div>";
     $Content .=       "<div class=\"col\"><button class=\"btn btn-sm btn-danger fw-bolder\" onClick=\"LoadForm('Reboot Device','4','" . $Dev["address"] . "')\">PANIC</button></div>";

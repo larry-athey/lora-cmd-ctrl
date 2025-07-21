@@ -51,6 +51,20 @@ function createMessage($DBcnx,$ID) {
   return $Msg;
 }
 //---------------------------------------------------------------------------------------------------
+function ctrlButtonMenu($DevType,$Address) {
+  $Content  = "<div class=\"dropdown\">";
+  $Content .=   "<button class=\"btn btn-sm btn-success dropdown-toggle fw-bolder\" type=\"button\" data-bs-toggle=\"dropdown\" aria-expanded=\"false\">CTRL</button>";
+  $Content .=   "<ul class=\"dropdown-menu\">";
+  if (($DevType == 1) || ($DevType == 4)) $Content .= "<li><a onClick=\"LoadForm('Brushed Motor Control','10','$Address')\" class=\"dropdown-item\" href=\"#\">Motor Control</a></li>";
+  if ($DevType == 2) $Content .= "<li><a onClick=\"LoadForm('Stepper Motor Control','11','$Address')\" class=\"dropdown-item\" href=\"#\">Stepper Control</a></li>";
+  $Content .=     "<li><a onClick=\"LoadForm('Location Based Action','12','$Address')\" class=\"dropdown-item\" href=\"#\">Location Detection</a></li>";
+  if ($DevType != 2) $Content .= "<li><a onClick=\"LoadForm('Play Sound Effects','13','$Address')\" class=\"dropdown-item\" href=\"#\">Sound Effects</a></li>";
+  $Content .=     "<li><a onClick=\"LoadForm('GPIO Pin Switching','14','$Address')\" class=\"dropdown-item\" href=\"#\">Switching Control</a></li>";
+  $Content .=   "</ul>";
+  $Content .= "</div>";
+  return $Content;
+}
+//---------------------------------------------------------------------------------------------------
 function deviceFilter() {
   if (! isset($_GET["filter"])) $_GET["filter"] = 0;
   $S1 = "";
@@ -82,6 +96,21 @@ function deviceSelector($Selected,$ID) {
       $Content .= "<option value=\"$x\">" . getDeviceType($x) . "</option>";
     }
   }
+  $Content .= "</select>";
+  return $Content;
+}
+//---------------------------------------------------------------------------------------------------
+function directionSelector($Selected) {
+  if ($Selected == 0) {
+    $S0 = "selected";
+    $S1 = "";
+  } else {
+    $S0 = "";
+    $S1 = "selected";
+  }
+  $Content  = "<select class=\"form-control form-select fw-bolder\" style=\"width: 100%;\" size=\"1\" class=\"form-control form-select\" id=\"direction\" name=\"direction\">";
+  $Content .= "<option $S1 value=\"1\">Forward</option>";
+  $Content .= "<option $S0 value=\"0\">Reverse</option>";
   $Content .= "</select>";
   return $Content;
 }
