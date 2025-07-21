@@ -24,13 +24,21 @@ if ($_POST) {
     $SQL = "INSERT INTO outbound (address,msg) VALUES ";
     for ($x = 0; $x <= (count($Data) - 1); $x ++) {
       $Temp = createMessage($DBcnx,$Data[$x]);
-      $Msg = explode("|",$Temp);
-      $ID = generateRandomString(32);
-      $SQL .= "('" . $_POST["address"] . "','/" . $ID . $Msg[0] . "'),";
+      if ($Temp != "") {
+        $Msg = explode("|",$Temp);
+        $ID = generateRandomString(32);
+        $SQL .= "('" . $_POST["address"] . "','/" . $ID . $Msg[0] . "'),";
+      }
     }
     $SQL = rtrim($SQL,",") . ";";
     $Result = mysqli_query($DBcnx,$SQL);
-    if ($Scr["repeat"] == 1) sendCommand($DBcnx,$_POST["address"],"/repeat/scr/" . $_POST["script"]);
+    if ($Scr["repeat"] == 1) {
+      if ($Scr["repeat_id"] == 0) {
+        sendCommand($DBcnx,$_POST["address"],"/repeat/scr/" . $_POST["script"]);
+      } else {
+        sendCommand($DBcnx,$_POST["address"],"/repeat/scr/" . $Scr["repeat_id"]);
+      }
+    }
     $Result = mysqli_query($DBcnx, "UPDATE devices SET status='<span class=\"text-warning\">Sent script commands</span>' WHERE address='" . $_POST["address"] . "'");
     echo($jsonSuccess);
   } elseif ($_POST["form-id"] == 4) { // Send reboot command

@@ -37,13 +37,13 @@ if ($_GET["ID"] == 1) { // CTRL button functions moved to 10..14
 } elseif ($_GET["ID"] == 4) { // Send reboot command
   $Content .= "<input type=\"hidden\" name=\"reboot\" value=\"1\">";
   $Content .= "<div class=\"fw-bolder\">Click the Submit button below to reboot <span class=\"text-success\">" . $Dev["dev_name"] . "</span></div>";
-} elseif ($_GET["ID"] == 10) { // Send
+} elseif ($_GET["ID"] == 10) { // Send motor command - type 1
   $Content .= "<div>";
   $Content .=   "<label for=\"direction\" class=\"form-label fw-bolder\">Direction</label>";
   $Content .=    directionSelector(1);
   $Content .= "</div>";
   $Content .= "<div style=\"margin-top: 0.5em;\">";
-  $Content .=   "<label for=\"speed\" class=\"form-label fw-bolder\">Speed (0%..100%)</label>";
+  $Content .=   "<label for=\"speed\" class=\"form-label fw-bolder\">Speed [0..100] Percent</label>";
   $Content .=   "<input type=\"number\" class=\"form-control fw-bolder\" id=\"speed\" name=\"speed\" min=\"0\" max=\"100\" step=\"1\" value=\"0\">";
   $Content .= "</div>";
   $Content .= "<div style=\"margin-top: 0.5em;\">";
@@ -54,14 +54,54 @@ if ($_GET["ID"] == 1) { // CTRL button functions moved to 10..14
   $Content .=   "<label for=\"duration\" class=\"form-label fw-bolder\">Duration (seconds, 0=indefinite)</label>";
   $Content .=   "<input type=\"number\" class=\"form-control fw-bolder\" id=\"duration\" name=\"duration\" min=\"0\" max=\"86400\" step=\"1\" value=\"0\">";
   $Content .= "</div>";
-} elseif ($_GET["ID"] == 11) { // Send stepper command
-
-} elseif ($_GET["ID"] == 12) { // Send location based action
-
-} elseif ($_GET["ID"] == 13) { // Send sound effect
-
-} elseif ($_GET["ID"] == 14) { // Send GPIO switch toggle
-
+} elseif ($_GET["ID"] == 11) { // Send stepper command - type 2
+  $Content .= "<div>";
+  $Content .=   "<label for=\"direction\" class=\"form-label fw-bolder\">Direction</label>";
+  $Content .=    directionSelector(1);
+  $Content .= "</div>";
+  $Content .= "<div style=\"margin-top: 0.5em;\">";
+  $Content .=   "<label for=\"speed\" class=\"form-label fw-bolder\">Speed [0..100] Percent</label>";
+  $Content .=   "<input type=\"number\" class=\"form-control fw-bolder\" id=\"speed\" name=\"speed\" min=\"0\" max=\"100\" step=\"1\" value=\"0\">";
+  $Content .= "</div>";
+  $Content .= "<div> style=\"margin-top: 0.5em;\"";
+  $Content .=   "<label for=\"resolution\" class=\"form-label fw-bolder\">Resolution</label>";
+  $Content .=    resolutionSelector(1);
+  $Content .= "</div>";
+  $Content .= "<div style=\"margin-top: 0.5em;\">";
+  $Content .=   "<label for=\"duration\" class=\"form-label fw-bolder\">Steps</label>";
+  $Content .=   "<input type=\"number\" class=\"form-control fw-bolder\" id=\"duration\" name=\"duration\" min=\"1\" max=\"100000\" step=\"1\" value=\"1\">";
+  $Content .= "</div>";
+} elseif ($_GET["ID"] == 12) { // Send location based action - type 3
+  $Content .= "<div>";
+  $Content .=   "<label for=\"location\" class=\"form-label fw-bolder\">Location</label>";
+  $Content .=    locationSelector($DBcnx,0);
+  $Content .= "</div>";
+  $Content .= "<div style=\"margin-top: 0.5em;\">";
+  $Content .=   "<label for=\"location_action\" class=\"form-label fw-bolder\">Action to Perform</label>";
+  $Content .=    locationActionSelector();
+  $Content .= "</div>";
+  $Content .= "<div style=\"margin-top: 0.5em;\">";
+  $Content .=   "<label for=\"location_data\" class=\"form-label fw-bolder\">Associated Action Data</label>";
+  $Content .=   "<input type=\"number\" class=\"form-control fw-bolder\" id=\"location_data\" name=\"location_data\" min=\"0\" max=\"2000000000\" step=\"1\" value=\"0\">";
+  $Content .= "</div>";
+} elseif ($_GET["ID"] == 13) { // Send sound effect - type 4
+  $Content .= "<div>";
+  $Content .=   "<label for=\"sound\" class=\"form-label fw-bolder\">Remote Sound File ID Number</label>";
+  $Content .=   "<input type=\"number\" class=\"form-control fw-bolder\" id=\"sound\" name=\"sound\" min=\"0\" max=\"2000000000\" step=\"1\" value=\"0\">";
+  $Content .= "</div>";
+  $Content .= "<div style=\"margin-top: 0.5em;\">";
+  $Content .=   "<label for=\"sound_loop\" class=\"form-label fw-bolder\">Loop Playback</label>";
+  $Content .=    YNSelector(0,"sound_loop");
+  $Content .= "</div>";
+} elseif ($_GET["ID"] == 14) { // Send GPIO switch toggle - type 5
+  $Content .= "<div>";
+  $Content .=   "<label for=\"gpio_pin\" class=\"form-label fw-bolder\">GPIO Pin Number [1..32]</label>";
+  $Content .=   "<input type=\"number\" class=\"form-control fw-bolder\" id=\"gpio_pin\" name=\"gpio_pin\" min=\"1\" max=\"32\" step=\"1\" value=\"1\">";
+  $Content .= "</div>";
+  $Content .= "<div style=\"margin-top: 0.5em;\">";
+  $Content .=   "<label for=\"gpio_state\" class=\"form-label fw-bolder\">GPIO Pin State</label>";
+  $Content .=    OnOffSelector(0,"gpio_state");
+  $Content .= "</div>";
 } else {
   $Content = "<p>Unknown form requested</p>";
 }

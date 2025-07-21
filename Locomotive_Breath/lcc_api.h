@@ -11,14 +11,17 @@ inline void sendRepeatRequest(String Request, String ID) { // Request a repeat o
   Serial2.readStringUntil('\n'); // Purge the +OK response
 }
 //------------------------------------------------------------------------------------------------
-inline void setupLocation(int Pin) { // Add a transponder pin and action to the Locations queue
-  // Locations[i][0] = Pin
-  // Locations[i][1] = Action Type
-  // Locations[i][2] = Action Data
+inline void setupLocation(int Pin, int Action, int Data) { // Add a transponder pin and action to the Locations queue
   for (byte i = 0; i <= 15; i ++) {
     if (Locations[i] == 0) {
       Locations[i][0] = Pin;
-      if (Serial) Serial.println("Location pin added: " + String(Pin));
+      Locations[i][1] = Action;
+      Locations[i][2] = Data;
+      if (Serial) {
+         Serial.println("Location pin added: " + String(Pin));
+         Serial.println("Location Action added: " + String(Action));
+         Serial.println("Location Data added: " + String(Data));
+      }
       break;
     }
   }
@@ -165,7 +168,7 @@ inline void runCommand(String Cmd) { // Execute a queued LCC mission control com
   // parts[2..(partCount-1)] : Any additional parameters for the command type
   if (parts[1] == "location") {
     //ID/location/pin/action-type/action-data
-    if (partCount == 3) setupLocation(parts[2].toInt());
+    if (partCount == 5) setupLocation(parts[2].toInt(),parts[3].toInt(),parts[4].toInt());
   } else if (parts[1] == "motor") {
     //ID/motor/direction/speed/progression/duration
     //b7f352dccb4372aff00d768a4728a64a/motor/1/80/30/0

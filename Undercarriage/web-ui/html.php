@@ -2,6 +2,10 @@
 //---------------------------------------------------------------------------------------------------
 require_once("subs.php");
 //---------------------------------------------------------------------------------------------------
+function deleteConfirm($DBcnx) {
+
+}
+//---------------------------------------------------------------------------------------------------
 function drawMenu($DBcnx) {
   $Content  = "<nav class=\"navbar navbar-expand-lg\" style=\"background-color: #121212;\">";
   $Content .=   "<div class=\"container-fluid\">";
@@ -65,7 +69,7 @@ function editDevice($DBcnx) {
   $Content .=       "</div>";
   $Content .=       "<div style=\"margin-top: 0.5em;\">";
   $Content .=         "<label for=\"dev_type\" class=\"form-label fw-bolder\">Device Type</label>";
-  $Content .=         deviceSelector($Dev["dev_type"],"dev_type");
+  $Content .=         deviceTypeSelector($Dev["dev_type"],"dev_type");
   $Content .=       "</div>";
   $Content .=       "<div style=\"margin-top: 0.5em;\">";
   $Content .=         "<label for=\"address\" class=\"form-label fw-bolder\">LoRa WAN Address [2..65535]</label>";
@@ -91,7 +95,55 @@ function editDevice($DBcnx) {
   return $Content;
 }
 //---------------------------------------------------------------------------------------------------
+function logViewer($DBcnx) {
+
+}
+//---------------------------------------------------------------------------------------------------
+function showCommands($DBcnx) { // *
+  $Counter  = 0;
+  $Content  = "<div style=\"width: 31em; margin-left: 0.25em;\">";
+  $Content .= "<a href=\"?page=edit_device&ID=0\" class=\"btn btn-outline-secondary fw-bolder\" style=\"width: 100%; margin-top: 0.5em; margin-bottom: 0.5em; margin-right: 0.5em;\" name=\"create_program\">Create New Device</a><br>";
+
+  $Result = mysqli_query($DBcnx,"SELECT * FROM devices ORDER BY dev_name");
+  while ($Dev = mysqli_fetch_assoc($Result)) {
+    $Counter ++;
+    $Content .= "<div class=\"card\" style=\"width: 100%; margin-bottom: 0.5em;\">";
+    $Content .=   "<div class=\"card-body\">";
+    $Content .=     "<p class=\"fw-bolder mb-0\">" . $Dev["dev_name"] . "</p>";
+    $Content .=     "<p class=\"mb-0\" style=\"float: right;\"><a href=\"?page=delete_confirm&type=1&ID=" . $Dev["ID"] . "\" class=\"btn btn-danger fw-bolder\" name=\"delete_device\" style=\"--bs-btn-padding-y: .10rem; --bs-btn-padding-x: .75rem; --bs-btn-font-size: .75rem;\">Delete</a>&nbsp;&nbsp;&nbsp;&nbsp;";
+    $Content .=     "<a href=\"?page=edit_device&ID=" . $Dev["ID"] . "\" class=\"btn btn-primary fw-bolder\" name=\"edit_device\" style=\"--bs-btn-padding-y: .10rem; --bs-btn-padding-x: .75rem; --bs-btn-font-size: .75rem;\">Edit</a></p>";
+    $Content .=   "</div>";
+    $Content .= "</div>";
+  }
+
+  if ($Counter == 0) $Content .= "<p class=\"fw-bolder\">No devices found...</p>";
+  $Content .= "</div>";
+  return $Content;
+}
+//---------------------------------------------------------------------------------------------------
 function showDevices($DBcnx) {
+  $Counter  = 0;
+  $Content  = "<div style=\"width: 31em; margin-left: 0.25em;\">";
+  $Content .= "<a href=\"?page=edit_device&ID=0\" class=\"btn btn-outline-secondary fw-bolder\" style=\"width: 100%; margin-top: 0.5em; margin-bottom: 0.5em; margin-right: 0.5em;\" name=\"create_program\">Create New Device</a><br>";
+
+  $Result = mysqli_query($DBcnx,"SELECT * FROM devices ORDER BY dev_name");
+  while ($Dev = mysqli_fetch_assoc($Result)) {
+    $Counter ++;
+    $Content .= "<div class=\"card\" style=\"width: 100%; margin-bottom: 0.5em;\">";
+    $Content .=   "<div class=\"card-body\">";
+    $Content .=     "<p class=\"fw-bolder mb-0\">" . $Dev["dev_name"] . "</p>";
+    $Content .=     "<p class=\"mb-0\" style=\"float: right;\"><a href=\"?page=delete_confirm&type=1&ID=" . $Dev["ID"] . "\" class=\"btn btn-danger fw-bolder\" name=\"delete_device\" style=\"--bs-btn-padding-y: .10rem; --bs-btn-padding-x: .75rem; --bs-btn-font-size: .75rem;\">Delete</a>&nbsp;&nbsp;&nbsp;&nbsp;";
+    $Content .=     "<a href=\"?page=edit_device&ID=" . $Dev["ID"] . "\" class=\"btn btn-primary fw-bolder\" name=\"edit_device\" style=\"--bs-btn-padding-y: .10rem; --bs-btn-padding-x: .75rem; --bs-btn-font-size: .75rem;\">Edit</a></p>";
+    $Content .=   "</div>";
+    $Content .= "</div>";
+  }
+
+  if ($Counter == 0) $Content .= "<p class=\"fw-bolder\">No devices found...</p>";
+  $Content .= "</div>";
+  return $Content;
+}
+//---------------------------------------------------------------------------------------------------
+function showEvents($DBcnx) { // *
   $Counter  = 0;
   $Content  = "<div style=\"width: 31em; margin-left: 0.25em;\">";
   $Content .= "<a href=\"?page=edit_device&ID=0\" class=\"btn btn-outline-secondary fw-bolder\" style=\"width: 100%; margin-top: 0.5em; margin-bottom: 0.5em; margin-right: 0.5em;\" name=\"create_program\">Create New Device</a><br>";
@@ -211,6 +263,50 @@ function showHomePage($DBcnx) {
     $Content .= "};\n";
     $Content .= "</script>\n\n";
   }
+  return $Content;
+}
+//---------------------------------------------------------------------------------------------------
+function showLocations($DBcnx) { // *
+  $Counter  = 0;
+  $Content  = "<div style=\"width: 31em; margin-left: 0.25em;\">";
+  $Content .= "<a href=\"?page=edit_device&ID=0\" class=\"btn btn-outline-secondary fw-bolder\" style=\"width: 100%; margin-top: 0.5em; margin-bottom: 0.5em; margin-right: 0.5em;\" name=\"create_program\">Create New Device</a><br>";
+
+  $Result = mysqli_query($DBcnx,"SELECT * FROM devices ORDER BY dev_name");
+  while ($Dev = mysqli_fetch_assoc($Result)) {
+    $Counter ++;
+    $Content .= "<div class=\"card\" style=\"width: 100%; margin-bottom: 0.5em;\">";
+    $Content .=   "<div class=\"card-body\">";
+    $Content .=     "<p class=\"fw-bolder mb-0\">" . $Dev["dev_name"] . "</p>";
+    $Content .=     "<p class=\"mb-0\" style=\"float: right;\"><a href=\"?page=delete_confirm&type=1&ID=" . $Dev["ID"] . "\" class=\"btn btn-danger fw-bolder\" name=\"delete_device\" style=\"--bs-btn-padding-y: .10rem; --bs-btn-padding-x: .75rem; --bs-btn-font-size: .75rem;\">Delete</a>&nbsp;&nbsp;&nbsp;&nbsp;";
+    $Content .=     "<a href=\"?page=edit_device&ID=" . $Dev["ID"] . "\" class=\"btn btn-primary fw-bolder\" name=\"edit_device\" style=\"--bs-btn-padding-y: .10rem; --bs-btn-padding-x: .75rem; --bs-btn-font-size: .75rem;\">Edit</a></p>";
+    $Content .=   "</div>";
+    $Content .= "</div>";
+  }
+
+  if ($Counter == 0) $Content .= "<p class=\"fw-bolder\">No devices found...</p>";
+  $Content .= "</div>";
+  return $Content;
+}
+//---------------------------------------------------------------------------------------------------
+function showScripts($DBcnx) { // *
+  $Counter  = 0;
+  $Content  = "<div style=\"width: 31em; margin-left: 0.25em;\">";
+  $Content .= "<a href=\"?page=edit_device&ID=0\" class=\"btn btn-outline-secondary fw-bolder\" style=\"width: 100%; margin-top: 0.5em; margin-bottom: 0.5em; margin-right: 0.5em;\" name=\"create_program\">Create New Device</a><br>";
+
+  $Result = mysqli_query($DBcnx,"SELECT * FROM devices ORDER BY dev_name");
+  while ($Dev = mysqli_fetch_assoc($Result)) {
+    $Counter ++;
+    $Content .= "<div class=\"card\" style=\"width: 100%; margin-bottom: 0.5em;\">";
+    $Content .=   "<div class=\"card-body\">";
+    $Content .=     "<p class=\"fw-bolder mb-0\">" . $Dev["dev_name"] . "</p>";
+    $Content .=     "<p class=\"mb-0\" style=\"float: right;\"><a href=\"?page=delete_confirm&type=1&ID=" . $Dev["ID"] . "\" class=\"btn btn-danger fw-bolder\" name=\"delete_device\" style=\"--bs-btn-padding-y: .10rem; --bs-btn-padding-x: .75rem; --bs-btn-font-size: .75rem;\">Delete</a>&nbsp;&nbsp;&nbsp;&nbsp;";
+    $Content .=     "<a href=\"?page=edit_device&ID=" . $Dev["ID"] . "\" class=\"btn btn-primary fw-bolder\" name=\"edit_device\" style=\"--bs-btn-padding-y: .10rem; --bs-btn-padding-x: .75rem; --bs-btn-font-size: .75rem;\">Edit</a></p>";
+    $Content .=   "</div>";
+    $Content .= "</div>";
+  }
+
+  if ($Counter == 0) $Content .= "<p class=\"fw-bolder\">No devices found...</p>";
+  $Content .= "</div>";
   return $Content;
 }
 //---------------------------------------------------------------------------------------------------

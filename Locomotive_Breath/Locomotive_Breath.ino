@@ -246,10 +246,29 @@ void setup() {
 bool beaconCheck(int Pin) { // Perform any registered actions based on the current location beacon
   for (byte i = 0; i <= 15; i ++) {
     if (Pin == Locations[i][0]) {
-      setMotorSpeed(0);
-      targetSpeed = 0;
-      progressFactor = 0;
+      if (Locations[i][1] == 1) { // Stop motor/stepper
+        setMotorSpeed(0);
+        targetRuntime = 0;
+        targetSpeed = 0;
+        progressFactor = 0;
+      } else if (Locations[i][1] == 2) { // Play sound effect
+        wavFile = String(Locations[i][2]);
+        sfxLoop = false;
+      } else if (Locations[i][1] == 3) { // Request command
+
+      } else if (Locations[i][1] == 4) { // Request script
+
+      } else if (Locations[i][1] == 5) { // Toggle GPIO pin
+        byte State = digitalRead(Locations[i][2]);
+        if (State == 0) {
+          digitalWrite(Locations[i][2],HIGH);
+        } else {
+          digitalWrite(Locations[i][2],LOW);
+        }
+      }
       Locations[i][0] = 0;
+      Locations[i][1] = 0;
+      Locations[i][2] = 0;
       return true;
     }
   }
@@ -331,6 +350,7 @@ void loop() {
   // Shut down the motor if either limit switch has been tripped
   if ((motorSpeed > 0) && ((digitalRead(LIMIT_1) == 0) || (digitalRead(LIMIT_2) == 0))) {
     setMotorSpeed(0);
+    targetRuntime = 0;
     targetSpeed = 0;
     progressFactor = 0;
     String Status;
@@ -355,9 +375,9 @@ void loop() {
     // Send the location update and stop status to mission control
     String Status;
     if (beaconCheck(Location)) {
-      Status = "/location/" + String(Location) + "/1";
+      Status = "/location/" + String(Location) + "/action";
     } else {
-      Status = "/location/" + String(Location) + "/0";
+      Status = "/location/" + String(Location) + "/report";
     }
     if (Serial) Serial.println("Location transponder detected: " + Status);
     Serial2.print("AT+SEND=1," + String(Status.length()) + "," + Status + "\r\n");

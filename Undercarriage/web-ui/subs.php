@@ -33,20 +33,22 @@ function AjaxRefreshJS($ID,$RandID,$Delay) {
 }
 //---------------------------------------------------------------------------------------------------
 function createMessage($DBcnx,$ID) {
-  $Result = mysqli_query($DBcnx,"SELECT * FROM commands WHERE ID=$ID");
-  $Cmd = mysqli_fetch_assoc($Result);
   $Msg = "";
+  $Result = mysqli_query($DBcnx,"SELECT * FROM commands WHERE ID=$ID");
+  if (mysqli_num_rows($Result) > 0) {
+    $Cmd = mysqli_fetch_assoc($Result);
 
-  if ($Cmd["cmd_type"] == 1) { // Motor Control
-    $Msg = "/motor/" . $Cmd["direction"] . "/" . $Cmd["speed"] . "/" . $Cmd["progression"] . "/" . $Cmd["duration"] . "|" . $Cmd["repeat"];
-  } elseif ($Cmd["cmd_type"] == 2) { // Stepper Control
-
-  } elseif ($Cmd["cmd_type"] == 3) { // Location based action
-
-  } elseif ($Cmd["cmd_type"] == 4) { // Sound effects
-
-  } elseif ($Cmd["cmd_type"] == 5) { // GPIO output switching
-
+    if ($Cmd["cmd_type"] == 1) { // Motor Control
+      $Msg = "/motor/" . $Cmd["direction"] . "/" . $Cmd["speed"] . "/" . $Cmd["progression"] . "/" . $Cmd["duration"] . "|" . $Cmd["repeat"];
+    } elseif ($Cmd["cmd_type"] == 2) { // Stepper Control
+      $Msg = "/stepper/" . $Cmd["direction"] . "/" . $Cmd["speed"] . "/" . $Cmd["resolution"] . "/" . $Cmd["steps"] . "|" . $Cmd["repeat"];
+    } elseif ($Cmd["cmd_type"] == 3) { // Location based action
+      $Msg = "/location/" . $Cmd["location_id"] . "/" . $Cmd["location_action"] . "/" . $Cmd["location_data"] . "|0";
+    } elseif ($Cmd["cmd_type"] == 4) { // Sound effects
+      $Msg = "/sound/" . $Cmd["sound"] . "/" . $Cmd["repeat"] . "|0";
+    } elseif ($Cmd["cmd_type"] == 5) { // GPIO output switching
+      $Msg = "/switch/" . $Cmd["gpio_pin"] . "/" . $Cmd["direction"] . "|" . $Cmd["repeat"];
+    }
   }
   return $Msg;
 }
@@ -87,7 +89,7 @@ function deviceFilter() {
   return $Content;
 }
 //---------------------------------------------------------------------------------------------------
-function deviceSelector($Selected,$ID) {
+function deviceTypeSelector($Selected,$ID) {
   $Content  = "<select class=\"form-control form-select fw-bolder\" style=\"width: 100%;\" size=\"1\" id=\"$ID\" name=\"$ID\">";
   for ($x = 0; $x <= 4; $x ++) {
     if ($x == $Selected) {
@@ -197,8 +199,8 @@ function getDeviceType($ID) {
 function getLocationName($DBcnx,$ID) {
   $Result = mysqli_query($DBcnx,"SELECT * FROM locations WHERE ID=$ID");
   if (mysqli_num_rows($Result) > 0) {
-    $Scr = mysqli_fetch_assoc($Result);
-    return $Scr["loc_name"];
+    $Loc = mysqli_fetch_assoc($Result);
+    return $Loc["loc_name"];
   } else {
     return "Unknown";
   }
@@ -246,6 +248,35 @@ function sendCommand($DBcnx,$Address,$Command) {
   return "<pre>cmd://" . $ID . $Command . ":$Address</pre>\n";
 }
 //---------------------------------------------------------------------------------------------------
+function locationSelector($DBcnx,$ID) {
+  $Result = mysqli_query($DBcnx,"SELECT * FROM locations ORDER BY loc_name");
+  if (mysqli_num_rows($Result) > 0) {
+    $Content  = "<select class=\"form-control form-select fw-bolder\" style=\"width: 100%;\" size=\"1\" class=\"form-control form-select\" id=\"location\" name=\"location\">";
+    while ($Loc = mysqli_fetch_assoc($Result)) {
+      if ($Loc["pin"] == $ID) {
+         $Content .= "<option selected value=\"" . $Loc["pin"] . "\">" . $Loc["loc_name"] . "</option>";
+      } else {
+         $Content .= "<option value=\"" . $Loc["pin"] . "\">" . $Loc["loc_name"] . "</option>";
+      }
+    }
+    $Content .= "</select>";
+    return $Content;
+  } else {
+    return "No configured locations";
+  }
+}
+//---------------------------------------------------------------------------------------------------
+function locationActionSelector() {
+  $Content  = "<select class=\"form-control form-select fw-bolder\" style=\"width: 100%;\" size=\"1\" class=\"form-control form-select\" id=\"location_action\" name=\"location_action\">";
+  $Content .= "<option value=\"0\">Stop Motor/Stepper</option>";
+  $Content .= "<option value=\"1\">Play Sound Effect</option>";
+  $Content .= "<option value=\"2\">Execute Command</option>";
+  $Content .= "<option value=\"3\">Execute Script</option>";
+  $Content .= "<option value=\"4\">GPIO Pin Switch/Toggle</option>";
+  $Content .= "</select>";
+  return $Content;
+}
+//---------------------------------------------------------------------------------------------------
 function OnOffSelector($Selected,$ID) {
   if ($Selected == 0) {
     $S0 = "selected";
@@ -261,6 +292,30 @@ function OnOffSelector($Selected,$ID) {
   return $Content;
 }
 //---------------------------------------------------------------------------------------------------
+function resolutionSelector($Selected) {
+  $S1 = "";
+  $S2 = "";
+  $S3 = "";
+  $S4 = "";
+  $S5 = "";
+  $S6 = "";
+  if ($Selected == 1) $S1 = "selected";
+  if ($Selected == 2) $S2 = "selected";
+  if ($Selected == 3) $S3 = "selected";
+  if ($Selected == 4) $S4 = "selected";
+  if ($Selected == 5) $S5 = "selected";
+  if ($Selected == 6) $S6 = "selected";
+  $Content  = "<select class=\"form-control form-select fw-bolder\" style=\"width: 100%;\" size=\"1\" class=\"form-control form-select\" id=\"resolution\" name=\"resolution\">";
+  $Content .= "<option $S1 value=\"1\">Whole Step</option>";
+  $Content .= "<option $S2 value=\"2\">1/2 Step</option>";
+  $Content .= "<option $S3 value=\"3\">1/4 Step</option>";
+  $Content .= "<option $S4 value=\"4\">1/8 Step</option>";
+  $Content .= "<option $S5 value=\"5\">1/16 Step</option>";
+  $Content .= "<option $S6 value=\"6\">1/32 Step</option>";
+  $Content .= "</select>";
+  return $Content;
+}
+//---------------------------------------------------------------------------------------------------
 function YNSelector($Selected,$ID) {
   if ($Selected == 0) {
     $S0 = "selected";
@@ -269,7 +324,7 @@ function YNSelector($Selected,$ID) {
     $S0 = "";
     $S1 = "selected";
   }
-  $Content  = "<select class=\"form-control form-select fw-bolder\" style=\"width: 100%;\" size=\"1\" class=\"form-control form-select\" id=\"$ID\" name=\"$ID\" aria-describedby=\"$ID" . "Help\">";
+  $Content  = "<select class=\"form-control form-select fw-bolder\" style=\"width: 100%;\" size=\"1\" class=\"form-control form-select\" id=\"$ID\" name=\"$ID\">";
   $Content .= "<option $S1 value=\"1\">Yes</option>";
   $Content .= "<option $S0 value=\"0\">No</option>";
   $Content .= "</select>";
