@@ -41,11 +41,11 @@ function createMessage($DBcnx,$ID) {
     $Msg = "/motor/" . $Cmd["direction"] . "/" . $Cmd["speed"] . "/" . $Cmd["progression"] . "/" . $Cmd["duration"] . "|" . $Cmd["repeat"];
   } elseif ($Cmd["cmd_type"] == 2) { // Stepper Control
 
-  } elseif ($Cmd["cmd_type"] == 3) { // Sound effect
+  } elseif ($Cmd["cmd_type"] == 3) { // Location based action
 
-  } elseif ($Cmd["cmd_type"] == 4) { // GPIO output toggle
+  } elseif ($Cmd["cmd_type"] == 4) { // Sound effects
 
-  } elseif ($Cmd["cmd_type"] == 5) { // Location based action
+  } elseif ($Cmd["cmd_type"] == 5) { // GPIO output switching
 
   }
   return $Msg;
@@ -171,19 +171,18 @@ function getCommandName($DBcnx,$ID) {
 function getDeviceStats($DBcnx,$Address) {
   $Result = mysqli_query($DBcnx,"SELECT * FROM devices WHERE address=$Address");
   $Dev = mysqli_fetch_assoc($Result);
-  $Content  =       "<div class=\"row\">";
-  $Content .=         "<div class=\"col-5 text-secondary-emphasis\">Honor Repeats:</div>";
-  $Content .=         "<div class=\"col-7\" style=\"text-align: right;\"><a href=\"/index.php?page=edit_device&ID=" . $Dev["ID"] . "\">" . IntToYNC($Dev["cmd_repeat"]) . "</a></div>";
-  $Content .=       "</div>";
-  $Content .=       "<div class=\"row\">";
-  $Content .=         "<div class=\"col-5 text-secondary-emphasis\">Last Location:</div>";
-  $Content .=         "<div class=\"col-7\" style=\"text-align: right;\">" . getLocationName($DBcnx,$Dev["last_loc"]) . "</div>";
-  $Content .=       "</div>";
-  $Content .=       "<div class=\"row\">";
-  $Content .=         "<div class=\"col-5 text-secondary-emphasis\">Status:</div>";
-  $Content .=         "<div class=\"col-7\" style=\"text-align: right;\">" . $Dev["status"] . "</div>";
-  $Content .=       "</div>";
-  $Content .=     "</div>";
+  $Content  = "<div class=\"row\">";
+  $Content .=   "<div class=\"col-5 text-secondary-emphasis\">Honor Repeats:</div>";
+  $Content .=   "<div class=\"col-7\" style=\"text-align: right;\"><a href=\"/index.php?page=edit_device&ID=" . $Dev["ID"] . "\">" . IntToYNC($Dev["cmd_repeat"]) . "</a></div>";
+  $Content .= "</div>";
+  $Content .= "<div class=\"row\">";
+  $Content .=   "<div class=\"col-5 text-secondary-emphasis\">Last Location:</div>";
+  $Content .=   "<div class=\"col-7\" style=\"text-align: right;\">" . getLocationName($DBcnx,$Dev["last_loc"]) . "</div>";
+  $Content .= "</div>";
+  $Content .= "<div class=\"row\">";
+  $Content .=   "<div class=\"col-5 text-secondary-emphasis\">Status:</div>";
+  $Content .=   "<div class=\"col-7\" style=\"text-align: right;\">" . $Dev["status"] . "</div>";
+  $Content .= "</div>";
   return $Content;
 }
 //---------------------------------------------------------------------------------------------------

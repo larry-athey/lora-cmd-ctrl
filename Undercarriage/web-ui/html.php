@@ -148,6 +148,7 @@ function showHomePage($DBcnx) {
     $Content .=        "<div id=\"$RandID\">";
     $Content .=        getDeviceStats($DBcnx,$Dev["address"]);
     $Content .=        "</div>";
+    $Content .=     "</div>";
     $Content .=     "<div class=\"border-bottom\"></div>";
     $Content .=     "<div class=\"row\" style=\"margin-top: 0.5em; margin-bottom: 0.5em; margin-left: 1em; margin-right: 1em;\">";
     $Content .=       "<div class=\"col\">" . ctrlButtonMenu($Dev["dev_type"],$Dev["address"]) . "</div>";

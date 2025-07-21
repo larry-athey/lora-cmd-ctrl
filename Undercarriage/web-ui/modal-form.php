@@ -10,7 +10,7 @@ $Content  = "<form id=\"modalForm\" onsubmit=\"return false;\">";
 $Content .= "<input type=\"hidden\" name=\"form-id\" value=\"" . $_GET["ID"] . "\">";
 $Content .= "<input type=\"hidden\" name=\"address\" value=\"" . $_GET["address"] . "\">";
 
-if ($_GET["ID"] == 1) { // CTRL functions moved to 10..14
+if ($_GET["ID"] == 1) { // CTRL button functions moved to 10..14
 
 } elseif ($_GET["ID"] == 2) { // Send command
   $Result = mysqli_query($DBcnx,"SELECT * FROM commands ORDER BY cmd_name");
@@ -54,13 +54,13 @@ if ($_GET["ID"] == 1) { // CTRL functions moved to 10..14
   $Content .=   "<label for=\"duration\" class=\"form-label fw-bolder\">Duration (seconds, 0=indefinite)</label>";
   $Content .=   "<input type=\"number\" class=\"form-control fw-bolder\" id=\"duration\" name=\"duration\" min=\"0\" max=\"86400\" step=\"1\" value=\"0\">";
   $Content .= "</div>";
-} elseif ($_GET["ID"] == 11) { // Send
+} elseif ($_GET["ID"] == 11) { // Send stepper command
 
-} elseif ($_GET["ID"] == 12) { // Send
+} elseif ($_GET["ID"] == 12) { // Send location based action
 
-} elseif ($_GET["ID"] == 13) { // Send
+} elseif ($_GET["ID"] == 13) { // Send sound effect
 
-} elseif ($_GET["ID"] == 14) { // Send
+} elseif ($_GET["ID"] == 14) { // Send GPIO switch toggle
 
 } else {
   $Content = "<p>Unknown form requested</p>";

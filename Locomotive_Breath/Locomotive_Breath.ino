@@ -371,6 +371,7 @@ void loop() {
     setMotorSpeed(0);
     targetSpeed = 0;
     progressFactor = 0;
+    targetRuntime = 0;
     // Send the runtime end status to mission control
     String Status = "/runtime/end";
     if (Serial) Serial.println("Status: " + Status);

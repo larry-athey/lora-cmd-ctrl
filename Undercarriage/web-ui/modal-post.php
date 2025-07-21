@@ -8,7 +8,7 @@ $jsonSuccess = "{\"status\": \"success\",\"message\": \"Operation completed succ
 $jsonFailure = "{\"status\": \"error\",\"message\": \"Operation failed\"}\n";
 //---------------------------------------------------------------------------------------------------
 if ($_POST) {
-  if ($_POST["form-id"] == 1) { // CTRL functions moved to 10..14
+  if ($_POST["form-id"] == 1) { // CTRL button functions moved to 10..14
 
   } elseif ($_POST["form-id"] == 2) { // Send command
     $Temp = createMessage($DBcnx,$_POST["command"]);
@@ -17,7 +17,7 @@ if ($_POST) {
     if ($Msg[1] == 1) sendCommand($DBcnx,$_POST["address"],"/repeat/cmd/" . $_POST["command"]);
     $Result = mysqli_query($DBcnx, "UPDATE devices SET status='<span class=\"text-primary\">Sent library command</span>' WHERE address='" . $_POST["address"] . "'");
     echo($jsonSuccess);
-  } elseif ($_POST["form-id"] == 3) { // Send script (command repeats not sent)
+  } elseif ($_POST["form-id"] == 3) { // Send script (command repeats are not sent, only script repeats)
     $Result = mysqli_query($DBcnx, "SELECT * FROM scripts WHERE ID=" . $_POST["script"]);
     $Scr = mysqli_fetch_assoc($Result);
     $Data = explode("|",$Scr["commands"]);
@@ -37,16 +37,24 @@ if ($_POST) {
     sendCommand($DBcnx,$_POST["address"],"/reboot");
     $Result = mysqli_query($DBcnx, "UPDATE devices SET status='<span class=\"text-danger\">Sent panic reboot</span>' WHERE address='" . $_POST["address"] . "'");
     echo($jsonSuccess);
-  } elseif ($_POST["form-id"] >= 10) { // Send CTRL button related commands
+  } elseif ($_POST["form-id"] >= 10) { // Send CTRL button commands
     $Result = mysqli_query($DBcnx, "INSERT INTO commands (cmd_name) VALUES ('Temp Motor Control')");
     $ID = mysqli_insert_id($DBcnx);
-    if ($_POST["form-id"] == 10) { // Brushed motor control command
+    if ($_POST["form-id"] == 10) { // Brushed motor control
       $direction = $_POST["direction"];
       $speed = $_POST["speed"];
       $progression = $_POST["progression"];
       $duration = $_POST["duration"];
       $Result = mysqli_query($DBcnx, "UPDATE commands SET cmd_type=1,cmd_class=1,direction=$direction,speed=$speed,progression=$progression,duration=$duration WHERE ID=$ID");
       $Result = mysqli_query($DBcnx, "UPDATE devices SET status='<span class=\"text-success\">Sent motor control command</span>' WHERE address='" . $_POST["address"] . "'");
+    } elseif ($_POST["form-id"] == 11) { // Stepper motor control
+
+    } elseif ($_POST["form-id"] == 12) { // Location based action
+
+    } elseif ($_POST["form-id"] == 13) { // Sound effects
+
+    } elseif ($_POST["form-id"] == 14) { // GPIO output switching
+
     }
     $Temp = createMessage($DBcnx,$ID);
     $Msg = explode("|",$Temp);
