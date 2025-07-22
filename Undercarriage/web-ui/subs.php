@@ -55,7 +55,7 @@ function createMessage($DBcnx,$ID) {
 //---------------------------------------------------------------------------------------------------
 function ctrlButtonMenu($DevType,$Address) {
   $Content  = "<div class=\"dropdown\">";
-  $Content .=   "<button class=\"btn btn-sm btn-success dropdown-toggle fw-bolder\" type=\"button\" data-bs-toggle=\"dropdown\" aria-expanded=\"false\">CTRL</button>";
+  $Content .=   "<button class=\"btn btn-sm btn-success dropdown-toggle fw-bolder\" type=\"button\" data-bs-toggle=\"dropdown\">CTRL</button>";
   $Content .=   "<ul class=\"dropdown-menu\">";
   if (($DevType == 1) || ($DevType == 4)) $Content .= "<li><a onClick=\"LoadForm('Brushed Motor Control','10','$Address')\" class=\"dropdown-item\" href=\"#\">Motor Control</a></li>";
   if ($DevType == 2) $Content .= "<li><a onClick=\"LoadForm('Stepper Motor Control','11','$Address')\" class=\"dropdown-item\" href=\"#\">Stepper Control</a></li>";
@@ -78,7 +78,7 @@ function deviceFilter() {
   if ($_GET["filter"] == 3) $S3 = "selected";
   if ($_GET["filter"] == 4) $S4 = "selected";
   $Content  = "<form class=\"d-flex\">";
-  $Content .=   "<select class=\"form-select\" onChange=\"window.location.href='?filter=' + this.value\">";
+  $Content .=   "<select class=\"form-control form-select\" onChange=\"window.location.href='?filter=' + this.value\">";
   $Content .=     "<option value=\"0\">All Devices</option>";
   $Content .=     "<option $S1 value=\"1\">Brushed Motor Controller</option>";
   $Content .=     "<option $S2 value=\"2\">Stepper Motor Controller</option>";
@@ -110,7 +110,7 @@ function directionSelector($Selected) {
     $S0 = "";
     $S1 = "selected";
   }
-  $Content  = "<select class=\"form-control form-select fw-bolder\" style=\"width: 100%;\" size=\"1\" class=\"form-control form-select\" id=\"direction\" name=\"direction\">";
+  $Content  = "<select class=\"form-control form-select fw-bolder\" style=\"width: 100%;\" size=\"1\" id=\"direction\" name=\"direction\">";
   $Content .= "<option $S1 value=\"1\">Forward</option>";
   $Content .= "<option $S0 value=\"0\">Reverse</option>";
   $Content .= "</select>";
@@ -251,7 +251,7 @@ function sendCommand($DBcnx,$Address,$Command) {
 function locationSelector($DBcnx,$ID) {
   $Result = mysqli_query($DBcnx,"SELECT * FROM locations ORDER BY loc_name");
   if (mysqli_num_rows($Result) > 0) {
-    $Content  = "<select class=\"form-control form-select fw-bolder\" style=\"width: 100%;\" size=\"1\" class=\"form-control form-select\" id=\"location\" name=\"location\">";
+    $Content  = "<select class=\"form-control form-select fw-bolder\" style=\"width: 100%;\" size=\"1\"  id=\"location_id\" name=\"location_id\">";
     while ($Loc = mysqli_fetch_assoc($Result)) {
       if ($Loc["pin"] == $ID) {
          $Content .= "<option selected value=\"" . $Loc["pin"] . "\">" . $Loc["loc_name"] . "</option>";
@@ -267,12 +267,12 @@ function locationSelector($DBcnx,$ID) {
 }
 //---------------------------------------------------------------------------------------------------
 function locationActionSelector() {
-  $Content  = "<select class=\"form-control form-select fw-bolder\" style=\"width: 100%;\" size=\"1\" class=\"form-control form-select\" id=\"location_action\" name=\"location_action\">";
-  $Content .= "<option value=\"0\">Stop Motor/Stepper</option>";
-  $Content .= "<option value=\"1\">Play Sound Effect</option>";
-  $Content .= "<option value=\"2\">Execute Command</option>";
-  $Content .= "<option value=\"3\">Execute Script</option>";
-  $Content .= "<option value=\"4\">GPIO Pin Switch/Toggle</option>";
+  $Content  = "<select class=\"form-control form-select fw-bolder\" style=\"width: 100%;\" size=\"1\" id=\"location_action\" name=\"location_action\">";
+  $Content .= "<option value=\"1\">Stop Motor/Stepper</option>";
+  $Content .= "<option value=\"2\">Play Sound Effect</option>";
+  $Content .= "<option value=\"3\">Request Command</option>";
+  $Content .= "<option value=\"4\">Request Script</option>";
+  $Content .= "<option value=\"5\">Toggle GPIO Pin</option>";
   $Content .= "</select>";
   return $Content;
 }
@@ -285,7 +285,7 @@ function OnOffSelector($Selected,$ID) {
     $S0 = "";
     $S1 = "selected";
   }
-  $Content  = "<select class=\"form-control form-select fw-bolder\" style=\"width: 100%;\" size=\"1\" class=\"form-control form-select\" id=\"$ID\" name=\"$ID\">";
+  $Content  = "<select class=\"form-control form-select fw-bolder\" style=\"width: 100%;\" size=\"1\" id=\"$ID\" name=\"$ID\">";
   $Content .= "<option $S1 value=\"1\">On</option>";
   $Content .= "<option $S0 value=\"0\">Off</option>";
   $Content .= "</select>";
@@ -305,7 +305,7 @@ function resolutionSelector($Selected) {
   if ($Selected == 4) $S4 = "selected";
   if ($Selected == 5) $S5 = "selected";
   if ($Selected == 6) $S6 = "selected";
-  $Content  = "<select class=\"form-control form-select fw-bolder\" style=\"width: 100%;\" size=\"1\" class=\"form-control form-select\" id=\"resolution\" name=\"resolution\">";
+  $Content  = "<select class=\"form-control form-select fw-bolder\" style=\"width: 100%;\" size=\"1\" id=\"resolution\" name=\"resolution\">";
   $Content .= "<option $S1 value=\"1\">Whole Step</option>";
   $Content .= "<option $S2 value=\"2\">1/2 Step</option>";
   $Content .= "<option $S3 value=\"3\">1/4 Step</option>";
@@ -324,7 +324,7 @@ function YNSelector($Selected,$ID) {
     $S0 = "";
     $S1 = "selected";
   }
-  $Content  = "<select class=\"form-control form-select fw-bolder\" style=\"width: 100%;\" size=\"1\" class=\"form-control form-select\" id=\"$ID\" name=\"$ID\">";
+  $Content  = "<select class=\"form-control form-select fw-bolder\" style=\"width: 100%;\" size=\"1\" id=\"$ID\" name=\"$ID\">";
   $Content .= "<option $S1 value=\"1\">Yes</option>";
   $Content .= "<option $S0 value=\"0\">No</option>";
   $Content .= "</select>";

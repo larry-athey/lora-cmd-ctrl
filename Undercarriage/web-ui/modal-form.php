@@ -63,7 +63,7 @@ if ($_GET["ID"] == 1) { // CTRL button functions moved to 10..14
   $Content .=   "<label for=\"speed\" class=\"form-label fw-bolder\">Speed [0..100] Percent</label>";
   $Content .=   "<input type=\"number\" class=\"form-control fw-bolder\" id=\"speed\" name=\"speed\" min=\"0\" max=\"100\" step=\"1\" value=\"0\">";
   $Content .= "</div>";
-  $Content .= "<div> style=\"margin-top: 0.5em;\"";
+  $Content .= "<div style=\"margin-top: 0.5em;\">";
   $Content .=   "<label for=\"resolution\" class=\"form-label fw-bolder\">Resolution</label>";
   $Content .=    resolutionSelector(1);
   $Content .= "</div>";
@@ -73,7 +73,7 @@ if ($_GET["ID"] == 1) { // CTRL button functions moved to 10..14
   $Content .= "</div>";
 } elseif ($_GET["ID"] == 12) { // Send location based action - type 3
   $Content .= "<div>";
-  $Content .=   "<label for=\"location\" class=\"form-label fw-bolder\">Location</label>";
+  $Content .=   "<label for=\"location_id\" class=\"form-label fw-bolder\">Location</label>";
   $Content .=    locationSelector($DBcnx,0);
   $Content .= "</div>";
   $Content .= "<div style=\"margin-top: 0.5em;\">";

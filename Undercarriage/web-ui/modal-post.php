@@ -46,7 +46,7 @@ if ($_POST) {
     $Result = mysqli_query($DBcnx, "UPDATE devices SET status='<span class=\"text-danger\">Sent panic reboot</span>' WHERE address='" . $_POST["address"] . "'");
     echo($jsonSuccess);
   } elseif ($_POST["form-id"] >= 10) { // Send CTRL button commands
-    $Result = mysqli_query($DBcnx, "INSERT INTO commands (cmd_name) VALUES ('Temp Motor Control')");
+    $Result = mysqli_query($DBcnx, "INSERT INTO commands (cmd_name) VALUES ('Temp Command')");
     $ID = mysqli_insert_id($DBcnx);
     if ($_POST["form-id"] == 10) { // Brushed motor control
       $direction = $_POST["direction"];
@@ -58,7 +58,11 @@ if ($_POST) {
     } elseif ($_POST["form-id"] == 11) { // Stepper motor control
 
     } elseif ($_POST["form-id"] == 12) { // Location based action
-
+      $location_id = $_POST["location_id"];
+      $location_action = $_POST["location_action"];
+      $location_data = $_POST["location_data"];
+      $Result = mysqli_query($DBcnx, "UPDATE commands SET cmd_type=3,cmd_class=1,location_id=$location_id,location_action=$location_action,location_data=$location_data WHERE ID=$ID");
+      $Result = mysqli_query($DBcnx, "UPDATE devices SET status='<span class=\"text-success\">Sent location action command</span>' WHERE address='" . $_POST["address"] . "'");
     } elseif ($_POST["form-id"] == 13) { // Sound effects
 
     } elseif ($_POST["form-id"] == 14) { // GPIO output switching
@@ -67,7 +71,7 @@ if ($_POST) {
     $Temp = createMessage($DBcnx,$ID);
     $Msg = explode("|",$Temp);
     sendCommand($DBcnx,$_POST["address"],$Msg[0]);
-    $Result = mysqli_query($DBcnx, "DELETE FROM commands WHERE ID=$ID");
+//    $Result = mysqli_query($DBcnx, "DELETE FROM commands WHERE ID=$ID");
     echo($jsonSuccess);
   } else {
     echo($jsonFailure);

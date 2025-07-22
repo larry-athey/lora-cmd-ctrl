@@ -230,7 +230,7 @@ void setup() {
   }
   #endif
 
-  // Zero out the location detection queue
+  // Zero out the location detection and task queue
   for (byte i = 0; i <= 15; i ++) {
     Locations[i][0] = 0;
     Locations[i][1] = 0;

@@ -13,7 +13,7 @@ inline void sendRepeatRequest(String Request, String ID) { // Request a repeat o
 //------------------------------------------------------------------------------------------------
 inline void setupLocation(int Pin, int Action, int Data) { // Add a transponder pin and action to the Locations queue
   for (byte i = 0; i <= 15; i ++) {
-    if (Locations[i] == 0) {
+    if (Locations[i][0] == 0) {
       Locations[i][0] = Pin;
       Locations[i][1] = Action;
       Locations[i][2] = Data;
@@ -168,6 +168,7 @@ inline void runCommand(String Cmd) { // Execute a queued LCC mission control com
   // parts[2..(partCount-1)] : Any additional parameters for the command type
   if (parts[1] == "location") {
     //ID/location/pin/action-type/action-data
+    //e2YMYCc2BISl9bA9GjQg9iKqqwHrTya0/location/16/2/15
     if (partCount == 5) setupLocation(parts[2].toInt(),parts[3].toInt(),parts[4].toInt());
   } else if (parts[1] == "motor") {
     //ID/motor/direction/speed/progression/duration

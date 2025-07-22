@@ -19,11 +19,11 @@ if (mysqli_num_rows($Result) > 0) {
   }
 }
 
-// Check for executed command notifications and update the device's status message.
+// Check for executed command notifications and update the device's status message
 $Result = mysqli_query($DBcnx,"SELECT * FROM inbound WHERE msg LIKE BINARY '%/exec/%' AND rcvd=0");
 if (mysqli_num_rows($Result) > 0) {
   while ($Inbound = mysqli_fetch_assoc($Result)) {
-    $Update = mysqli_query($DBcnx,"UPDATE inbound SET rcvd=1 WHERE ID='" . $Inbound["ID"] . "'");
+    $Update = mysqli_query($DBcnx,"UPDATE inbound SET rcvd=1 WHERE ID=" . $Inbound["ID"]);
     $Data = explode("/",trim($Inbound["msg"],"/"));
     $Result2 = mysqli_query($DBcnx,"SELECT * FROM outbound WHERE msg LIKE '%/" . $Data[1] . "/%'");
     if (mysqli_num_rows($Result2) > 0) {
@@ -33,6 +33,15 @@ if (mysqli_num_rows($Result) > 0) {
       $Update = mysqli_query($DBcnx,"UPDATE outbound SET ack=2, exec_time=NOW() WHERE ID=" . $Outbound["ID"]);
       $Update = mysqli_query($DBcnx,"UPDATE devices SET status='cmd://" . implode("/",$Data) . "' WHERE address=" . $Outbound["address"]);
     }
+  }
+}
+
+// Check for runtime end notifications
+$Result = mysqli_query($DBcnx,"SELECT * FROM inbound WHERE msg LIKE BINARY '%/runtime/end%' AND rcvd=0");
+if (mysqli_num_rows($Result) > 0) {
+  while ($Inbound = mysqli_fetch_assoc($Result)) {
+    $Update = mysqli_query($DBcnx,"UPDATE inbound SET rcvd=1 WHERE ID=" . $Inbound["ID"]);
+    $Update = mysqli_query($DBcnx,"UPDATE devices SET status='Runtime has expired' WHERE address=" . $Inbound["address"]);
   }
 }
 //---------------------------------------------------------------------------------------------

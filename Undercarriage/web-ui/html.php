@@ -235,6 +235,7 @@ function showHomePage($DBcnx) {
     $Content .= "jQuery(document).ready(function() {\n";
     $Content .= "  jQuery('#submit_button').on('click',function() {\n";
     $Content .= "    var formData = jQuery('#modalForm').serialize();\n";
+    $Content .= "    console.log('formData: ' + formData);\n";
     $Content .= "    jQuery.ajax({\n";
     $Content .= "      type: 'POST',\n";
     $Content .= "      url: './modal-post.php',\n";

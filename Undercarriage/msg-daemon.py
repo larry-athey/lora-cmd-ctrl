@@ -25,12 +25,12 @@ DB_CONFIG = {
     'cursorclass': MySQLdb.cursors.DictCursor
 }
 
-# RYLR998 configuration
+# RYLR998 configuration - customize LORA_NETWORK and LORA_PW as you wish
 SERIAL_PORT = '/dev/ttyUSB0'
 BAUD_RATE = 115200
 LORA_ADDRESS = 1  # LCC server address is always 1
-LORA_NETWORK = 18  # Network ID (0-18)
-LORA_PW = "1A2B3C4D" # Domain password, 8 characters, hex
+LORA_NETWORK = 18  # Network ID (0..15 [0 is public, all devices see all messages], plus a stray at 18)
+LORA_PW = "1A2B3C4D" # Domain password, 8 characters, hex (it's just a 32 bit unsigned integer, 0 to 4.3 billion)
 LORA_BAND = "915000000"  # Frequency band (e.g., 915 MHz for US, 868100000 for EU)
 LORA_PARAMETERS = "9,7,1,12"  # SF9, 125 kHz, CR 4/5, preamble 12
 #----------------------------------------------------------------------------------------------
