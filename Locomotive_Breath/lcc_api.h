@@ -3,9 +3,9 @@
 //
 // Inline functions used for modular unit organization
 //------------------------------------------------------------------------------------------------
-inline void sendRepeatRequest(String Request, String ID) { // Request a repeat of the last command/script
-  String Status = "/" + Request + "/" + ID;
-  if (Serial) Serial.println("Requesting repeat: " + Status);
+inline void sendReplayRequest(String Request, String ID) { // Request a repeat of the last command/script
+  String Status = "/replay/" + Request + "/" + ID;
+  if (Serial) Serial.println("Requesting replay: " + Status);
   Serial2.print("AT+SEND=1," + String(Status.length()) + "," + Status + "\r\n");
   delay(100);
   Serial2.readStringUntil('\n'); // Purge the +OK response
@@ -177,9 +177,9 @@ inline void runCommand(String Cmd) { // Execute a queued LCC mission control com
   } else if (parts[1] == "reboot") {
     //ID/reboot
     if (partCount == 2) ESP.restart();
-  } else if (parts[1] == "repeat") {
-    //ID/repeat/cmd-or-script/cmd-hash or script-id
-    if (partCount == 4) sendRepeatRequest(parts[2],parts[3]);
+  } else if (parts[1] == "replay") {
+    //ID/replay/cmd-or-script/cmd-hash or script-id
+    if (partCount == 4) sendReplayRequest(parts[2],parts[3]);
   } else if (parts[1] == "sound") {
     //ID/sound/file-number/loop
     //a7f352dccb4372aff00d768a4728a64a/sound/1/0
@@ -230,7 +230,7 @@ inline byte queueSize() {
 inline byte handleCommand() { // Handle commands sent from mission control
   byte msgCount = 0;
   for (byte x = 0; x <= 16; x ++) msgCache[x].clear();
-  delay(1000); // Allow the 2048 byte buffer to fill if a script was sent
+  delay(500); // Allow the 2048 byte buffer to fill a bit if a script was sent
   while (Serial2.available()) {  
     String incoming = Serial2.readStringUntil('\n');
     if (Serial) Serial.println("LoRa message: " + incoming);
@@ -254,6 +254,7 @@ inline byte handleCommand() { // Handle commands sent from mission control
                 queueCommand(message);
                 msgCount ++;
                 msgCache[msgCount - 1] = message;
+                if (Serial2.available()) delay(500);
               }
             }
           }
