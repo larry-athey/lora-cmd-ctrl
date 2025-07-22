@@ -17,7 +17,7 @@
 //   TSOP34838 IR Rcvr    - $1.00
 //   WWZMDiB Audio Module - $2.00
 //   10x15mm Speaker      - $0.80
-//   3.3v 3A Regulator    - $0.70
+//   5V 1.8A Regulator    - $0.70
 //
 // Roughly $30 in parts to convert any brand of model train locomotive to have all of the features
 // found in a full blown DCC enabled locomotive with sound effects. You want color changing LEDs?

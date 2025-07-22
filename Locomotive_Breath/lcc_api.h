@@ -92,16 +92,16 @@ inline void setupStepper(byte Direction, byte Speed, byte Resolution, int Steps)
   #endif
 }
 //------------------------------------------------------------------------------------------------
-inline void setupSound(String FileNumber, byte Loop) { // Set up sound effect background process
+inline void setupSound(int FileNumber, byte Loop) { // Set up sound effect background process
   if (SFX) {
-    wavFile = FileNumber;
+    wavFile = String(FileNumber);
     if (Loop == 1) {
       sfxLoop = true;
     } else {
       sfxLoop = false;
     }
     if (Serial) {
-      Serial.println("Sound file loaded: " + FileNumber);
+      Serial.println("Sound file queued: " + wavFile);
       Serial.println("Playback loop: " + String(Loop));
     }
   }
@@ -114,7 +114,7 @@ inline void toggleSwitch(byte gpioPin, byte State) { // Toggle a specific GPIO p
   mcp.digitalWrite(gpioPin,State);
   #endif
   if (Serial) {
-    Serial.println("Toggling GPIO pin: " + String(gpioPin));
+    Serial.println("Setting GPIO pin: " + String(gpioPin));
     Serial.println("Current state: " + String(State));
   }
 }
@@ -183,7 +183,7 @@ inline void runCommand(String Cmd) { // Execute a queued LCC mission control com
   } else if (parts[1] == "sound") {
     //ID/sound/file-number/loop
     //a7f352dccb4372aff00d768a4728a64a/sound/1/0
-    if (partCount == 4) setupSound(parts[2],parts[3].toInt());
+    if (partCount == 4) setupSound(parts[2].toInt(),parts[3].toInt());
   } else if (parts[1] == "stepper") {
     //ID/stepper/direction/speed/resolution/steps
     if (partCount == 6) setupStepper(parts[2].toInt(),parts[3].toInt(),parts[4].toInt(),parts[5].toInt());

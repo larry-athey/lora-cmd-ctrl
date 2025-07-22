@@ -87,7 +87,7 @@ if ($_GET["ID"] == 1) { // CTRL button functions moved to 10..14
 } elseif ($_GET["ID"] == 13) { // Send sound effect - type 4
   $Content .= "<div>";
   $Content .=   "<label for=\"sound\" class=\"form-label fw-bolder\">Remote Sound File ID Number</label>";
-  $Content .=   "<input type=\"number\" class=\"form-control fw-bolder\" id=\"sound\" name=\"sound\" min=\"0\" max=\"2000000000\" step=\"1\" value=\"0\">";
+  $Content .=   "<input type=\"number\" class=\"form-control fw-bolder\" id=\"sound\" name=\"sound\" min=\"0\" max=\"1000\" step=\"1\" value=\"0\">";
   $Content .= "</div>";
   $Content .= "<div style=\"margin-top: 0.5em;\">";
   $Content .=   "<label for=\"sound_loop\" class=\"form-label fw-bolder\">Loop Playback</label>";

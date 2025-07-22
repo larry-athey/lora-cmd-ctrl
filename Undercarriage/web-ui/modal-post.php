@@ -56,7 +56,12 @@ if ($_POST) {
       $Result = mysqli_query($DBcnx, "UPDATE commands SET cmd_type=1,cmd_class=1,direction=$direction,speed=$speed,progression=$progression,duration=$duration WHERE ID=$ID");
       $Result = mysqli_query($DBcnx, "UPDATE devices SET status='<span class=\"text-success\">Sent motor control command</span>' WHERE address='" . $_POST["address"] . "'");
     } elseif ($_POST["form-id"] == 11) { // Stepper motor control
-
+      $direction = $_POST["direction"];
+      $speed = $_POST["speed"];
+      $resolution = $_POST["resolution"];
+      $steps = $_POST["steps"];
+      $Result = mysqli_query($DBcnx, "UPDATE commands SET cmd_type=2,cmd_class=1,direction=$direction,speed=$speed,resolution=$resolution,steps=$steps WHERE ID=$ID");
+      $Result = mysqli_query($DBcnx, "UPDATE devices SET status='<span class=\"text-success\">Sent stepper control command</span>' WHERE address='" . $_POST["address"] . "'");
     } elseif ($_POST["form-id"] == 12) { // Location based action
       $location_id = $_POST["location_id"];
       $location_action = $_POST["location_action"];
@@ -64,14 +69,20 @@ if ($_POST) {
       $Result = mysqli_query($DBcnx, "UPDATE commands SET cmd_type=3,cmd_class=1,location_id=$location_id,location_action=$location_action,location_data=$location_data WHERE ID=$ID");
       $Result = mysqli_query($DBcnx, "UPDATE devices SET status='<span class=\"text-success\">Sent location action command</span>' WHERE address='" . $_POST["address"] . "'");
     } elseif ($_POST["form-id"] == 13) { // Sound effects
-
+      $sound = $_POST["sound"];
+      $sound_loop = $_POST["sound_loop"];
+      $Result = mysqli_query($DBcnx, "UPDATE commands SET cmd_type=4,cmd_class=1,sound=$sound,replay=$sound_loop WHERE ID=$ID");
+      $Result = mysqli_query($DBcnx, "UPDATE devices SET status='<span class=\"text-success\">Sent sound effect command</span>' WHERE address='" . $_POST["address"] . "'");
     } elseif ($_POST["form-id"] == 14) { // GPIO output switching
-
+      $gpio_pin = $_POST["gpio_pin"];
+      $gpio_state = $_POST["gpio_state"];
+      $Result = mysqli_query($DBcnx, "UPDATE commands SET cmd_type=5,cmd_class=1,gpio_pin=$gpio_pin,direction=$gpio_state WHERE ID=$ID");
+      $Result = mysqli_query($DBcnx, "UPDATE devices SET status='<span class=\"text-success\">Sent GPIO switch command</span>' WHERE address='" . $_POST["address"] . "'");
     }
     $Temp = createMessage($DBcnx,$ID);
     $Msg = explode("|",$Temp);
     sendCommand($DBcnx,$_POST["address"],$Msg[0]);
-//    $Result = mysqli_query($DBcnx, "DELETE FROM commands WHERE ID=$ID");
+    $Result = mysqli_query($DBcnx, "DELETE FROM commands WHERE ID=$ID");
     echo($jsonSuccess);
   } else {
     echo($jsonFailure);
