@@ -66,7 +66,6 @@ CREATE TABLE outbound (
   `ack_time` TIMESTAMP DEFAULT NULL,
   `exec_time` TIMESTAMP DEFAULT NULL,
   `sent` TINYINT(4) DEFAULT 0,
-  `repeat` TINYINT(4) DEFAULT 0,
   `ack` TINYINT(4) DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
