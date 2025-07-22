@@ -34,7 +34,7 @@ CREATE TABLE devices (
   `dev_type` TINYINT(4) DEFAULT NULL,
   `last_loc` INT(11) DEFAULT 0,
   `favorites` TEXT DEFAULT NULL,
-  `cmd_repeat` TINYINT(4) DEFAULT 0
+  `replay` TINYINT(4) DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 ALTER TABLE `devices` MODIFY `ID` INT(11) NOT NULL AUTO_INCREMENT;
