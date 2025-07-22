@@ -18,7 +18,7 @@ CREATE TABLE commands (
   `steps` INT(11) DEFAULT NULL,
   `resolution` TINYINT(4) DEFAULT NULL,
   `sound` INT(11) DEFAULT NULL,
-  `repeat` TINYINT(4) DEFAULT 0,
+  `replay` TINYINT(4) DEFAULT 0,
   `location_id` INT(11) DEFAULT NULL,
   `location_action` INT(11) DEFAULT NULL,
   `location_data` INT(11) DEFAULT NULL  
@@ -89,7 +89,7 @@ ALTER TABLE `schedule` MODIFY `ID` INT(11) NOT NULL AUTO_INCREMENT;
 CREATE TABLE scripts (
   `ID` INT AUTO_INCREMENT PRIMARY KEY,
   `scr_name` VARCHAR(255) DEFAULT NULL,
-  `repeat` TINYINT(4) DEFAULT 0,
+  `replay` TINYINT(4) DEFAULT 0,
   `repeat_id` INT(11) DEFAULT 0,
   `commands` TEXT DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
