@@ -285,13 +285,23 @@ function locationSelector($DBcnx,$ID) {
   }
 }
 //---------------------------------------------------------------------------------------------------
-function locationActionSelector() {
+function locationActionSelector($Selected) {
+  $S1 = "";
+  $S2 = "";
+  $S3 = "";
+  $S4 = "";
+  $S5 = "";
+  if ($Selected == 1) $S1 = "selected";
+  if ($Selected == 2) $S2 = "selected";
+  if ($Selected == 3) $S3 = "selected";
+  if ($Selected == 4) $S4 = "selected";
+  if ($Selected == 5) $S5 = "selected";
   $Content  = "<select class=\"form-control form-select fw-bolder\" style=\"width: 100%;\" size=\"1\" id=\"location_action\" name=\"location_action\">";
-  $Content .= "<option value=\"1\">Stop Motor/Stepper</option>";
-  $Content .= "<option value=\"2\">Play Sound Effect</option>";
-  $Content .= "<option value=\"3\">Request Command</option>";
-  $Content .= "<option value=\"4\">Request Script</option>";
-  $Content .= "<option value=\"5\">Toggle GPIO Pin</option>";
+  $Content .= "<option $S1 value=\"1\">Stop Motor/Stepper</option>";
+  $Content .= "<option $S2 value=\"2\">Play Sound Effect</option>";
+  $Content .= "<option $S3 value=\"3\">Request Command</option>";
+  $Content .= "<option $S4 value=\"4\">Request Script</option>";
+  $Content .= "<option $S5 value=\"5\">Toggle GPIO Pin</option>";
   $Content .= "</select>";
   return $Content;
 }
