@@ -13,7 +13,7 @@ $Content .= "<input type=\"hidden\" name=\"address\" value=\"" . $_GET["address"
 if ($_GET["ID"] == 1) { // CTRL button functions moved to 10..14
 
 } elseif ($_GET["ID"] == 2) { // Send command
-  $Result = mysqli_query($DBcnx,"SELECT * FROM commands ORDER BY cmd_name");
+  $Result = mysqli_query($DBcnx,"SELECT * FROM commands WHERE cmd_class=" . $Dev["dev_type"] . " ORDER BY cmd_name");
   if (mysqli_num_rows($Result) > 0) {
     $Content .= "<select class=\"form-control form-select fw-bolder\" style=\"width: 100%;\" size=\"1\" id=\"command\" name=\"command\">";
     while ($Cmd = mysqli_fetch_assoc($Result)) {
@@ -24,7 +24,7 @@ if ($_GET["ID"] == 1) { // CTRL button functions moved to 10..14
     $Content .= "<div class=\"text-danger fw-bolder\">No custom commands found</div>";
   }
 } elseif ($_GET["ID"] == 3) { // Send script
-  $Result = mysqli_query($DBcnx,"SELECT * FROM scripts ORDER BY scr_name");
+  $Result = mysqli_query($DBcnx,"SELECT * FROM scripts WHERE cmd_class=" . $Dev["dev_type"] . " ORDER BY scr_name");
   if (mysqli_num_rows($Result) > 0) {
     $Content .= "<select class=\"form-control form-select fw-bolder\" style=\"width: 100%;\" size=\"1\" id=\"script\" name=\"script\">";
     while ($Scr = mysqli_fetch_assoc($Result)) {
