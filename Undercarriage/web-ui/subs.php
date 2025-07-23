@@ -281,7 +281,7 @@ function locationSelector($DBcnx,$ID) {
     $Content .= "</select>";
     return $Content;
   } else {
-    return "No configured locations";
+    return "<span class=\"text-danger fw-bolder\">No configured locations</span>";
   }
 }
 //---------------------------------------------------------------------------------------------------
@@ -341,6 +341,42 @@ function resolutionSelector($Selected) {
   $Content .= "<option $S4 value=\"4\">1/8 Step</option>";
   $Content .= "<option $S5 value=\"5\">1/16 Step</option>";
   $Content .= "<option $S6 value=\"6\">1/32 Step</option>";
+  $Content .= "</select>";
+  return $Content;
+}
+//---------------------------------------------------------------------------------------------------
+function scriptCommandSelector($DBcnx,$DevType,$ID) {
+  $Result = mysqli_query($DBcnx,"SELECT * FROM commands WHERE cmd_class=$DevType ORDER BY cmd_name");
+  if (mysqli_num_rows($Result) > 0) {
+    $Content  = "<select class=\"form-control form-select fw-bolder\" style=\"width: 100%;\" size=\"1\"  id=\"command[]\" name=\"command[]\">";
+    $Content .= "<option value=\"0\">Command slot not in use</option>";
+    while ($Cmd = mysqli_fetch_assoc($Result)) {
+      if ($Cmd["ID"] == $ID) {
+         $Content .= "<option selected value=\"" . $Cmd["ID"] . "\">" . $Cmd["cmd_name"] . "</option>";
+      } else {
+         $Content .= "<option value=\"" . $Cmd["ID"] . "\">" . $Cmd["cmd_name"] . "</option>";
+      }
+    }
+    $Content .= "</select>";
+    return $Content;
+  } else {
+    return "<span class=\"text-danger fw-bolder\">No commands found for this device type</span>";
+  }
+}
+//---------------------------------------------------------------------------------------------------
+function scriptReplaySelector($DBcnx,$DevType,$ID) {
+  $Content  = "<select class=\"form-control form-select fw-bolder\" style=\"width: 100%;\" size=\"1\"  id=\"replay_id\" name=\"replay_id\">";
+  $Content .= "<option value=\"0\">Repeat this script</option>";
+  $Result = mysqli_query($DBcnx,"SELECT * FROM scripts WHERE cmd_class=$DevType ORDER BY scr_name");
+  if (mysqli_num_rows($Result) > 0) {
+    while ($Scr = mysqli_fetch_assoc($Result)) {
+      if ($Scr["ID"] == $ID) {
+         $Content .= "<option selected value=\"" . $Scr["ID"] . "\">" . $Scr["scr_name"] . "</option>";
+      } else {
+         $Content .= "<option value=\"" . $Scr["ID"] . "\">" . $Scr["scr_name"] . "</option>";
+      }
+    }
+  }
   $Content .= "</select>";
   return $Content;
 }

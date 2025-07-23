@@ -21,7 +21,7 @@ if ($_GET["ID"] == 1) { // CTRL button functions moved to 10..14
     }
     $Content .= "</select>";
   } else {
-    $Content .= "<div class=\"text-danger fw-bolder\">No custom commands found</div>";
+    $Content .= "<div class=\"text-danger fw-bolder\">No commands found for this device type</div>";
   }
 } elseif ($_GET["ID"] == 3) { // Send script
   $Result = mysqli_query($DBcnx,"SELECT * FROM scripts WHERE cmd_class=" . $Dev["dev_type"] . " ORDER BY scr_name");
@@ -32,7 +32,7 @@ if ($_GET["ID"] == 1) { // CTRL button functions moved to 10..14
     }
     $Content .= "</select>";
   } else {
-    $Content .= "<div class=\"text-danger fw-bolder\">No custom scripts found</div>";
+    $Content .= "<div class=\"text-danger fw-bolder\">No scripts found for this device type</div>";
   }
 } elseif ($_GET["ID"] == 4) { // Send reboot command
   $Content .= "<input type=\"hidden\" name=\"reboot\" value=\"1\">";

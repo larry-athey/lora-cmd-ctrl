@@ -102,6 +102,8 @@ if (! isset($_GET["page"])) {
     $Content .= editCommand($DBcnx);
   } elseif ($_GET["page"] == "edit_device") {
     $Content .= editDevice($DBcnx);
+  } elseif ($_GET["page"] == "edit_script") {
+    $Content .= editScript($DBcnx);
   } elseif ($_GET["page"] == "locations") {
     $Content .= showLocations($DBcnx);
   } elseif ($_GET["page"] == "logs") {

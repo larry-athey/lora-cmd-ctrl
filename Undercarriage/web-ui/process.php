@@ -52,6 +52,30 @@ elseif (isset($_POST["edit_command"])) {
 //exit;
 }
 //---------------------------------------------------------------------------------------------------
+elseif (isset($_POST["edit_script"])) {
+  if ($_POST["ID"] == 0) {
+    $Result = mysqli_query($DBcnx,"INSERT INTO scripts (scr_name) VALUES ('Temp')");
+    $ID = mysqli_insert_id($DBcnx);
+  } else {
+    $ID = $_POST["ID"];
+  }
+  $commands = "";
+  for ($x = 0; $x <= 15; $x ++) {
+    if ($_POST["command"][$x] != 0) $commands .= $_POST["command"][$x] . "|";
+  }
+  $commands = trim($commands,"|");
+  $scr_name = mysqli_escape_string($DBcnx,trim($_POST["scr_name"]));
+  $cmd_class = $_POST["cmd_class"];
+  $replay = $_POST["replay"];
+  $replay_id = $_POST["replay_id"];
+  $Result = mysqli_query($DBcnx,"UPDATE scripts SET scr_name='$scr_name',cmd_class=$cmd_class,replay=$replay,replay_id=$replay_id,commands-'$commands'  WHERE ID=$ID");
+//echo("<pre>");
+//print_r($_POST);
+//echo($commands);
+//echo("</pre>");
+//exit;
+}
+//---------------------------------------------------------------------------------------------------
 elseif (isset($_POST["edit_device"])) {
   if ($_POST["ID"] == 0) {
     $Result = mysqli_query($DBcnx, "INSERT INTO devices (dev_name) VALUES ('Temp')");

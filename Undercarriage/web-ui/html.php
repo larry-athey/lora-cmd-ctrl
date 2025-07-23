@@ -221,7 +221,7 @@ function editDevice($DBcnx) {
   $Content .=         "<input type=\"number\" class=\"form-control fw-bolder\" id=\"address\" name=\"address\" min=\"2\" max=\"65535\" step=\"1\" value=\"" . $Dev["address"] . "\">";
   $Content .=       "</div>";
   $Content .=       "<div style=\"margin-top: 0.5em;\">";
-  $Content .=         "<label for=\"replayt\" class=\"form-label fw-bolder\">Honor Replay Requests</label>";
+  $Content .=         "<label for=\"replay\" class=\"form-label fw-bolder\">Honor Replay Requests</label>";
   $Content .=         YNSelector($Dev["replay"],"replay");
   $Content .=       "</div>";
   $Content .=       "<div style=\"margin-top: 0.5em;\">";
@@ -240,8 +240,89 @@ function editDevice($DBcnx) {
   return $Content;
 }
 //---------------------------------------------------------------------------------------------------
-function logViewer($DBcnx) {
+function editScript($DBcnx) {
+  if ($_GET["ID"] == 0) {
+    if (! isset($_GET["cmd_class"])) {
+      $Content  = "<div style=\"width: 31em; margin-left: 0.25em; margin-top: 0.5em;\">";
+      $Content .=   "<div class=\"card\" style=\"width: 100%; margin-bottom: 0.5em;\">";
+      $Content .=     "<div class=\"card-header\"><span class=\"text-muted fw-bolder\">Choose Device Type</span></div>";
+      $Content .=     "<div class=\"card-body\">";
+      $Content .=       "<a href=\"./index.php?page=edit_script&ID=0&cmd_class=1\" class=\"btn btn-sm btn-success fw-bolder\" style=\"width: 100%;\">Brushed Motor Controller</a>";
+      $Content .=       "<a href=\"./index.php?page=edit_script&ID=0&cmd_class=2\" class=\"btn btn-sm btn-success fw-bolder\" style=\"width: 100%; margin-top: 1em;\">Stepper Motor Controller</a>";
+      $Content .=       "<a href=\"./index.php?page=edit_script&ID=0&cmd_class=3\" class=\"btn btn-sm btn-success fw-bolder\" style=\"width: 100%; margin-top: 1em;\">Switching Controller</a>";
+      $Content .=       "<a href=\"./index.php?page=edit_script&ID=0&cmd_class=4\" class=\"btn btn-sm btn-success fw-bolder\" style=\"width: 100%; margin-top: 1em;\">Model Train Locomotive</a>";
+      $Content .=     "</div>";
+      $Content .=   "</div>";
+      $Content .= "</div>";
+      return $Content;
+    } else {
+      $Scr["scr_name"]  = "";
+      $Scr["cmd_class"] = $_GET["cmd_class"];
+      $Scr["replay"]    = 0;
+      $Scr["replay_id"] = 0;
+      $Scr["commands"]  = "";
+    }
+  } else {
+    $Result = mysqli_query($DBcnx,"SELECT * FROM scripts WHERE ID=" . $_GET["ID"]);
+    $Scr = mysqli_fetch_assoc($Result);
+  }
+  $Result = mysqli_query($DBcnx,"SELECT * FROM commands WHERE cmd_class=" . $Scr["cmd_class"] . " LIMIT 1");
+  if (mysqli_num_rows($Result) > 0) {
+    $Cmd = mysqli_fetch_assoc($Result);
+    $FirstCmd = $Cmd["ID"];
+  } else {
+    return "<div style=\"width: 31em; margin-left: 0.25em;\" class=\"text-danger fw-bolder\">No commands found for this device type</div>";
+  }
+  if (trim(" " . $Scr["commands"]) != "") {
+    $Data = explode("|",$Scr["commands"]);
+  } else {
+    $Data[0] = $FirstCmd;
+  }
 
+  $Content  = "<div style=\"width: 31em; margin-left: 0.25em; margin-top: 0.5em;\">";
+  $Content .=   "<form id=\"device_editor\" method=\"post\" action=\"/process.php\">";
+  $Content .=   "<input type=\"hidden\" id=\"ID\" name=\"ID\" value=\"" . $_GET["ID"] . "\">";
+  $Content .=   "<input type=\"hidden\" id=\"cmd_class\" name=\"cmd_class\" value=\"" . $Scr["cmd_class"] . "\">";
+  $Content .=   "<div class=\"card\" style=\"width: 100%; margin-bottom: 0.5em;\">";
+  $Content .=     "<div class=\"card-header\"><span class=\"text-muted fw-bolder\">Edit Script <i>(" . getDeviceType($Scr["cmd_class"]) . ")</i></span></div>";
+  $Content .=     "<div class=\"card-body\">";
+  $Content .=       "<div>";
+  $Content .=         "<label for=\"cmd_name\" class=\"form-label fw-bolder\">Script Name</label>";
+  $Content .=         "<input type=\"text\" class=\"form-control fw-bolder\" id=\"scr_name\" name=\"scr_name\" maxlength=\"255\" value=\"" . $Scr["scr_name"] . "\">";
+  $Content .=       "</div>";
+  $Content .=       "<div style=\"margin-top: 0.5em;\" class=\"fw-bolder\">Command Sequence</div>";
+  for ($x = 0; $x <= 15; $x ++) {
+    $Content .=     "<div style=\"margin-top: 0.5em;\">";
+    if (isset($Data[$x])) {
+      $Content .=     scriptCommandSelector($DBcnx,$Scr["cmd_class"],$Data[$x]);
+    } else {
+      $Content .=     scriptCommandSelector($DBcnx,$Scr["cmd_class"],0);
+    }
+    $Content .=     "</div>";
+  }
+  $Content .=     "</div>";
+  $Content .=     "<div class=\"border-bottom\"></div>";
+  $Content .=     "<div style=\"margin-left: 1em; margin-right: 1em; margin-bottom: 1em;\">";
+  $Content .=       "<div style=\"margin-top: 0.5em;\">";
+  $Content .=         "<label for=\"replay\" class=\"form-label fw-bolder\">Automatic Script Replay</label>";
+  $Content .=         YNSelector($Scr["replay"],"replay");
+  $Content .=       "</div>";
+  $Content .=       "<div style=\"margin-top: 0.5em;\">";
+  $Content .=         "<div style=\"margin-top: 0.5em;\">";
+  $Content .=           "<label for=\"replay_id\" class=\"form-label fw-bolder\">Script to Replay</label>";
+  $Content .=           scriptReplaySelector($DBcnx,$Scr["cmd_class"],$Scr["replay_id"]);
+  $Content .=         "</div>";
+  $Content .=       "</div>";
+  $Content .=     "</div>";
+  $Content .=     "<div class=\"border-bottom\"></div>";
+  $Content .=     "<div style=\"margin-top: 1em;\">";
+  $Content .=       "<p style=\"float: right; margin-right: 1em;\"><a href=\"?page=scripts\" class=\"btn btn-danger fw-bolder\" name=\"cancel\" style=\"--bs-btn-padding-y: .10rem; --bs-btn-padding-x: .75rem; --bs-btn-font-size: .75rem;\">Cancel</a>&nbsp;&nbsp;&nbsp;&nbsp;";
+  $Content .=       "<button type=\"submit\" class=\"btn btn-primary fw-bolder\" name=\"edit_script\" id=\"edit_script\" style=\"--bs-btn-padding-y: .10rem; --bs-btn-padding-x: .75rem; --bs-btn-font-size: .75rem;\">Save</button></p>";
+  $Content .=     "</div>";
+  $Content .=   "</div>";
+  $Content .=   "</form>";
+  $Content .= "</div>";
+  return $Content;
 }
 //---------------------------------------------------------------------------------------------------
 function showCommands($DBcnx) {
@@ -393,7 +474,7 @@ function showHomePage($DBcnx) {
 function showLocations($DBcnx) {
   $Counter  = 0;
   $Content  = "<div style=\"width: 31em; margin-left: 0.25em;\">";
-  $Content .= "<a href=\"?page=edit_device&ID=0\" class=\"btn btn-outline-secondary fw-bolder\" style=\"width: 100%; margin-top: 0.5em; margin-bottom: 0.5em; margin-right: 0.5em;\" name=\"create_program\">Create New Location</a><br>";
+  $Content .= "<a href=\"?page=edit_location&ID=0\" class=\"btn btn-outline-secondary fw-bolder\" style=\"width: 100%; margin-top: 0.5em; margin-bottom: 0.5em; margin-right: 0.5em;\" name=\"create_program\">Create New Location</a><br>";
 
   $Result = mysqli_query($DBcnx,"SELECT * FROM locations ORDER BY loc_name");
   while ($Loc = mysqli_fetch_assoc($Result)) {
@@ -422,7 +503,7 @@ function showLogs($DBcnx) {
 function showScripts($DBcnx) {
   $Counter  = 0;
   $Content  = "<div style=\"width: 31em; margin-left: 0.25em;\">";
-  $Content .= "<a href=\"?page=edit_device&ID=0\" class=\"btn btn-outline-secondary fw-bolder\" style=\"width: 100%; margin-top: 0.5em; margin-bottom: 0.5em; margin-right: 0.5em;\" name=\"create_program\">Create New Script</a><br>";
+  $Content .= "<a href=\"?page=edit_script&ID=0\" class=\"btn btn-outline-secondary fw-bolder\" style=\"width: 100%; margin-top: 0.5em; margin-bottom: 0.5em; margin-right: 0.5em;\" name=\"create_program\">Create New Script</a><br>";
 
   $Result = mysqli_query($DBcnx,"SELECT * FROM scripts ORDER BY scr_name");
   while ($Scr = mysqli_fetch_assoc($Result)) {
@@ -444,7 +525,7 @@ function showScripts($DBcnx) {
 function showSchedule($DBcnx) {
   $Counter  = 0;
   $Content  = "<div style=\"width: 31em; margin-left: 0.25em;\">";
-  $Content .= "<a href=\"?page=edit_device&ID=0\" class=\"btn btn-outline-secondary fw-bolder\" style=\"width: 100%; margin-top: 0.5em; margin-bottom: 0.5em; margin-right: 0.5em;\" name=\"create_program\">Create New Task</a><br>";
+  $Content .= "<a href=\"?page=edit_task&ID=0\" class=\"btn btn-outline-secondary fw-bolder\" style=\"width: 100%; margin-top: 0.5em; margin-bottom: 0.5em; margin-right: 0.5em;\" name=\"create_program\">Create New Task</a><br>";
 
   $Result = mysqli_query($DBcnx,"SELECT * FROM schedule ORDER BY task_name");
   while ($Task = mysqli_fetch_assoc($Result)) {
