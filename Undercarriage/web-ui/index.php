@@ -94,10 +94,22 @@ $Content .=   "<div class=\"row\">";
 if (! isset($_GET["page"])) {
   $Content .= showHomePage($DBcnx);
 } else {
-  if ($_GET["page"] == "devices") {
+  if ($_GET["page"] == "commands") {
+    $Content .= showCommands($DBcnx);
+  } elseif ($_GET["page"] == "devices") {
     $Content .= showDevices($DBcnx);
+  } elseif ($_GET["page"] == "edit_command") {
+    $Content .= editCommand($DBcnx);
   } elseif ($_GET["page"] == "edit_device") {
     $Content .= editDevice($DBcnx);
+  } elseif ($_GET["page"] == "locations") {
+    $Content .= showLocations($DBcnx);
+  } elseif ($_GET["page"] == "logs") {
+    $Content .= showLogs($DBcnx);
+  } elseif ($_GET["page"] == "schedule") {
+    $Content .= showSchedule($DBcnx);
+  } elseif ($_GET["page"] == "scripts") {
+    $Content .= showScripts($DBcnx);
   }
 }
 

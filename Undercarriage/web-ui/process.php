@@ -9,6 +9,29 @@ if (isset($_GET["delete_command"])) {
   $Return = "/index.php?page=commands";
 }
 //---------------------------------------------------------------------------------------------------
+elseif (isset($_POST["edit_command"])) {
+  if ($_POST["ID"] == 0) {
+    $Result = mysqli_query($DBcnx, "INSERT INTO commands (cmd_name) VALUES ('Temp')");
+    $_POST["ID"] = mysqli_insert_id($DBcnx);
+  }
+  $cmd_name = mysqli_escape_string($DBcnx,trim($_POST["cmd_name"]));
+  if ($_POST["cmd_type"] == 1) {
+
+  } elseif ($_POST["cmd_type"] == 2) {
+
+  } elseif ($_POST["cmd_type"] == 3) {
+
+  } elseif ($_POST["cmd_type"] == 4) {
+
+  } elseif ($_POST["cmd_type"] == 5) {
+
+  }
+//echo("<pre>");
+//print_r($_POST);
+//echo("</pre>");
+//exit;
+}
+//---------------------------------------------------------------------------------------------------
 elseif (isset($_POST["edit_device"])) {
   if ($_POST["ID"] == 0) {
     $Result = mysqli_query($DBcnx, "INSERT INTO devices (dev_name) VALUES ('Temp')");
@@ -19,8 +42,8 @@ elseif (isset($_POST["edit_device"])) {
   $dev_type = $_POST["dev_type"];
   if (isset($_POST["favorites"])) $favorites = implode("|",$_POST["favorites"]);
   if (! isset($favorites)) $favorites = "";
-  $cmd_repeat  = $_POST["cmd_repeat"];
-  $Result = mysqli_query($DBcnx, "UPDATE devices SET address='$address',dev_name='$dev_name',dev_type='$dev_type',favorites='$favorites',cmd_repeat='$cmd_repeat' WHERE ID=" . $_POST["ID"]);
+  $replay = $_POST["replay"];
+  $Result = mysqli_query($DBcnx, "UPDATE devices SET address='$address',dev_name='$dev_name',dev_type='$dev_type',favorites='$favorites',replay='$replay' WHERE ID=" . $_POST["ID"]);
   $Return = "/index.php?page=devices";
 //echo("<pre>");
 //print_r($_POST);

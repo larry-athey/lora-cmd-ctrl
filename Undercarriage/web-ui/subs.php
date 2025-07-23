@@ -173,12 +173,12 @@ function getDeviceStats($DBcnx,$Address) {
   $Result = mysqli_query($DBcnx,"SELECT * FROM devices WHERE address=$Address");
   $Dev = mysqli_fetch_assoc($Result);
   $Content  = "<div class=\"row\">";
-  $Content .=   "<div class=\"col-5 text-secondary-emphasis\">Honor Repeats:</div>";
-  $Content .=   "<div class=\"col-7\" style=\"text-align: right;\"><a href=\"/index.php?page=edit_device&ID=" . $Dev["ID"] . "\">" . IntToYNC($Dev["cmd_repeat"]) . "</a></div>";
+  $Content .=   "<div class=\"col-5 text-secondary-emphasis\">Honor Replays:</div>";
+  $Content .=   "<div class=\"col-7\" style=\"text-align: right;\"><a href=\"/index.php?page=edit_device&ID=" . $Dev["ID"] . "\">" . IntToYNC($Dev["replay"]) . "</a></div>";
   $Content .= "</div>";
   $Content .= "<div class=\"row\">";
   $Content .=   "<div class=\"col-5 text-secondary-emphasis\">Last Location:</div>";
-  $Content .=   "<div class=\"col-7\" style=\"text-align: right;\">" . getLocationName($DBcnx,$Dev["last_loc"]) . "</div>";
+  $Content .=   "<div class=\"col-7\" style=\"text-align: right;\">" . getLocationByPin($DBcnx,$Dev["last_loc"]) . "</div>";
   $Content .= "</div>";
   $Content .= "<div class=\"row\">";
   $Content .=   "<div class=\"col-5 text-secondary-emphasis\">Status:</div>";
@@ -193,6 +193,16 @@ function getDeviceType($ID) {
   elseif ($ID == 3) {return "Switching Controller";}
   elseif ($ID == 4) {return "Model Train Locomotive";}
   else {return "Unknown";}
+}
+//---------------------------------------------------------------------------------------------------
+function getLocationByPin($DBcnx,$Pin) {
+  $Result = mysqli_query($DBcnx,"SELECT * FROM locations WHERE pin=$Pin");
+  if (mysqli_num_rows($Result) > 0) {
+    $Loc = mysqli_fetch_assoc($Result);
+    return $Loc["loc_name"];
+  } else {
+    return "Unknown";
+  }
 }
 //---------------------------------------------------------------------------------------------------
 function getLocationName($DBcnx,$ID) {
@@ -210,6 +220,16 @@ function getScriptName($DBcnx,$ID) {
   if (mysqli_num_rows($Result) > 0) {
     $Scr = mysqli_fetch_assoc($Result);
     return $Scr["scr_name"];
+  } else {
+    return "Unknown";
+  }
+}
+//---------------------------------------------------------------------------------------------------
+function getTaskName($DBcnx,$ID) {
+  $Result = mysqli_query($DBcnx,"SELECT * FROM schedule WHERE ID=$ID");
+  if (mysqli_num_rows($Result) > 0) {
+    $Loc = mysqli_fetch_assoc($Result);
+    return $Task["task_name"];
   } else {
     return "Unknown";
   }

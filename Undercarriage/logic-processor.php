@@ -36,6 +36,71 @@ if (mysqli_num_rows($Result) > 0) {
   }
 }
 
+// Check for command replay requests
+$Result = mysqli_query($DBcnx,"SELECT * FROM inbound WHERE msg LIKE BINARY '%/replay/cmd/%' AND rcvd=0");
+if (mysqli_num_rows($Result) > 0) {
+  while ($Inbound = mysqli_fetch_assoc($Result)) {
+    $Update = mysqli_query($DBcnx,"UPDATE inbound SET rcvd=1 WHERE ID='" . $Inbound["ID"] . "'");
+    $Result2 = mysqli_query($DBcnx,"SELECT * FROM devices WHERE address='" . $Inbound["Address"] . "'");
+    $Device = mysqli_fetch_assoc($Result2);
+    if ($Device["replay"] == 1) {
+      $Data = explode("/",trim($Inbound["msg"],"/"));
+      // Command ID is $Data[2]
+
+
+    }
+  }
+}
+
+// Check for script replay requests
+$Result = mysqli_query($DBcnx,"SELECT * FROM inbound WHERE msg LIKE BINARY '%/replay/scr/%' AND rcvd=0");
+if (mysqli_num_rows($Result) > 0) {
+  while ($Inbound = mysqli_fetch_assoc($Result)) {
+    $Update = mysqli_query($DBcnx,"UPDATE inbound SET rcvd=1 WHERE ID='" . $Inbound["ID"] . "'");
+    $Result2 = mysqli_query($DBcnx,"SELECT * FROM devices WHERE address='" . $Inbound["address"] . "'");
+    $Device = mysqli_fetch_assoc($Result2);
+    if ($Device["replay"] == 1) {
+      $Data = explode("/",trim($Inbound["msg"],"/"));
+      $Result3 = mysqli_query($DBcnx, "SELECT * FROM scripts WHERE ID=" . $Data[2]);
+      $Scr = mysqli_fetch_assoc($Result3);
+      $Data2 = explode("|",$Scr["commands"]);
+      $SQL = "INSERT INTO outbound (address,msg) VALUES ";
+      for ($x = 0; $x <= (count($Data2) - 1); $x ++) {
+        $Temp = createMessage($DBcnx,$Data2[$x]);
+        if ($Temp != "") {
+          $Msg = explode("|",$Temp);
+          $ID = generateRandomString(32);
+          $SQL .= "('" . $Inbound["address"] . "','/" . $ID . $Msg[0] . "'),";
+        }
+      }
+      $SQL = rtrim($SQL,",");
+      if ($Scr["replay"] == 1) {
+        $ID = generateRandomString(32);
+        if ($Scr["replay_id"] == 0) {
+          $SQL .= ",('" . $Inbound["address"] . "','/" . $ID . "/replay/scr/" . $Data[2] . "')";
+        } else {
+          $SQL .= ",('" . $Inbound["address"] . "','/" . $ID . "/replay/scr/" . $Scr["replay_id"] . "')";
+        }
+      }
+      $SQL .= ";";
+      $Result3 = mysqli_query($DBcnx,$SQL);
+      $Result3 = mysqli_query($DBcnx, "UPDATE devices SET status='<span class=\"text-warning\">Sent script replay</span>' WHERE address='" . $Inbound["address"] . "'");
+    }
+  }
+}
+
+// Check for limit switch notifications
+$Result = mysqli_query($DBcnx,"SELECT * FROM inbound WHERE msg LIKE BINARY '%/limit/%' AND rcvd=0");
+if (mysqli_num_rows($Result) > 0) {
+
+}
+
+// Check for location related notifications
+$Result = mysqli_query($DBcnx,"SELECT * FROM inbound WHERE msg LIKE BINARY '%/location/%' AND rcvd=0");
+if (mysqli_num_rows($Result) > 0) {
+
+}
+
 // Check for runtime end notifications
 $Result = mysqli_query($DBcnx,"SELECT * FROM inbound WHERE msg LIKE BINARY '%/runtime/end%' AND rcvd=0");
 if (mysqli_num_rows($Result) > 0) {

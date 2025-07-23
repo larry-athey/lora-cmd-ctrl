@@ -30,15 +30,19 @@ if ($_POST) {
         $SQL .= "('" . $_POST["address"] . "','/" . $ID . $Msg[0] . "'),";
       }
     }
-    $SQL = rtrim($SQL,",") . ";";
-    $Result = mysqli_query($DBcnx,$SQL);
-    if ($Scr["repeat"] == 1) {
-      if ($Scr["repeat_id"] == 0) {
-        sendCommand($DBcnx,$_POST["address"],"/repeat/scr/" . $_POST["script"]);
+    $SQL = rtrim($SQL,",");
+
+    if ($Scr["replay"] == 1) {
+      $ID = generateRandomString(32);
+      if ($Scr["replay_id"] == 0) {
+        $SQL .= ",('" . $_POST["address"] . "','/" . $ID . "/replay/scr/" . $_POST["script"] . "')";
       } else {
-        sendCommand($DBcnx,$_POST["address"],"/repeat/scr/" . $Scr["repeat_id"]);
+        $SQL .= ",('" . $_POST["address"] . "','/" . $ID . "/replay/scr/" . $Scr["replay_id"] . "')";
       }
     }
+
+    $SQL .= ";";
+    $Result = mysqli_query($DBcnx,$SQL);
     $Result = mysqli_query($DBcnx, "UPDATE devices SET status='<span class=\"text-warning\">Sent script commands</span>' WHERE address='" . $_POST["address"] . "'");
     echo($jsonSuccess);
   } elseif ($_POST["form-id"] == 4) { // Send reboot command
