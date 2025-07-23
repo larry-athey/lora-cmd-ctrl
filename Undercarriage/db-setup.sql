@@ -78,7 +78,7 @@ CREATE TABLE schedule (
   `start_hour` TINYINT(4) DEFAULT NULL,
   `start_min` TINYINT(4) DEFAULT NULL,
   `days` VARCHAR(13) DEFAULT NULL,
-  `last_run` TIMESTAMP DEFAULT NULL,
+  `last_run` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   `disabled` TINYINT(4) DEFAULT 0,
   `script` INT(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
