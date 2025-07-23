@@ -105,7 +105,7 @@ function editCommand($DBcnx) {
   $Content .=   "<input type=\"hidden\" id=\"cmd_type\" name=\"cmd_type\" value=\"" . $Cmd["cmd_type"] . "\">";
   $Content .=   "<input type=\"hidden\" id=\"cmd_class\" name=\"cmd_class\" value=\"" . $Cmd["cmd_class"] . "\">";
   $Content .=   "<div class=\"card\" style=\"width: 100%; margin-bottom: 0.5em;\">";
-  $Content .=     "<div class=\"card-header\"><span class=\"text-muted fw-bolder\">Edit Command</span></div>";
+  $Content .=     "<div class=\"card-header\"><span class=\"text-muted fw-bolder\">Edit Command <i>(" . getDeviceType($Cmd["cmd_class"]) . ")</i></span></div>";
   $Content .=     "<div class=\"card-body\">";
   $Content .=       "<div>";
   $Content .=         "<label for=\"cmd_name\" class=\"form-label fw-bolder\">Command Name</label>";
