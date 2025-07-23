@@ -68,7 +68,8 @@ elseif (isset($_POST["edit_script"])) {
   $cmd_class = $_POST["cmd_class"];
   $replay = $_POST["replay"];
   $replay_id = $_POST["replay_id"];
-  $Result = mysqli_query($DBcnx,"UPDATE scripts SET scr_name='$scr_name',cmd_class=$cmd_class,replay=$replay,replay_id=$replay_id,commands-'$commands'  WHERE ID=$ID");
+  $Result = mysqli_query($DBcnx,"UPDATE scripts SET scr_name='$scr_name',cmd_class=$cmd_class,replay=$replay,replay_id=$replay_id,commands='$commands'  WHERE ID=$ID");
+  $Return = "/index.php?page=scripts";
 //echo("<pre>");
 //print_r($_POST);
 //echo($commands);

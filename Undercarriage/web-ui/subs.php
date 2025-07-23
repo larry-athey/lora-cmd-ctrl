@@ -32,6 +32,17 @@ function AjaxRefreshJS($ID,$RandID,$Delay) {
   return $Content;
 }
 //---------------------------------------------------------------------------------------------------
+function checkDays($DayArray) {
+  $Today = date('N',time()) + 1; // Default PHP says that Monday is the first DOW rather than Sunday
+  if ($Today > 7) $Today = 1;
+  $Data = explode("|",$DayArray);
+  if ($Data[$Today -1] == 1) {
+    return true;
+  } else {
+    return false;
+  }
+}
+//---------------------------------------------------------------------------------------------------
 function createMessage($DBcnx,$ID) {
   $Msg = "";
   $Result = mysqli_query($DBcnx,"SELECT * FROM commands WHERE ID=$ID");
@@ -63,6 +74,22 @@ function ctrlButtonMenu($DevType,$Address) {
   $Content .=     "<li><a onClick=\"LoadForm('GPIO Pin Switching','14','$Address')\" class=\"dropdown-item\" href=\"#\">Switching Control</a></li>";
   $Content .=   "</ul>";
   $Content .= "</div>";
+  return $Content;
+}
+//---------------------------------------------------------------------------------------------------
+function dayCheckboxes($Days) {
+  $Content = "<label class=\"form-check-label\">Deployment Execution Days</label><br>";
+  $DayArray = explode("|",$Days);
+  $DayList  = array("Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday");
+  for ($x = 0; $x <= 6; $x ++) {
+    $Content .= "<div class=\"form-check\">";
+    if ($DayArray[$x] == 1) {
+      $Content .= "<input class=\"form-control form-check-input\" type=\"checkbox\" id=\"cb$x\" name=\"days[]\" value=\"$x\" checked>";
+    } else {
+      $Content .= "<input class=\"form-control form-check-input\" type=\"checkbox\" id=\"cb$x\" name=\"days[]\" value=\"$x\">";
+    }
+    $Content .= "<label class=\"form-check-label\" for=\"cb$x\">$DayList[$x]</label></div>";
+  }
   return $Content;
 }
 //---------------------------------------------------------------------------------------------------
