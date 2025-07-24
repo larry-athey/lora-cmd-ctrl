@@ -363,7 +363,7 @@ function showDevices($DBcnx) {
     $Content .= "<div class=\"card\" style=\"width: 100%; margin-bottom: 0.5em;\">";
     $Content .=   "<div class=\"card-body\">";
     $Content .=     "<p class=\"fw-bolder mb-0\">" . $Dev["dev_name"] . "</p>";
-    $Content .=     "<p class=\"text-secondary fs-6 mb-0\">" . getDeviceType($Dev["dev_type"]) . ", ID " . $Dev["ID"] . "</p>";
+    $Content .=     "<p class=\"text-secondary fs-6 mb-0\">" . getDeviceType($Dev["dev_type"]) . ", Address " . $Dev["address"] . "</p>";
     $Content .=     "<p class=\"mb-0\" style=\"float: right;\"><a href=\"?page=delete_confirm&type=1&ID=" . $Dev["ID"] . "\" class=\"btn btn-danger fw-bolder\" name=\"delete_device\" style=\"--bs-btn-padding-y: .10rem; --bs-btn-padding-x: .75rem; --bs-btn-font-size: .75rem;\">Delete</a>&nbsp;&nbsp;&nbsp;&nbsp;";
     $Content .=     "<a href=\"?page=edit_device&ID=" . $Dev["ID"] . "\" class=\"btn btn-primary fw-bolder\" name=\"edit_device\" style=\"--bs-btn-padding-y: .10rem; --bs-btn-padding-x: .75rem; --bs-btn-font-size: .75rem;\">Edit</a></p>";
     $Content .=   "</div>";
