@@ -69,7 +69,7 @@ function ctrlButtonMenu($DevType,$Address) {
   $Content .=   "<ul class=\"dropdown-menu\">";
   if (($DevType == 1) || ($DevType == 4)) $Content .= "<li><a onClick=\"LoadForm('Brushed Motor Control','10','$Address')\" class=\"dropdown-item\" href=\"#\">Motor Control</a></li>";
   if ($DevType == 2) $Content .= "<li><a onClick=\"LoadForm('Stepper Motor Control','11','$Address')\" class=\"dropdown-item\" href=\"#\">Stepper Control</a></li>";
-  $Content .=     "<li><a onClick=\"LoadForm('Location Based Action','12','$Address')\" class=\"dropdown-item\" href=\"#\">Location Detection</a></li>";
+  if ($DevType != 3) $Content .= "<li><a onClick=\"LoadForm('Location Based Action','12','$Address')\" class=\"dropdown-item\" href=\"#\">Location Detection</a></li>";
   if ($DevType != 2) $Content .= "<li><a onClick=\"LoadForm('Play Sound Effects','13','$Address')\" class=\"dropdown-item\" href=\"#\">Sound Effects</a></li>";
   $Content .=     "<li><a onClick=\"LoadForm('GPIO Pin Switching','14','$Address')\" class=\"dropdown-item\" href=\"#\">Switching Control</a></li>";
   $Content .=   "</ul>";
@@ -214,6 +214,16 @@ function getDeviceStats($DBcnx,$Address) {
   return $Content;
 }
 //---------------------------------------------------------------------------------------------------
+function getDeviceName($DBcnx,$Address) {
+  $Result = mysqli_query($DBcnx,"SELECT * FROM devices WHERE address=$Address");
+  if (mysqli_num_rows($Result) > 0) {
+    $Dev = mysqli_fetch_assoc($Result);
+    return $Dev["dev_name"];
+  } else {
+    return "Unknown";
+  }
+}
+//---------------------------------------------------------------------------------------------------
 function getDeviceType($ID) {
   if ($ID == 1) {return "Brushed Motor Controller";}
   elseif ($ID == 2) {return "Stepper Motor Controller";}
@@ -287,13 +297,6 @@ function IntToYNC($Int) {
   }
 }
 //---------------------------------------------------------------------------------------------------
-function sendCommand($DBcnx,$Address,$Command) {
-  //$ID = md5($Address . "|" . time());
-  $ID = generateRandomString(32);
-  $Result = mysqli_query($DBcnx,"INSERT INTO outbound (address,msg) VALUES ('$Address','/" . $ID . $Command . "')");
-  return "<pre>cmd://" . $ID . $Command . ":$Address</pre>\n";
-}
-//---------------------------------------------------------------------------------------------------
 function locationSelector($DBcnx,$ID) {
   $Result = mysqli_query($DBcnx,"SELECT * FROM locations ORDER BY loc_name");
   if (mysqli_num_rows($Result) > 0) {
@@ -330,6 +333,29 @@ function locationActionSelector($Selected) {
   $Content .= "<option $S4 value=\"4\">Request Script</option>";
   $Content .= "<option $S5 value=\"5\">Toggle GPIO Pin</option>";
   $Content .= "</select>";
+  return $Content;
+}
+//---------------------------------------------------------------------------------------------------
+function logViewerMenu() {
+  $lines = 50;
+  $log = 0;
+  if (isset($_POST["lines"])) $lines = $_POST["lines"];
+  if (isset($_POST["log"])) $log = $_POST["log"];
+  if ($log == 0) {
+    $S0 = "selected";
+    $S1 = "";
+  } else {
+    $S0 = "";
+    $S1 = "selected";
+  }
+  $Content  = "<form class=\"d-flex\" method=\"post\" action=\"/index.php?page=logs\">";
+  $Content .= "<select class=\"form-control form-select fw-bolder\" style=\"width: 8em;\" size=\"1\" id=\"log\" name=\"log\">";
+  $Content .= "<option $S0 value=\"0\">Inbound</option>";
+  $Content .= "<option $S1 value=\"1\">Outbound</option>";
+  $Content .= "</select>";
+  $Content .= "<input class=\"form-control\" style=\"width: 8em;\" type=\"number\" id=\"lines\" name=\"lines\" min=\"1\" step=\"1\" value=\"$lines\">";
+  $Content .= "<button class=\"btn btn-sm btn-outline-secondary\" style=\"width: 8em;\">Update</button>";
+  $Content .= "</form>";
   return $Content;
 }
 //---------------------------------------------------------------------------------------------------
@@ -406,6 +432,12 @@ function scriptReplaySelector($DBcnx,$DevType,$ID) {
   }
   $Content .= "</select>";
   return $Content;
+}
+//---------------------------------------------------------------------------------------------------
+function sendCommand($DBcnx,$Address,$Command) {
+  $ID = generateRandomString(32);
+  $Result = mysqli_query($DBcnx,"INSERT INTO outbound (address,msg) VALUES ('$Address','/" . $ID . $Command . "')");
+  return "<pre>cmd://" . $ID . $Command . ":$Address</pre>\n";
 }
 //---------------------------------------------------------------------------------------------------
 function YNSelector($Selected,$ID) {
