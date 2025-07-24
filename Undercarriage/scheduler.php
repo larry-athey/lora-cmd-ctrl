@@ -34,7 +34,6 @@ function deployScript($DBcnx,$ID,$Address) {
 }
 //---------------------------------------------------------------------------------------------
 $today = new DateTime('today');
-
 $Result = mysqli_query($DBcnx,"SELECT * FROM schedule WHERE disabled=0 AND last_run < CURRENT_DATE");
 while ($RS = mysqli_fetch_array($Result)) {
   if (checkDays($RS["days"])) {

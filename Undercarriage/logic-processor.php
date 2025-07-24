@@ -3,7 +3,6 @@
 //---------------------------------------------------------------------------------------------
 require_once("/var/www/html/subs.php");
 //---------------------------------------------------------------------------------------------
-set_time_limit(600);
 $DBcnx = mysqli_connect(DB_HOST,DB_USER,DB_PASS,DB_NAME);
 //---------------------------------------------------------------------------------------------
 // Check for unread command acknowledgment messages. Until a command is acknowledged by the LCC
@@ -106,7 +105,7 @@ $Result = mysqli_query($DBcnx,"SELECT * FROM inbound WHERE msg LIKE BINARY '%/ru
 if (mysqli_num_rows($Result) > 0) {
   while ($Inbound = mysqli_fetch_assoc($Result)) {
     $Update = mysqli_query($DBcnx,"UPDATE inbound SET rcvd=1 WHERE ID=" . $Inbound["ID"]);
-    $Update = mysqli_query($DBcnx,"UPDATE devices SET status='Runtime has expired' WHERE address=" . $Inbound["address"]);
+    $Update = mysqli_query($DBcnx,"UPDATE devices SET status='<span class=\"text-danger\">Runtime has expired</span>' WHERE address=" . $Inbound["address"]);
   }
 }
 //---------------------------------------------------------------------------------------------

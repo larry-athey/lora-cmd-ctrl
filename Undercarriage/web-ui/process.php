@@ -52,6 +52,44 @@ elseif (isset($_POST["edit_command"])) {
 //exit;
 }
 //---------------------------------------------------------------------------------------------------
+elseif (isset($_POST["edit_device"])) {
+  if ($_POST["ID"] == 0) {
+    $Result = mysqli_query($DBcnx,"INSERT INTO devices (dev_name) VALUES ('Temp')");
+    $ID = mysqli_insert_id($DBcnx);
+  } else {
+    $ID = $_POST["ID"];
+  }
+  $address = $_POST["address"];
+  $dev_name = mysqli_escape_string($DBcnx,trim($_POST["dev_name"]));
+  $dev_type = $_POST["dev_type"];
+  if (isset($_POST["favorites"])) $favorites = implode("|",$_POST["favorites"]);
+  if (! isset($favorites)) $favorites = "";
+  $replay = $_POST["replay"];
+  $Result = mysqli_query($DBcnx,"UPDATE devices SET address='$address',dev_name='$dev_name',dev_type='$dev_type',favorites='$favorites',replay='$replay' WHERE ID=$ID");
+  $Return = "/index.php?page=devices";
+//echo("<pre>");
+//print_r($_POST);
+//echo("</pre>");
+//exit;
+}
+//---------------------------------------------------------------------------------------------------
+elseif (isset($_POST["edit_location"])) {
+  if ($_POST["ID"] == 0) {
+    $Result = mysqli_query($DBcnx,"INSERT INTO locations (loc_name) VALUES ('Temp')");
+    $ID = mysqli_insert_id($DBcnx);
+  } else {
+    $ID = $_POST["ID"];
+  }
+  $loc_name = mysqli_escape_string($DBcnx,trim($_POST["loc_name"]));
+  $pin = $_POST["pin"];
+  $Result = mysqli_query($DBcnx,"UPDATE locations SET loc_name='$loc_name',pin=$pin WHERE ID=$ID");
+  $Return = "/index.php?page=locations";
+//echo("<pre>");
+//print_r($_POST);
+//echo("</pre>");
+//exit;
+}
+//---------------------------------------------------------------------------------------------------
 elseif (isset($_POST["edit_script"])) {
   if ($_POST["ID"] == 0) {
     $Result = mysqli_query($DBcnx,"INSERT INTO scripts (scr_name) VALUES ('Temp')");
@@ -77,23 +115,33 @@ elseif (isset($_POST["edit_script"])) {
 //exit;
 }
 //---------------------------------------------------------------------------------------------------
-elseif (isset($_POST["edit_device"])) {
+elseif (isset($_POST["edit_task"])) {
   if ($_POST["ID"] == 0) {
-    $Result = mysqli_query($DBcnx, "INSERT INTO devices (dev_name) VALUES ('Temp')");
+    $Result = mysqli_query($DBcnx,"INSERT INTO schedule (task_name) VALUES ('Temp')");
     $ID = mysqli_insert_id($DBcnx);
   } else {
     $ID = $_POST["ID"];
   }
+  $task_name = mysqli_escape_string($DBcnx,trim($_POST["task_name"]));
   $address = $_POST["address"];
-  $dev_name = mysqli_escape_string($DBcnx,trim($_POST["dev_name"]));
-  $dev_type = $_POST["dev_type"];
-  if (isset($_POST["favorites"])) $favorites = implode("|",$_POST["favorites"]);
-  if (! isset($favorites)) $favorites = "";
-  $replay = $_POST["replay"];
-  $Result = mysqli_query($DBcnx,"UPDATE devices SET address='$address',dev_name='$dev_name',dev_type='$dev_type',favorites='$favorites',replay='$replay' WHERE ID=$ID");
-  $Return = "/index.php?page=devices";
+  $dayList = explode("|","0|0|0|0|0|0|0");
+  if (isset($_POST["days"])) {
+    foreach ($_POST["days"] as $Selected) {
+      $dayList[$Selected] = "1";
+    }
+    $days = implode("|",$dayList);
+  } else {
+    $days = "0|0|0|0|0|0|0";
+  }
+  $start_hour = $_POST["start_hour"];
+  $start_min = $_POST["start_min"];
+  $disabled = $_POST["disabled"];
+  $script = $_POST["script"];
+  $Result = mysqli_query($DBcnx,"UPDATE schedule SET task_name='$task_name',address='$address',days='$days',start_hour=$start_hour,start_min=$start_min,last_run=DATE_SUB(NOW(),INTERVAL 1 DAY),disabled=$disabled,script=$script WHERE ID=$ID");
+  $Return = "/index.php?page=schedule";
 //echo("<pre>");
 //print_r($_POST);
+//echo($days);
 //echo("</pre>");
 //exit;
 }

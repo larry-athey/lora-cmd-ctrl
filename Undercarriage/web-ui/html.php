@@ -198,7 +198,6 @@ function editDevice($DBcnx) {
     $Result = mysqli_query($DBcnx,"SELECT * FROM devices WHERE ID=" . $_GET["ID"]);
     $Dev = mysqli_fetch_assoc($Result);
   } else {
-    $Dev["ID"]         = 0;
     $Dev["address"]    = "";
     $Dev["dev_name"]   = "";
     $Dev["dev_type"]   = 0;
@@ -237,6 +236,40 @@ function editDevice($DBcnx) {
   $Content .=     "<div style=\"margin-top: 1em;\">";
   $Content .=       "<p style=\"float: right; margin-right: 1em;\"><a href=\"?page=devices\" class=\"btn btn-danger fw-bolder\" name=\"cancel\" style=\"--bs-btn-padding-y: .10rem; --bs-btn-padding-x: .75rem; --bs-btn-font-size: .75rem;\">Cancel</a>&nbsp;&nbsp;&nbsp;&nbsp;";
   $Content .=       "<button type=\"submit\" class=\"btn btn-primary fw-bolder\" name=\"edit_device\" id=\"edit_device\" style=\"--bs-btn-padding-y: .10rem; --bs-btn-padding-x: .75rem; --bs-btn-font-size: .75rem;\">Save</button></p>";
+  $Content .=     "</div>";
+  $Content .=   "</div>";
+  $Content .=   "</form>";
+  $Content .= "</div>";
+  return $Content;
+}
+//---------------------------------------------------------------------------------------------------
+function editLocation($DBcnx) {
+  if ($_GET["ID"] > 0) {
+    $Result = mysqli_query($DBcnx,"SELECT * FROM locations WHERE ID=" . $_GET["ID"]);
+    $Loc = mysqli_fetch_assoc($Result);
+  } else {
+    $Loc["loc_name"] = "";
+    $Loc["pin"]      = 0;
+  }
+  $Content  = "<div style=\"width: 31em; margin-left: 0.25em; margin-top: 0.5em;\">";
+  $Content .=   "<form id=\"device_editor\" method=\"post\" action=\"/process.php\">";
+  $Content .=   "<input type=\"hidden\" id=\"ID\" name=\"ID\" value=\"" . $_GET["ID"] . "\">";
+  $Content .=   "<div class=\"card\" style=\"width: 100%; margin-bottom: 0.5em;\">";
+  $Content .=     "<div class=\"card-header\"><span class=\"text-muted fw-bolder\">Edit Location</span></div>";
+  $Content .=     "<div class=\"card-body\">";
+  $Content .=       "<div>";
+  $Content .=         "<label for=\"loc_name\" class=\"form-label fw-bolder\">Location Name</label>";
+  $Content .=         "<input type=\"text\" class=\"form-control fw-bolder\" id=\"loc_name\" name=\"loc_name\" maxlength=\"255\" value=\"" . $Loc["loc_name"] . "\">";
+  $Content .=       "</div>";
+  $Content .=       "<div style=\"margin-top: 0.5em;\">";
+  $Content .=         "<label for=\"pin\" class=\"form-label fw-bolder\">Transponder Pin</label>";
+  $Content .=         "<input type=\"number\" class=\"form-control fw-bolder\" id=\"pin\" name=\"pin\" min=\"1\"  max=\"65535\" step=\"1\" value=\"" . $Loc["pin"] . "\">";
+  $Content .=       "</div>";
+  $Content .=     "</div>";
+  $Content .=     "<div class=\"border-bottom\"></div>";
+  $Content .=     "<div style=\"margin-top: 1em;\">";
+  $Content .=       "<p style=\"float: right; margin-right: 1em;\"><a href=\"?page=locations\" class=\"btn btn-danger fw-bolder\" name=\"cancel\" style=\"--bs-btn-padding-y: .10rem; --bs-btn-padding-x: .75rem; --bs-btn-font-size: .75rem;\">Cancel</a>&nbsp;&nbsp;&nbsp;&nbsp;";
+  $Content .=       "<button type=\"submit\" class=\"btn btn-primary fw-bolder\" name=\"edit_location\" id=\"edit_location\" style=\"--bs-btn-padding-y: .10rem; --bs-btn-padding-x: .75rem; --bs-btn-font-size: .75rem;\">Save</button></p>";
   $Content .=     "</div>";
   $Content .=   "</div>";
   $Content .=   "</form>";
@@ -322,6 +355,93 @@ function editScript($DBcnx) {
   $Content .=     "<div style=\"margin-top: 1em;\">";
   $Content .=       "<p style=\"float: right; margin-right: 1em;\"><a href=\"?page=scripts\" class=\"btn btn-danger fw-bolder\" name=\"cancel\" style=\"--bs-btn-padding-y: .10rem; --bs-btn-padding-x: .75rem; --bs-btn-font-size: .75rem;\">Cancel</a>&nbsp;&nbsp;&nbsp;&nbsp;";
   $Content .=       "<button type=\"submit\" class=\"btn btn-primary fw-bolder\" name=\"edit_script\" id=\"edit_script\" style=\"--bs-btn-padding-y: .10rem; --bs-btn-padding-x: .75rem; --bs-btn-font-size: .75rem;\">Save</button></p>";
+  $Content .=     "</div>";
+  $Content .=   "</div>";
+  $Content .=   "</form>";
+  $Content .= "</div>";
+  return $Content;
+}
+//---------------------------------------------------------------------------------------------------
+function editTask($DBcnx) {
+  if ($_GET["ID"] > 0) {
+    $Result = mysqli_query($DBcnx,"SELECT * FROM schedule WHERE ID=" . $_GET["ID"]);
+    $Task = mysqli_fetch_assoc($Result);
+    $Result = mysqli_query($DBcnx,"SELECT * FROM devices WHERE address='" . $Task["address"] . "'");
+    $Dev = mysqli_fetch_assoc($Result);
+    $cmd_class = $Dev["dev_type"];
+  } else {
+    if (! isset($_GET["cmd_class"])) {
+      $Content  = "<div style=\"width: 31em; margin-left: 0.25em; margin-top: 0.5em;\">";
+      $Content .=   "<div class=\"card\" style=\"width: 100%; margin-bottom: 0.5em;\">";
+      $Content .=     "<div class=\"card-header\"><span class=\"text-muted fw-bolder\">Choose Device Type</span></div>";
+      $Content .=     "<div class=\"card-body\">";
+      $Content .=       "<a href=\"./index.php?page=edit_task&ID=0&cmd_class=1\" class=\"btn btn-sm btn-success fw-bolder\" style=\"width: 100%;\">Brushed Motor Controller</a>";
+      $Content .=       "<a href=\"./index.php?page=edit_task&ID=0&cmd_class=2\" class=\"btn btn-sm btn-success fw-bolder\" style=\"width: 100%; margin-top: 1em;\">Stepper Motor Controller</a>";
+      $Content .=       "<a href=\"./index.php?page=edit_task&ID=0&cmd_class=3\" class=\"btn btn-sm btn-success fw-bolder\" style=\"width: 100%; margin-top: 1em;\">Switching Controller</a>";
+      $Content .=       "<a href=\"./index.php?page=edit_task&ID=0&cmd_class=4\" class=\"btn btn-sm btn-success fw-bolder\" style=\"width: 100%; margin-top: 1em;\">Model Train Locomotive</a>";
+      $Content .=     "</div>";
+      $Content .=   "</div>";
+      $Content .= "</div>";
+      return $Content;
+    } else {
+      $cmd_class          = $_GET["cmd_class"];
+      $Task["address"]    = "";
+      $Task["task_name"]  = "";
+      $Task["start_hour"] = "00";
+      $Task["start_min"]  = "00";
+      $Task["days"]       = "0|0|0|0|0|0|0";
+      $Task["last_run"]   = "Never";
+      $Task["disabled"]   = 0;
+      $Task["script"]     = 0;
+    }
+  }
+  $Content  = "<div style=\"width: 31em; margin-left: 0.25em; margin-top: 0.5em;\">";
+  $Content .=   "<form id=\"device_editor\" method=\"post\" action=\"/process.php\">";
+  $Content .=   "<input type=\"hidden\" id=\"ID\" name=\"ID\" value=\"" . $_GET["ID"] . "\">";
+  $Content .=   "<div class=\"card\" style=\"width: 100%; margin-bottom: 0.5em;\">";
+  $Content .=     "<div class=\"card-header\"><span class=\"text-muted fw-bolder\">Edit Task</span></div>";
+  $Content .=     "<div class=\"card-body\">";
+  $Content .=       "<div>";
+  $Content .=         "<label for=\"task_name\" class=\"form-label fw-bolder\">Script Name</label>";
+  $Content .=         "<input type=\"text\" class=\"form-control fw-bolder\" id=\"task_name\" name=\"task_name\" maxlength=\"255\" value=\"" . $Task["task_name"] . "\">";
+  $Content .=       "</div>";
+  $Content .=       "<div style=\"margin-top: 0.5em;\">";
+  $Content .=         "<label for=\"address\" class=\"form-label fw-bolder\">Target Device</label>";
+  $Content .=         deviceAddressSelector($DBcnx,$cmd_class,$Task["address"]);
+  $Content .=       "</div>";
+  $Content .=       "<div style=\"margin-top: 0.5em;\">";
+  $Content .=         dayCheckboxes($Task["days"]);
+  $Content .=       "</div>";
+  $Content .=       "<div style=\"margin-top: 0.5em;\">";
+  $Content .=         "<div class=\"row\">";
+  $Content .=           "<label for=\"start_hour\" class=\"form-label fw-bolder\">Run Time HH:MM (24 hour format)</label>";
+  $Content .=         "</div>";
+  $Content .=         "<div class=\"row\">";
+  $Content .=           "<div class=\"col\">";
+  $Content .=             "<input type=\"number\" class=\"form-control fw-bolder\" id=\"start_hour\" name=\"start_hour\" min=\"0\" max=\"23\" step=\"1\" value=\"" . $Task["start_hour"] . "\">";
+  $Content .=           "</div>";
+  $Content .=           "<div class=\"col\">";
+  $Content .=             "<input type=\"number\" class=\"form-control fw-bolder\" id=\"start_min\" name=\"start_min\" min=\"0\" max=\"59\" step=\"1\" value=\"" . $Task["start_min"] . "\">";
+  $Content .=           "</div>";
+  $Content .=         "</div>";
+  $Content .=       "</div>";
+  $Content .=       "<div style=\"margin-top: 0.5em;\">";
+  $Content .=         "<label for=\"cmd_name\" class=\"form-label fw-bolder\">Last Run Time</label>";
+  $Content .=         "<input type=\"text\" class=\"form-control fw-bolder\" id=\"last_run\" name=\"last_run\" disabled value=\"" . $Task["last_run"] . "\">";
+  $Content .=       "</div>";
+  $Content .=       "<div style=\"margin-top: 0.5em;\">";
+  $Content .=         "<label for=\"diabled\" class=\"form-label fw-bolder\">Disabled Task</label>";
+  $Content .=         YNSelector($Task["disabled"],"disabled");
+  $Content .=       "</div>";
+  $Content .=       "<div style=\"margin-top: 0.5em;\">";
+  $Content .=         "<label for=\"replay_id\" class=\"form-label fw-bolder\">Script to Run</label>";
+  $Content .=         scriptSelector($DBcnx,$cmd_class,$Task["script"]);
+  $Content .=       "</div>";
+  $Content .=     "</div>";
+  $Content .=     "<div class=\"border-bottom\"></div>";
+  $Content .=     "<div style=\"margin-top: 1em;\">";
+  $Content .=       "<p style=\"float: right; margin-right: 1em;\"><a href=\"?page=schedule\" class=\"btn btn-danger fw-bolder\" name=\"cancel\" style=\"--bs-btn-padding-y: .10rem; --bs-btn-padding-x: .75rem; --bs-btn-font-size: .75rem;\">Cancel</a>&nbsp;&nbsp;&nbsp;&nbsp;";
+  $Content .=       "<button type=\"submit\" class=\"btn btn-primary fw-bolder\" name=\"edit_task\" id=\"edit_task\" style=\"--bs-btn-padding-y: .10rem; --bs-btn-padding-x: .75rem; --bs-btn-font-size: .75rem;\">Save</button></p>";
   $Content .=     "</div>";
   $Content .=   "</div>";
   $Content .=   "</form>";

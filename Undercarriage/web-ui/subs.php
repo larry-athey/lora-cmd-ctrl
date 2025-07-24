@@ -1,6 +1,10 @@
 <?php
 //---------------------------------------------------------------------------------------------------
+// Set this to match your time zone or your scheduled events will run at unexpected times
+date_default_timezone_set("America/Denver");
+
 /*
+// Edit /etc/php/[version]/fpm/php.ini if the ini_set calls don't work for you
 display_errors = On
 display_startup_errors = On
 error_reporting = E_ALL
@@ -78,7 +82,7 @@ function ctrlButtonMenu($DevType,$Address) {
 }
 //---------------------------------------------------------------------------------------------------
 function dayCheckboxes($Days) {
-  $Content = "<label class=\"form-check-label\">Deployment Execution Days</label><br>";
+  $Content = "<label class=\"form-check-label fw-bolder\" style=\"margin-bottom: 0.25em;\">Script Execution Days</label><br>";
   $DayArray = explode("|",$Days);
   $DayList  = array("Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday");
   for ($x = 0; $x <= 6; $x ++) {
@@ -88,7 +92,7 @@ function dayCheckboxes($Days) {
     } else {
       $Content .= "<input class=\"form-control form-check-input\" type=\"checkbox\" id=\"cb$x\" name=\"days[]\" value=\"$x\">";
     }
-    $Content .= "<label class=\"form-check-label\" for=\"cb$x\">$DayList[$x]</label></div>";
+    $Content .= "<label class=\"form-check-label fw-bolder\" for=\"cb$x\">&nbsp;&nbsp;$DayList[$x]</label></div>";
   }
   return $Content;
 }
@@ -112,6 +116,24 @@ function deviceFilter() {
   $Content .=     "<option $S4 value=\"4\">Model Train Locomotives</option>";
   $Content .=   "</select>";
   $Content .= "</form>";
+  return $Content;
+}
+//---------------------------------------------------------------------------------------------------
+function deviceAddressSelector($DBcnx,$DevType,$Address) {
+  $Result = mysqli_query($DBcnx,"SELECT * FROM devices WHERE dev_type=$DevType ORDER BY dev_name");
+  if (mysqli_num_rows($Result) > 0) {
+    $Content  = "<select class=\"form-control form-select fw-bolder\" style=\"width: 100%;\" size=\"1\" id=\"address\" name=\"address\">";
+    while ($Dev = mysqli_fetch_assoc($Result)) {
+      if ($Dev["address"] == $Address) {
+         $Content .= "<option selected value=\"" . $Dev["address"] . "\">" . $Dev["dev_name"] . "</option>";
+      } else {
+         $Content .= "<option value=\"" . $Dev["address"] . "\">" . $Dev["dev_name"] . "</option>";
+      }
+    }
+    $Content .= "</select>";
+  } else {
+    return "<p class=\"text-danger fw-bolder\">No configured devices</p>";
+  }
   return $Content;
 }
 //---------------------------------------------------------------------------------------------------
@@ -420,6 +442,22 @@ function scriptCommandSelector($DBcnx,$DevType,$ID) {
 function scriptReplaySelector($DBcnx,$DevType,$ID) {
   $Content  = "<select class=\"form-control form-select fw-bolder\" style=\"width: 100%;\" size=\"1\"  id=\"replay_id\" name=\"replay_id\">";
   $Content .= "<option value=\"0\">Repeat this script</option>";
+  $Result = mysqli_query($DBcnx,"SELECT * FROM scripts WHERE cmd_class=$DevType ORDER BY scr_name");
+  if (mysqli_num_rows($Result) > 0) {
+    while ($Scr = mysqli_fetch_assoc($Result)) {
+      if ($Scr["ID"] == $ID) {
+         $Content .= "<option selected value=\"" . $Scr["ID"] . "\">" . $Scr["scr_name"] . "</option>";
+      } else {
+         $Content .= "<option value=\"" . $Scr["ID"] . "\">" . $Scr["scr_name"] . "</option>";
+      }
+    }
+  }
+  $Content .= "</select>";
+  return $Content;
+}
+//---------------------------------------------------------------------------------------------------
+function scriptSelector($DBcnx,$DevType,$ID) {
+  $Content = "<select class=\"form-control form-select fw-bolder\" style=\"width: 100%;\" size=\"1\"  id=\"script\" name=\"script\">";
   $Result = mysqli_query($DBcnx,"SELECT * FROM scripts WHERE cmd_class=$DevType ORDER BY scr_name");
   if (mysqli_num_rows($Result) > 0) {
     while ($Scr = mysqli_fetch_assoc($Result)) {
