@@ -5,8 +5,7 @@ require_once("/var/www/html/subs.php");
 //---------------------------------------------------------------------------------------------
 $DBcnx = mysqli_connect(DB_HOST,DB_USER,DB_PASS,DB_NAME);
 //---------------------------------------------------------------------------------------------
-// Check for unread command acknowledgment messages. Until a command is acknowledged by the LCC
-// receiver, mission control will try re-sending it two more times before marking it failed.
+// Check for unread command acknowledgment messages
 $Result = mysqli_query($DBcnx,"SELECT * FROM inbound WHERE rcvd=0");
 if (mysqli_num_rows($Result) > 0) {
   while ($Inbound = mysqli_fetch_assoc($Result)) {
@@ -35,7 +34,7 @@ if (mysqli_num_rows($Result) > 0) {
   }
 }
 
-// Check for command replay requests
+// Check for command replay requests, these are only sent by location detection actions
 $Result = mysqli_query($DBcnx,"SELECT * FROM inbound WHERE msg LIKE BINARY '%/replay/cmd/%' AND rcvd=0");
 if (mysqli_num_rows($Result) > 0) {
   while ($Inbound = mysqli_fetch_assoc($Result)) {
@@ -44,9 +43,13 @@ if (mysqli_num_rows($Result) > 0) {
     $Device = mysqli_fetch_assoc($Result2);
     if ($Device["replay"] == 1) {
       $Data = explode("/",trim($Inbound["msg"],"/"));
-      // Command ID is $Data[2]
-
-
+      $Temp = createMessage($DBcnx,$Data[2]);
+      if ($Temp != "") {
+        $Msg = explode("|",$Temp);
+        $ID = generateRandomString(32);
+        $Result3 = mysqli_query($DBcnx,"INSERT INTO outbound (address,msg) VALUES ('" . $Inbound["Address"] . "','/" . $ID . $Msg[0] . "')");
+        $Result3 = mysqli_query($DBcnx,"UPDATE devices SET status='<span class=\"text-primary\">Sent command replay</span>' WHERE address='" . $Inbound["address"] . "'");
+      }
     }
   }
 }
@@ -60,7 +63,7 @@ if (mysqli_num_rows($Result) > 0) {
     $Device = mysqli_fetch_assoc($Result2);
     if ($Device["replay"] == 1) {
       $Data = explode("/",trim($Inbound["msg"],"/"));
-      $Result3 = mysqli_query($DBcnx, "SELECT * FROM scripts WHERE ID=" . $Data[2]);
+      $Result3 = mysqli_query($DBcnx,"SELECT * FROM scripts WHERE ID=" . $Data[2]);
       $Scr = mysqli_fetch_assoc($Result3);
       $Data2 = explode("|",$Scr["commands"]);
       $SQL = "INSERT INTO outbound (address,msg) VALUES ";
@@ -83,7 +86,7 @@ if (mysqli_num_rows($Result) > 0) {
       }
       $SQL .= ";";
       $Result3 = mysqli_query($DBcnx,$SQL);
-      $Result3 = mysqli_query($DBcnx, "UPDATE devices SET status='<span class=\"text-warning\">Sent script replay</span>' WHERE address='" . $Inbound["address"] . "'");
+      $Result3 = mysqli_query($DBcnx,"UPDATE devices SET status='<span class=\"text-warning\">Sent script replay</span>' WHERE address='" . $Inbound["address"] . "'");
     }
   }
 }
@@ -91,13 +94,29 @@ if (mysqli_num_rows($Result) > 0) {
 // Check for limit switch notifications
 $Result = mysqli_query($DBcnx,"SELECT * FROM inbound WHERE msg LIKE BINARY '%/limit/%' AND rcvd=0");
 if (mysqli_num_rows($Result) > 0) {
-
+  while ($Inbound = mysqli_fetch_assoc($Result)) {
+    $Update = mysqli_query($DBcnx,"UPDATE inbound SET rcvd=1 WHERE ID='" . $Inbound["ID"] . "'");
+    if (InStr("/limit/0",$Inbound["msg"])) {
+      $Update = mysqli_query($DBcnx,"UPDATE devices SET status='<span class=\"text-danger\">Lower limit switch triggered</span>' WHERE address=" . $Inbound["address"]);
+    } else {
+      $Update = mysqli_query($DBcnx,"UPDATE devices SET status='<span class=\"text-danger\">Upper limit switch triggered</span>' WHERE address=" . $Inbound["address"]);
+    }
+  }
 }
 
 // Check for location related notifications
 $Result = mysqli_query($DBcnx,"SELECT * FROM inbound WHERE msg LIKE BINARY '%/location/%' AND rcvd=0");
 if (mysqli_num_rows($Result) > 0) {
-
+  while ($Inbound = mysqli_fetch_assoc($Result)) {
+    $Update = mysqli_query($DBcnx,"UPDATE inbound SET rcvd=1 WHERE ID='" . $Inbound["ID"] . "'");
+    $Inbound["msg"] = trim($Inbound["msg"],"/");
+    $Data = explode("/",$Inbound["msg"]);
+    if ($Data[2] == "/action") {
+      $Update = mysqli_query($DBcnx,"UPDATE devices SET status='<span class=\"text-primary\">Location $Data[1] executed</span>' WHERE address=" . $Inbound["address"]);
+    } else {
+      $Update = mysqli_query($DBcnx,"UPDATE devices SET status='<span class=\"text-success\">Location $Data[1] encountered</span>' WHERE address=" . $Inbound["address"]);
+    }
+  }
 }
 
 // Check for runtime end notifications
@@ -105,7 +124,7 @@ $Result = mysqli_query($DBcnx,"SELECT * FROM inbound WHERE msg LIKE BINARY '%/ru
 if (mysqli_num_rows($Result) > 0) {
   while ($Inbound = mysqli_fetch_assoc($Result)) {
     $Update = mysqli_query($DBcnx,"UPDATE inbound SET rcvd=1 WHERE ID=" . $Inbound["ID"]);
-    $Update = mysqli_query($DBcnx,"UPDATE devices SET status='<span class=\"text-danger\">Runtime has expired</span>' WHERE address=" . $Inbound["address"]);
+    $Update = mysqli_query($DBcnx,"UPDATE devices SET status='<span class=\"text-warning\">Runtime has expired</span>' WHERE address=" . $Inbound["address"]);
   }
 }
 //---------------------------------------------------------------------------------------------

@@ -129,7 +129,7 @@ function editCommand($DBcnx) {
     $Content .=   "<input type=\"number\" class=\"form-control fw-bolder\" id=\"progression\" name=\"progression\" min=\"0\" max=\"86400\" step=\"1\" value=\"" . $Cmd["progression"] . "\">";
     $Content .= "</div>";
     $Content .= "<div style=\"margin-top: 0.5em;\">";
-    $Content .=   "<label for=\"duration\" class=\"form-label fw-bolder\">Duration (seconds, 0=indefinite)</label>";
+    $Content .=   "<label for=\"duration\" class=\"form-label fw-bolder\">Run Duration (seconds, 0=indefinite)</label>";
     $Content .=   "<input type=\"number\" class=\"form-control fw-bolder\" id=\"duration\" name=\"duration\" min=\"0\" max=\"86400\" step=\"1\" value=\"" . $Cmd["duration"] . "\">";
     $Content .= "</div>";
   } elseif ($Cmd["cmd_type"] == 2) {

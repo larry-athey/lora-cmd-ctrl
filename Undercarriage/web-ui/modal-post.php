@@ -14,10 +14,10 @@ if ($_POST) {
     $Temp = createMessage($DBcnx,$_POST["command"]);
     $Msg = explode("|",$Temp);
     sendCommand($DBcnx,$_POST["address"],$Msg[0]);
-    if ($Msg[1] == 1) sendCommand($DBcnx,$_POST["address"],"/repeat/cmd/" . $_POST["command"]);
+    //if ($Msg[1] == 1) sendCommand($DBcnx,$_POST["address"],"/replay/cmd/" . $_POST["command"]); // Command replays are only used for sound effect looping, use script replays
     $Result = mysqli_query($DBcnx, "UPDATE devices SET status='<span class=\"text-primary\">Sent library command</span>' WHERE address='" . $_POST["address"] . "'");
     echo($jsonSuccess);
-  } elseif ($_POST["form-id"] == 3) { // Send script (command repeats are not sent, only script repeats)
+  } elseif ($_POST["form-id"] == 3) { // Send script
     $Result = mysqli_query($DBcnx, "SELECT * FROM scripts WHERE ID=" . $_POST["script"]);
     $Scr = mysqli_fetch_assoc($Result);
     $Data = explode("|",$Scr["commands"]);

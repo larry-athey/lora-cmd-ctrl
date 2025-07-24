@@ -51,7 +51,7 @@ if ($_GET["ID"] == 1) { // CTRL button functions moved to 10..14
   $Content .=   "<input type=\"number\" class=\"form-control fw-bolder\" id=\"progression\" name=\"progression\" min=\"0\" max=\"86400\" step=\"1\" value=\"0\">";
   $Content .= "</div>";
   $Content .= "<div style=\"margin-top: 0.5em;\">";
-  $Content .=   "<label for=\"duration\" class=\"form-label fw-bolder\">Duration (seconds, 0=indefinite)</label>";
+  $Content .=   "<label for=\"duration\" class=\"form-label fw-bolder\">Run Duration (seconds, 0=indefinite)</label>";
   $Content .=   "<input type=\"number\" class=\"form-control fw-bolder\" id=\"duration\" name=\"duration\" min=\"0\" max=\"86400\" step=\"1\" value=\"0\">";
   $Content .= "</div>";
 } elseif ($_GET["ID"] == 11) { // Send stepper command - type 2

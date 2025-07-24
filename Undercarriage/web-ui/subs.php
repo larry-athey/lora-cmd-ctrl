@@ -48,20 +48,22 @@ function checkDays($DayArray) {
 }
 //---------------------------------------------------------------------------------------------------
 function createMessage($DBcnx,$ID) {
+  // Command replays were an initial idea and then I realized that they only need to exist in scripts.
+  // The replay field in the command database is currently only used to control sound effect looping.
   $Msg = "";
   $Result = mysqli_query($DBcnx,"SELECT * FROM commands WHERE ID=$ID");
   if (mysqli_num_rows($Result) > 0) {
     $Cmd = mysqli_fetch_assoc($Result);
     if ($Cmd["cmd_type"] == 1) { // Motor Control
-      $Msg = "/motor/" . $Cmd["direction"] . "/" . $Cmd["speed"] . "/" . $Cmd["progression"] . "/" . $Cmd["duration"] . "|" . $Cmd["replay"];
+      $Msg = "/motor/" . $Cmd["direction"] . "/" . $Cmd["speed"] . "/" . $Cmd["progression"] . "/" . $Cmd["duration"] . "|0";
     } elseif ($Cmd["cmd_type"] == 2) { // Stepper Control
-      $Msg = "/stepper/" . $Cmd["direction"] . "/" . $Cmd["speed"] . "/" . $Cmd["resolution"] . "/" . $Cmd["steps"] . "|" . $Cmd["replay"];
+      $Msg = "/stepper/" . $Cmd["direction"] . "/" . $Cmd["speed"] . "/" . $Cmd["resolution"] . "/" . $Cmd["steps"] . "|0";
     } elseif ($Cmd["cmd_type"] == 3) { // Location based action
       $Msg = "/location/" . $Cmd["location_id"] . "/" . $Cmd["location_action"] . "/" . $Cmd["location_data"] . "|0";
     } elseif ($Cmd["cmd_type"] == 4) { // Sound effects
       $Msg = "/sound/" . $Cmd["sound"] . "/" . $Cmd["replay"] . "|0";
     } elseif ($Cmd["cmd_type"] == 5) { // GPIO output switching
-      $Msg = "/switch/" . $Cmd["gpio_pin"] . "/" . $Cmd["direction"] . "|" . $Cmd["replay"];
+      $Msg = "/switch/" . $Cmd["gpio_pin"] . "/" . $Cmd["direction"] . "|0";
     }
   }
   return $Msg;
