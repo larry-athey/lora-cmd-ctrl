@@ -244,6 +244,7 @@ void setup() {
 }
 //------------------------------------------------------------------------------------------------
 bool beaconCheck(int Pin) { // Perform any registered actions based on the current location beacon
+  String Request;
   for (byte i = 0; i <= 15; i ++) {
     if (Pin == Locations[i][0]) {
       if (Locations[i][1] == 1) { // Stop motor/stepper
@@ -254,10 +255,16 @@ bool beaconCheck(int Pin) { // Perform any registered actions based on the curre
       } else if (Locations[i][1] == 2) { // Play sound effect
         wavFile = String(Locations[i][2]);
         sfxLoop = false;
-      } else if (Locations[i][1] == 3) { // Request command
-
-      } else if (Locations[i][1] == 4) { // Request script
-
+      } else if (Locations[i][1] == 3) { // Request command with /replay/cmd/#
+        Request = "/replay/cmd/" + String(Locations[i][2]);
+        Serial2.print("AT+SEND=1," + String(Request.length()) + "," + Request + "\r\n");
+        delay(100);
+        Serial2.readStringUntil('\n'); // Purge the +OK response
+      } else if (Locations[i][1] == 4) { // Request script with /replay/scr/#
+        Request = "/replay/scr/" + String(Locations[i][2]);
+        Serial2.print("AT+SEND=1," + String(Request.length()) + "," + Request + "\r\n");
+        delay(100);
+        Serial2.readStringUntil('\n'); // Purge the +OK response
       } else if (Locations[i][1] == 5) { // Toggle GPIO pin
         byte State = digitalRead(Locations[i][2]);
         if (State == 0) {
@@ -266,6 +273,7 @@ bool beaconCheck(int Pin) { // Perform any registered actions based on the curre
           digitalWrite(Locations[i][2],LOW);
         }
       }
+      // Clear the location memory slot
       Locations[i][0] = 0;
       Locations[i][1] = 0;
       Locations[i][2] = 0;
