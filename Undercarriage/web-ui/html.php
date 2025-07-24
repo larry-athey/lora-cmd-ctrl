@@ -37,7 +37,11 @@ function drawMenu($DBcnx) {
   $Content .=           "<a class=\"nav-link fw-bolder\" aria-current=\"page\" href=\"/index.php?page=logs\">Log&nbsp;Viewer</a>";
   $Content .=         "</li>";
   $Content .=       "</ul>";
-  if (! isset($_GET["page"])) $Content .= deviceFilter();
+  if (! isset($_GET["page"])) {
+    $Content .= deviceFilter();
+  } elseif ($_GET["page"] == "logs") {
+    $Content .= logViewerMenu();
+  }
   $Content .=     "</div>";
   $Content .=   "</div>";
   $Content .= "</nav>";
@@ -70,7 +74,7 @@ function editCommand($DBcnx) {
         } elseif ($_GET["cmd_class"] == 2) {
           $Content .=     "<a href=\"./index.php?page=edit_command&ID=0&cmd_class=" . $_GET["cmd_class"] . "&cmd_type=2\" class=\"btn btn-sm btn-primary fw-bolder\" style=\"width: 100%;\">Stepper Control Command</a>";
         }
-        $Content .=       "<a href=\"./index.php?page=edit_command&ID=0&cmd_class=" . $_GET["cmd_class"] . "&cmd_type=3\" class=\"btn btn-sm btn-primary fw-bolder\" style=\"width: 100%; margin-top: 1em;\">Location Based Action</a>";
+        if ($_GET["cmd_class"] != 3) $Content .= "<a href=\"./index.php?page=edit_command&ID=0&cmd_class=" . $_GET["cmd_class"] . "&cmd_type=3\" class=\"btn btn-sm btn-primary fw-bolder\" style=\"width: 100%; margin-top: 1em;\">Location Based Action</a>";
         if ($_GET["cmd_class"] != 2) $Content .= "<a href=\"./index.php?page=edit_command&ID=0&cmd_class=" . $_GET["cmd_class"] . "&cmd_type=4\" class=\"btn btn-sm btn-primary fw-bolder\" style=\"width: 100%; margin-top: 1em;\">Sound Effect Command</a>";
         $Content .=       "<a href=\"./index.php?page=edit_command&ID=0&cmd_class=" . $_GET["cmd_class"] . "&cmd_type=5\" class=\"btn btn-sm btn-primary fw-bolder\" style=\"width: 100%; margin-top: 1em;\">Switching Control Command</a>";
         $Content .=     "</div>";
@@ -336,6 +340,7 @@ function showCommands($DBcnx) {
     $Content .= "<div class=\"card\" style=\"width: 100%; margin-bottom: 0.5em;\">";
     $Content .=   "<div class=\"card-body\">";
     $Content .=     "<p class=\"fw-bolder mb-0\">" . $Cmd["cmd_name"] . "</p>";
+    $Content .=     "<p class=\"text-secondary fs-6 mb-0\">" . getDeviceType($Cmd["cmd_class"]) . ", ID " . $Cmd["ID"] . "</p>";
     $Content .=     "<p class=\"mb-0\" style=\"float: right;\"><a href=\"?page=delete_confirm&type=2&ID=" . $Cmd["ID"] . "\" class=\"btn btn-danger fw-bolder\" name=\"delete_command\" style=\"--bs-btn-padding-y: .10rem; --bs-btn-padding-x: .75rem; --bs-btn-font-size: .75rem;\">Delete</a>&nbsp;&nbsp;&nbsp;&nbsp;";
     $Content .=     "<a href=\"?page=edit_command&ID=" . $Cmd["ID"] . "\" class=\"btn btn-primary fw-bolder\" name=\"edit_device\" style=\"--bs-btn-padding-y: .10rem; --bs-btn-padding-x: .75rem; --bs-btn-font-size: .75rem;\">Edit</a></p>";
     $Content .=   "</div>";
@@ -358,6 +363,7 @@ function showDevices($DBcnx) {
     $Content .= "<div class=\"card\" style=\"width: 100%; margin-bottom: 0.5em;\">";
     $Content .=   "<div class=\"card-body\">";
     $Content .=     "<p class=\"fw-bolder mb-0\">" . $Dev["dev_name"] . "</p>";
+    $Content .=     "<p class=\"text-secondary fs-6 mb-0\">" . getDeviceType($Dev["dev_type"]) . ", ID " . $Dev["ID"] . "</p>";
     $Content .=     "<p class=\"mb-0\" style=\"float: right;\"><a href=\"?page=delete_confirm&type=1&ID=" . $Dev["ID"] . "\" class=\"btn btn-danger fw-bolder\" name=\"delete_device\" style=\"--bs-btn-padding-y: .10rem; --bs-btn-padding-x: .75rem; --bs-btn-font-size: .75rem;\">Delete</a>&nbsp;&nbsp;&nbsp;&nbsp;";
     $Content .=     "<a href=\"?page=edit_device&ID=" . $Dev["ID"] . "\" class=\"btn btn-primary fw-bolder\" name=\"edit_device\" style=\"--bs-btn-padding-y: .10rem; --bs-btn-padding-x: .75rem; --bs-btn-font-size: .75rem;\">Edit</a></p>";
     $Content .=   "</div>";
@@ -482,8 +488,9 @@ function showLocations($DBcnx) {
     $Content .= "<div class=\"card\" style=\"width: 100%; margin-bottom: 0.5em;\">";
     $Content .=   "<div class=\"card-body\">";
     $Content .=     "<p class=\"fw-bolder mb-0\">" . $Loc["loc_name"] . "</p>";
+    $Content .=     "<p class=\"text-secondary fs-6 mb-0\">Transponder Pin " . $Loc["pin"] . "</p>";
     $Content .=     "<p class=\"mb-0\" style=\"float: right;\"><a href=\"?page=delete_confirm&type=4&ID=" . $Loc["ID"] . "\" class=\"btn btn-danger fw-bolder\" name=\"delete_location\" style=\"--bs-btn-padding-y: .10rem; --bs-btn-padding-x: .75rem; --bs-btn-font-size: .75rem;\">Delete</a>&nbsp;&nbsp;&nbsp;&nbsp;";
-    $Content .=     "<a href=\"?page=edit_location&ID=" . $Loc["ID"] . "\" class=\"btn btn-primary fw-bolder\" name=\"edit_device\" style=\"--bs-btn-padding-y: .10rem; --bs-btn-padding-x: .75rem; --bs-btn-font-size: .75rem;\">Edit</a></p>";
+    $Content .=     "<a href=\"?page=edit_location&ID=" . $Loc["ID"] . "\" class=\"btn btn-primary fw-bolder\" name=\"edit_location\" style=\"--bs-btn-padding-y: .10rem; --bs-btn-padding-x: .75rem; --bs-btn-font-size: .75rem;\">Edit</a></p>";
     $Content .=   "</div>";
     $Content .= "</div>";
   }
@@ -494,9 +501,67 @@ function showLocations($DBcnx) {
 }
 //---------------------------------------------------------------------------------------------------
 function showLogs($DBcnx) {
-  $Content  = "<div style=\"width: 99%; margin-left: 0.25em;\">";
-  $Content .= "Coming soon...";
-  $Content .= "</div>";
+  $lines = 100;
+  $log = 0;
+  if (isset($_POST["lines"])) $lines = $_POST["lines"];
+  if (isset($_POST["log"])) $log = $_POST["log"];
+
+  if ($log == 0) {
+    $Content  = "<div class=\"table-responsive\" style=\"width: 99%; margin-left: 0.25em;\">";
+    $Content .= "<table class=\"table table-dark table-sm table-striped table-hover\">";
+    $Content .=   "<thead class=\"thead-dark\">";
+    $Content .=     "<tr>";
+    $Content .=       "<th scope=\"col\">#</th>";
+    $Content .=       "<th scope=\"col\">Address</th>";
+    $Content .=       "<th scope=\"col\">Message</th>";
+    $Content .=       "<th scope=\"col\">Received</th>";
+    $Content .=     "</tr>";
+    $Content .=   "</thead>";
+    $Content .=   "<tbody>";
+    $Result = mysqli_query($DBcnx,"SELECT * FROM inbound ORDER BY ID DESC LIMIT $lines");
+    while ($RS = mysqli_fetch_assoc($Result)) {
+      $Content .=   "<tr>";
+      $Content .=     "<td>" . $RS["ID"] . "</td>";
+      $Content .=     "<td>" . $RS["address"] . "</td>";
+      $Content .=     "<td>" . $RS["msg"] . "</td>";
+      $Content .=     "<td>" . $RS["creation"] . "</td>";
+      $Content .=   "</tr>";
+    }
+    $Content .=   "</tbody>";
+    $Content .= "</table>";
+    $Content .= "</div>";
+  } else {
+    $Content  = "<div class=\"table-responsive\" style=\"width: 99%; margin-left: 0.25em;\">";
+    $Content .= "<table class=\"table table-dark table-sm table-striped table-hover\">";
+    $Content .=   "<thead class=\"thead-dark\">";
+    $Content .=     "<tr>";
+    $Content .=       "<th scope=\"col\">#</th>";
+    $Content .=       "<th scope=\"col\">Address</th>";
+    $Content .=       "<th scope=\"col\">Message</th>";
+    $Content .=       "<th scope=\"col\">Created</th>";
+    $Content .=       "<th scope=\"col\">Sent</th>";
+    $Content .=       "<th scope=\"col\">Acknowledged</th>";
+    $Content .=       "<th scope=\"col\">Executed</th>";
+    $Content .=     "</tr>";
+    $Content .=   "</thead>";
+    $Content .=   "<tbody>";
+    $Result = mysqli_query($DBcnx,"SELECT * FROM outbound ORDER BY ID DESC LIMIT $lines");
+    while ($RS = mysqli_fetch_assoc($Result)) {
+      $Content .=   "<tr>";
+      $Content .=     "<td>" . $RS["ID"] . "</td>";
+      $Content .=     "<td>" . $RS["address"] . "</td>";
+      $Content .=     "<td>" . $RS["msg"] . "</td>";
+      $Content .=     "<td>" . $RS["creation"] . "</td>";
+      $Content .=     "<td>" . $RS["sent_time"] . "</td>";
+      $Content .=     "<td>" . $RS["ack_time"] . "</td>";
+      $Content .=     "<td>" . $RS["exec_time"] . "</td>";
+      $Content .=   "</tr>";
+    }
+    $Content .=   "</tbody>";
+    $Content .= "</table>";
+    $Content .= "</div>";
+  }
+
   return $Content;
 }
 //---------------------------------------------------------------------------------------------------
@@ -511,6 +576,7 @@ function showScripts($DBcnx) {
     $Content .= "<div class=\"card\" style=\"width: 100%; margin-bottom: 0.5em;\">";
     $Content .=   "<div class=\"card-body\">";
     $Content .=     "<p class=\"fw-bolder mb-0\">" . $Scr["scr_name"] . "</p>";
+    $Content .=     "<p class=\"text-secondary fs-6 mb-0\">" . getDeviceType($Scr["cmd_class"]) . ", ID " . $Scr["ID"] . "</p>";
     $Content .=     "<p class=\"mb-0\" style=\"float: right;\"><a href=\"?page=delete_confirm&type=3&ID=" . $Scr["ID"] . "\" class=\"btn btn-danger fw-bolder\" name=\"delete_script\" style=\"--bs-btn-padding-y: .10rem; --bs-btn-padding-x: .75rem; --bs-btn-font-size: .75rem;\">Delete</a>&nbsp;&nbsp;&nbsp;&nbsp;";
     $Content .=     "<a href=\"?page=edit_script&ID=" . $Scr["ID"] . "\" class=\"btn btn-primary fw-bolder\" name=\"edit_device\" style=\"--bs-btn-padding-y: .10rem; --bs-btn-padding-x: .75rem; --bs-btn-font-size: .75rem;\">Edit</a></p>";
     $Content .=   "</div>";
@@ -533,6 +599,7 @@ function showSchedule($DBcnx) {
     $Content .= "<div class=\"card\" style=\"width: 100%; margin-bottom: 0.5em;\">";
     $Content .=   "<div class=\"card-body\">";
     $Content .=     "<p class=\"fw-bolder mb-0\">" . $Task["task_name"] . "</p>";
+    $Content .=     "<p class=\"text-secondary fs-6 mb-0\">" . getDeviceName($DBcnx,$Task["address"]) . ", Script " . $Task["script"] . "</p>";
     $Content .=     "<p class=\"mb-0\" style=\"float: right;\"><a href=\"?page=delete_confirm&type=5&ID=" . $Task["ID"] . "\" class=\"btn btn-danger fw-bolder\" name=\"delete_task\" style=\"--bs-btn-padding-y: .10rem; --bs-btn-padding-x: .75rem; --bs-btn-font-size: .75rem;\">Delete</a>&nbsp;&nbsp;&nbsp;&nbsp;";
     $Content .=     "<a href=\"?page=edit_task&ID=" . $Task["ID"] . "\" class=\"btn btn-primary fw-bolder\" name=\"edit_device\" style=\"--bs-btn-padding-y: .10rem; --bs-btn-padding-x: .75rem; --bs-btn-font-size: .75rem;\">Edit</a></p>";
     $Content .=   "</div>";
