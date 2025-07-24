@@ -349,7 +349,7 @@ function logViewerMenu() {
     $S1 = "selected";
   }
   $Content  = "<form class=\"d-flex\" method=\"post\" action=\"/index.php?page=logs\">";
-  $Content .= "<select class=\"form-control form-select fw-bolder\" style=\"width: 8em;\" size=\"1\" id=\"log\" name=\"log\">";
+  $Content .= "<select class=\"form-control form-select fw-bolder\" style=\"width: 8em;\" size=\"1\" id=\"log\" name=\"log\" onChange=\"this.form.submit()\">";
   $Content .= "<option $S0 value=\"0\">Inbound</option>";
   $Content .= "<option $S1 value=\"1\">Outbound</option>";
   $Content .= "</select>";
