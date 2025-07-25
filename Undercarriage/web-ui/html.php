@@ -3,7 +3,46 @@
 require_once("subs.php");
 //---------------------------------------------------------------------------------------------------
 function deleteConfirm($DBcnx) {
-
+  $ID = $_GET["ID"];
+  if ($_GET["type"] == 1) {
+    $Return = "devices";
+    $btdID  = "delete_device";
+    $Name   = getDeviceName_ID($DBcnx,$ID);
+  } elseif ($_GET["type"] == 2) {
+    $Return = "commands";
+    $btdID  = "delete_command";
+    $Name   = getCommandName($DBcnx,$ID);
+  } elseif ($_GET["type"] == 3) {
+    $Return = "scripts";
+    $btdID  = "delete_script";
+    $Name   = getScriptName($DBcnx,$ID);
+  } elseif ($_GET["type"] == 4) {
+    $Return = "locations";
+    $btdID  = "delete_location";
+    $Name   = getLocationName($DBcnx,$ID);
+  } elseif ($_GET["type"] == 5) {
+    $Return = "schedule";
+    $btdID  = "delete_task";
+    $Name   = getTaskName($DBcnx,$ID);
+  } else {
+    return;
+  }
+  $Content  = "<div style=\"width: 31em; margin-left: 0.25em; margin-top: 0.5em;\">";
+  $Content .=   "<form id=\"device_editor\" method=\"post\" action=\"/process.php\">";
+  $Content .=   "<div class=\"card\" style=\"width: 100%; margin-bottom: 0.5em;\">";
+  $Content .=     "<div class=\"card-header\"><span class=\"text-muted fw-bolder\">Delete Item</div>";
+  $Content .=     "<div class=\"card-body\">";
+  $Content .=     "<p class=\"fw-bolder\">Are you sure that you want to delete the item<br>'<span class=\"text-success\">$Name</span>'</p>";
+  $Content .=     "</div>";
+  $Content .=     "<div class=\"border-bottom\"></div>";
+  $Content .=     "<div style=\"margin-top: 1em;\">";
+  $Content .=       "<p style=\"float: right; margin-right: 1em;\"><a href=\"?page=$Return\" class=\"btn btn-danger fw-bolder\" name=\"cancel\" style=\"--bs-btn-padding-y: .10rem; --bs-btn-padding-x: .75rem; --bs-btn-font-size: .75rem;\">Cancel</a>&nbsp;&nbsp;&nbsp;&nbsp;";
+  $Content .=       "<a href=\"\" class=\"btn btn-primary fw-bolder\" name=\"$btdID\" id=\"$btdID\" style=\"--bs-btn-padding-y: .10rem; --bs-btn-padding-x: .75rem; --bs-btn-font-size: .75rem;\">Continue</a></p>";
+  $Content .=     "</div>";
+  $Content .=   "</div>";
+  $Content .=   "</form>";
+  $Content .= "</div>";
+  return $Content;
 }
 //---------------------------------------------------------------------------------------------------
 function drawMenu($DBcnx) {
@@ -204,7 +243,6 @@ function editDevice($DBcnx) {
     $Dev["favorites"]  = "";
     $Dev["replay"]     = 0;
   }
-
   $Content  = "<div style=\"width: 31em; margin-left: 0.25em; margin-top: 0.5em;\">";
   $Content .=   "<form id=\"device_editor\" method=\"post\" action=\"/process.php\">";
   $Content .=   "<input type=\"hidden\" id=\"ID\" name=\"ID\" value=\"" . $_GET["ID"] . "\">";
@@ -315,7 +353,6 @@ function editScript($DBcnx) {
   } else {
     $Data[0] = $FirstCmd;
   }
-
   $Content  = "<div style=\"width: 31em; margin-left: 0.25em; margin-top: 0.5em;\">";
   $Content .=   "<form id=\"device_editor\" method=\"post\" action=\"/process.php\">";
   $Content .=   "<input type=\"hidden\" id=\"ID\" name=\"ID\" value=\"" . $_GET["ID"] . "\">";
@@ -513,7 +550,6 @@ function showHomePage($DBcnx) {
   $Content .=     "</div>";
   $Content .=   "</div>";
   $Content .= "</div>\n";
-
   if ((! isset($_GET["filter"])) || ($_GET["filter"] == 0)) {
     $Result = mysqli_query($DBcnx,"SELECT * FROM devices ORDER BY dev_name");
   } else {

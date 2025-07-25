@@ -238,6 +238,16 @@ function getDeviceStats($DBcnx,$Address) {
   return $Content;
 }
 //---------------------------------------------------------------------------------------------------
+function getDeviceName_ID($DBcnx,$ID) {
+  $Result = mysqli_query($DBcnx,"SELECT * FROM devices WHERE ID=$ID");
+  if (mysqli_num_rows($Result) > 0) {
+    $Dev = mysqli_fetch_assoc($Result);
+    return $Dev["dev_name"];
+  } else {
+    return "Unknown";
+  }
+}
+//---------------------------------------------------------------------------------------------------
 function getDeviceName($DBcnx,$Address) {
   $Result = mysqli_query($DBcnx,"SELECT * FROM devices WHERE address=$Address");
   if (mysqli_num_rows($Result) > 0) {
@@ -289,7 +299,7 @@ function getScriptName($DBcnx,$ID) {
 function getTaskName($DBcnx,$ID) {
   $Result = mysqli_query($DBcnx,"SELECT * FROM schedule WHERE ID=$ID");
   if (mysqli_num_rows($Result) > 0) {
-    $Loc = mysqli_fetch_assoc($Result);
+    $Task = mysqli_fetch_assoc($Result);
     return $Task["task_name"];
   } else {
     return "Unknown";

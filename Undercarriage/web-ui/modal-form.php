@@ -36,7 +36,7 @@ if ($_GET["ID"] == 1) { // CTRL button functions moved to 10..14
   }
 } elseif ($_GET["ID"] == 4) { // Send reboot command
   $Content .= "<input type=\"hidden\" name=\"reboot\" value=\"1\">";
-  $Content .= "<div class=\"fw-bolder\">Click the Submit button below to reboot <span class=\"text-success\">" . $Dev["dev_name"] . "</span></div>";
+  $Content .= "<div class=\"fw-bolder\">Click the Submit button below to reboot<br>'<span class=\"text-success\">" . $Dev["dev_name"] . "</span>'</div>";
 } elseif ($_GET["ID"] == 10) { // Send motor command - type 1
   $Content .= "<div>";
   $Content .=   "<label for=\"direction\" class=\"form-label fw-bolder\">Direction</label>";

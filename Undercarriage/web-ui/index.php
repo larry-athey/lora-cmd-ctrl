@@ -96,6 +96,8 @@ if (! isset($_GET["page"])) {
 } else {
   if ($_GET["page"] == "commands") {
     $Content .= showCommands($DBcnx);
+  } elseif ($_GET["page"] == "delete_confirm") {
+    $Content .= deleteConfirm($DBcnx);
   } elseif ($_GET["page"] == "devices") {
     $Content .= showDevices($DBcnx);
   } elseif ($_GET["page"] == "edit_command") {
