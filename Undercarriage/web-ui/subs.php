@@ -377,8 +377,8 @@ function logViewerMenu() {
   $Content .= "<option $S0 value=\"0\">Inbound</option>";
   $Content .= "<option $S1 value=\"1\">Outbound</option>";
   $Content .= "</select>";
-  $Content .= "<input class=\"form-control\" style=\"width: 8em;\" type=\"number\" id=\"lines\" name=\"lines\" min=\"1\" step=\"1\" value=\"$lines\">";
-  $Content .= "<button class=\"btn btn-sm btn-outline-secondary\" style=\"width: 8em;\">Update</button>";
+  $Content .= "<input class=\"form-control fw-bolder\" style=\"width: 8em;\" type=\"number\" id=\"lines\" name=\"lines\" min=\"1\" step=\"1\" value=\"$lines\">";
+  $Content .= "<button class=\"btn btn-sm btn-outline-secondary fw-bolder\" style=\"width: 8em;\">Update</button>";
   $Content .= "</form>";
   return $Content;
 }
