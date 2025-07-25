@@ -12,7 +12,7 @@ if (mysqli_num_rows($Result) > 0) {
     $Result2 = mysqli_query($DBcnx,"SELECT * FROM outbound WHERE msg = BINARY '" . $Inbound["msg"] . "'");
     if (mysqli_num_rows($Result2) > 0) {
       $Update = mysqli_query($DBcnx,"UPDATE outbound SET ack=1, ack_time=NOW() WHERE msg = BINARY '" . $Inbound["msg"] . "'");
-      $Update = mysqli_query($DBcnx,"UPDATE inbound SET rcvd=1 WHERE ID='" . $Inbound["ID"] . "'");
+      $Update = mysqli_query($DBcnx,"UPDATE inbound SET rcvd=1 WHERE ID=" . $Inbound["ID"]);
     }
   }
 }
@@ -38,7 +38,7 @@ if (mysqli_num_rows($Result) > 0) {
 $Result = mysqli_query($DBcnx,"SELECT * FROM inbound WHERE msg LIKE BINARY '%/replay/cmd/%' AND rcvd=0");
 if (mysqli_num_rows($Result) > 0) {
   while ($Inbound = mysqli_fetch_assoc($Result)) {
-    $Update = mysqli_query($DBcnx,"UPDATE inbound SET rcvd=1 WHERE ID='" . $Inbound["ID"] . "'");
+    $Update = mysqli_query($DBcnx,"UPDATE inbound SET rcvd=1 WHERE ID=" . $Inbound["ID"]);
     $Result2 = mysqli_query($DBcnx,"SELECT * FROM devices WHERE address='" . $Inbound["Address"] . "'");
     $Device = mysqli_fetch_assoc($Result2);
     if ($Device["replay"] == 1) {
@@ -58,7 +58,7 @@ if (mysqli_num_rows($Result) > 0) {
 $Result = mysqli_query($DBcnx,"SELECT * FROM inbound WHERE msg LIKE BINARY '%/replay/scr/%' AND rcvd=0");
 if (mysqli_num_rows($Result) > 0) {
   while ($Inbound = mysqli_fetch_assoc($Result)) {
-    $Update = mysqli_query($DBcnx,"UPDATE inbound SET rcvd=1 WHERE ID='" . $Inbound["ID"] . "'");
+    $Update = mysqli_query($DBcnx,"UPDATE inbound SET rcvd=1 WHERE ID=" . $Inbound["ID"]);
     $Result2 = mysqli_query($DBcnx,"SELECT * FROM devices WHERE address='" . $Inbound["address"] . "'");
     $Device = mysqli_fetch_assoc($Result2);
     if ($Device["replay"] == 1) {
@@ -95,7 +95,7 @@ if (mysqli_num_rows($Result) > 0) {
 $Result = mysqli_query($DBcnx,"SELECT * FROM inbound WHERE msg LIKE BINARY '%/limit/%' AND rcvd=0");
 if (mysqli_num_rows($Result) > 0) {
   while ($Inbound = mysqli_fetch_assoc($Result)) {
-    $Update = mysqli_query($DBcnx,"UPDATE inbound SET rcvd=1 WHERE ID='" . $Inbound["ID"] . "'");
+    $Update = mysqli_query($DBcnx,"UPDATE inbound SET rcvd=1 WHERE ID=" . $Inbound["ID"]);
     if (InStr("/limit/0",$Inbound["msg"])) {
       $Update = mysqli_query($DBcnx,"UPDATE devices SET status='<span class=\"text-danger\">Lower limit switch triggered</span>' WHERE address=" . $Inbound["address"]);
     } else {
@@ -108,7 +108,7 @@ if (mysqli_num_rows($Result) > 0) {
 $Result = mysqli_query($DBcnx,"SELECT * FROM inbound WHERE msg LIKE BINARY '%/location/%' AND rcvd=0");
 if (mysqli_num_rows($Result) > 0) {
   while ($Inbound = mysqli_fetch_assoc($Result)) {
-    $Update = mysqli_query($DBcnx,"UPDATE inbound SET rcvd=1 WHERE ID='" . $Inbound["ID"] . "'");
+    $Update = mysqli_query($DBcnx,"UPDATE inbound SET rcvd=1 WHERE ID=" . $Inbound["ID"]);
     $Inbound["msg"] = trim($Inbound["msg"],"/");
     $Data = explode("/",$Inbound["msg"]);
     if ($Data[2] == "/action") {
