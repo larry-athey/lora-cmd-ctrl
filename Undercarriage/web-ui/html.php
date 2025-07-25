@@ -621,7 +621,7 @@ function showLocations($DBcnx) {
 }
 //---------------------------------------------------------------------------------------------------
 function showLogs($DBcnx) {
-  $lines = 100;
+  $lines = 50;
   $log = 0;
   if (isset($_POST["lines"])) $lines = $_POST["lines"];
   if (isset($_POST["log"])) $log = $_POST["log"];
