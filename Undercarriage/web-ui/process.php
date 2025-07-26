@@ -9,6 +9,26 @@ if (isset($_GET["delete_command"])) {
   $Return = "/index.php?page=commands";
 }
 //---------------------------------------------------------------------------------------------------
+elseif (isset($_GET["delete_device"])) {
+  $Update = mysqli_query($DBcnx,"DELETE FROM devices WHERE ID=" . $_GET["ID"]);
+  $Return = "/index.php?page=devices";
+}
+//---------------------------------------------------------------------------------------------------
+elseif (isset($_GET["delete_location"])) {
+  $Update = mysqli_query($DBcnx,"DELETE FROM locations WHERE ID=" . $_GET["ID"]);
+  $Return = "/index.php?page=location";
+}
+//---------------------------------------------------------------------------------------------------
+elseif (isset($_GET["delete_script"])) {
+  $Update = mysqli_query($DBcnx,"DELETE FROM scripts WHERE ID=" . $_GET["ID"]);
+  $Return = "/index.php?page=scripts";
+}
+//---------------------------------------------------------------------------------------------------
+elseif (isset($_GET["delete_task"])) {
+  $Update = mysqli_query($DBcnx,"DELETE FROM schedule WHERE ID=" . $_GET["ID"]);
+  $Return = "/index.php?page=schedule";
+}
+//---------------------------------------------------------------------------------------------------
 elseif (isset($_POST["edit_command"])) {
   if ($_POST["ID"] == 0) {
     $Result = mysqli_query($DBcnx,"INSERT INTO commands (cmd_name) VALUES ('Temp')");
