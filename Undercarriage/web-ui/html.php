@@ -439,7 +439,7 @@ function editTask($DBcnx) {
   $Content .=     "<div class=\"card-header\"><span class=\"text-muted fw-bolder\">Edit Task</span></div>";
   $Content .=     "<div class=\"card-body\">";
   $Content .=       "<div>";
-  $Content .=         "<label for=\"task_name\" class=\"form-label fw-bolder\">Script Name</label>";
+  $Content .=         "<label for=\"task_name\" class=\"form-label fw-bolder\">Task Name</label>";
   $Content .=         "<input type=\"text\" class=\"form-control fw-bolder\" id=\"task_name\" name=\"task_name\" maxlength=\"255\" value=\"" . $Task["task_name"] . "\">";
   $Content .=       "</div>";
   $Content .=       "<div style=\"margin-top: 0.5em;\">";
