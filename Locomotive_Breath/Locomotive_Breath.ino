@@ -54,8 +54,7 @@
 // NOTE: The location transponder MCU can actually run up to 11 unique LED transmitters.
 /************************************************************************************************/
 //#define MCP23017               // Can only be used with a stepper, not a brushed DC motor
-//#define STEPPER                // No sound effects possible when using a stepper, define this if
-                                 // an MCP23017 is used so accidental motor commands don't bork it
+//#define STEPPER                // Remember, no sound effects are possible when using a stepper
 /************************************************************************************************/
 #define DISABLE_CODE_FOR_TRANSMITTER
 #define SEND_LEDC_CHANNEL 0
@@ -91,7 +90,8 @@
 #ifndef STEPPER
 DFRobotDFPlayerMini myDFPlayer;  // Set up the sound effects system object
 #endif
-Adafruit_NeoPixel pixels(1,LED_PIN,NEO_RGB + NEO_KHZ800); // Set up the heartbeat/pulse LED
+Adafruit_NeoPixel neopixel(1,LED_PIN,NEO_RGB + NEO_KHZ800); // Set up the heartbeat/pulse LED
+Adafruit_NeoPixel lights(2,BUS_3,NEO_RGB + NEO_KHZ800); // Set up the locomotive lighting bus
 //------------------------------------------------------------------------------------------------
 bool SFX = false;                // True if the sound effects system successfully initialized
 bool sfxLoop = false;            // True if a sound effect command is supposed to play endlessly
@@ -147,11 +147,19 @@ void setup() {
   delay(500);
 
   // Initialize the heartbeat/pulse LED
-  pixels.begin();
-  pixels.setBrightness(25); // These things run stupidly hot
-  pixels.clear();
-  pixels.setPixelColor(0,pixels.Color(0,0,255));
-  pixels.show();
+  neopixel.begin();
+  neopixel.setBrightness(25); // These things run stupidly hot
+  neopixel.clear();
+  neopixel.setPixelColor(0,neopixel.Color(0,0,255));
+  neopixel.show();
+
+  // Initialize the Neopixel bus for the locomotive lights
+  lights.begin();
+  lights.setBrightness(25); // These things run stupidly hot
+  lights.clear();
+  lights.setPixelColor(0,lights.Color(255,255,255));
+  lights.setPixelColor(1,lights.Color(255,0,0));
+  lights.show();
 
   // Intialize the GPIO pins
   pinMode(IR_RCV,INPUT_PULLUP);
@@ -312,21 +320,21 @@ void pulseLED() { // Update the color of the heartbeat/pulse LED
   pulseIndex ++;
   if (pulseIndex > 7) pulseIndex = 1;
   if (pulseIndex == 1) {
-    pixels.setPixelColor(0,pixels.Color(0,0,255));
+    neopixel.setPixelColor(0,neopixel.Color(0,0,255));
   } else if (pulseIndex == 2) {
-    pixels.setPixelColor(0,pixels.Color(0,255,255));
+    neopixel.setPixelColor(0,neopixel.Color(0,255,255));
   } else if (pulseIndex == 3) {
-    pixels.setPixelColor(0,pixels.Color(0,255,0));
+    neopixel.setPixelColor(0,neopixel.Color(0,255,0));
   } else if (pulseIndex == 4) {
-    pixels.setPixelColor(0,pixels.Color(255,255,0));
+    neopixel.setPixelColor(0,neopixel.Color(255,255,0));
   } else if (pulseIndex == 5) {
-    pixels.setPixelColor(0,pixels.Color(255,0,0));
+    neopixel.setPixelColor(0,neopixel.Color(255,0,0));
   } else if (pulseIndex == 6) {
-    pixels.setPixelColor(0,pixels.Color(255,0,255));
+    neopixel.setPixelColor(0,neopixel.Color(255,0,255));
   } else if (pulseIndex == 7) {
-    pixels.setPixelColor(0,pixels.Color(255,255,255));
+    neopixel.setPixelColor(0,neopixel.Color(255,255,255));
   }
-  pixels.show();
+  neopixel.show();
 }
 //------------------------------------------------------------------------------------------------
 // External function includes are used here to reduce the overall size of the main sketch.
