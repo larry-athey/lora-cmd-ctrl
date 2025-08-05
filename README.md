@@ -8,6 +8,7 @@ _**NOTE:** While this can be used as an alternative to DCC and WCC in the model 
 
 **This project began on July 1, 2025 and does not yet have an official release.**
 
+<img width="1024" src="./Diagrams/LCC-Mobile-UI.jpg"><br>
 ---
 
 LCC is a client & server system where a mission control web app runs on a Raspberry Pi _(or clone)_ or any other Debian Linux based PC/SBC. The communications backbone between the server and client devices is LoRa WAN wireless networking based on the Reyax RYLR998 modem.
