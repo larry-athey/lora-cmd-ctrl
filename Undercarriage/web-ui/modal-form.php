@@ -95,7 +95,7 @@ if ($_GET["ID"] == 1) { // CTRL button functions moved to 10..14
   $Content .= "</div>";
 } elseif ($_GET["ID"] == 14) { // Send GPIO switch toggle - type 5
   $Content .= "<div>";
-  $Content .=   "<label for=\"gpio_pin\" class=\"form-label fw-bolder\">GPIO Pin Number [1..32]</label>";
+  $Content .=   "<label for=\"gpio_pin\" class=\"form-label fw-bolder\">GPIO Pin Number [0..31]</label>";
   $Content .=   "<input type=\"number\" class=\"form-control fw-bolder\" id=\"gpio_pin\" name=\"gpio_pin\" min=\"1\" max=\"32\" step=\"1\" value=\"1\">";
   $Content .= "</div>";
   $Content .= "<div style=\"margin-top: 0.5em;\">";
