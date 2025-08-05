@@ -45,6 +45,9 @@ The LCC receiver module can be any variety of ESP32, the switching capabilities 
 ### Remote MP3 Playback
 Sound files (.mp3) can be stored on an SD card and played back as needed. These are useful for greetings, sound effects, warnings, etc. This requires a WWZMDiB _(DFRobot DFPlayer)_ sound module and speaker attached. Sound files can play as a single shot or in a continuous loop.
 
+### Remote Neopixel/WS2811 LED Control
+Neopixel/WS2811 addressable LEDs can be controlled at an individual level or the entire network can be set to the same color. Keep in mind that these LEDs pull a lot of current and will require you to use a sturdy power supply such as those offered by [Mean Well](https://www.meanwell.com/).
+
 ### Scheduling
 The LCC mission control server can schedule scripts to run at specific times on specific days. However, in the case of single board computers such as the Raspberry Pi _(or clones)_ this requires the addition of a real time clock module to be added if the mission control server is isolated from the internet.
 
