@@ -7,7 +7,7 @@ Subscribe to the official YouTube channel at https://www.youtube.com/@PanhandleP
 _**NOTE:** While this can be used as an alternative to DCC and WCC in the model railroad world, that absolutely is not my specialty. However, I do have a local hobbyist in that field that I'm working with in order to make this a viable alternative for that purpose, which is far more affordable than a DCC/WCC upgrade._
 
 **This project began on July 1, 2025 and does not yet have an official release.**
-
+---
 <img width="1024" src="Diagrams/LCC-Mobile-UI.jpg"><br>
 ---
 
