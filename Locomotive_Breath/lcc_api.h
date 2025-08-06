@@ -19,6 +19,7 @@ inline void setupLights(int ID, byte Red, byte Green, byte Blue) { // Sets the c
       lights.setPixelColor(x,lights.Color(Red,Green,Blue));
     }
   }
+  LightScene = false;
   lights.show();
 }
 //------------------------------------------------------------------------------------------------
