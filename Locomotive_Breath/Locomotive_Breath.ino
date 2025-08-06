@@ -94,7 +94,7 @@ DFRobotDFPlayerMini myDFPlayer;  // Set up the sound effects system object
 Adafruit_NeoPixel neopixel(1,LED_PIN,NEO_RGB + NEO_KHZ800); // Set up the heartbeat/pulse LED
 Adafruit_NeoPixel lights(TOTAL_LEDS,BUS_3,NEO_RGB + NEO_KHZ800); // Set up the Neopixel/WS2812 lighting bus
 //------------------------------------------------------------------------------------------------
-bool LightScene = false;         // True if a lighting scene/animation has been requested
+bool lightScene = false;         // True if a lighting scene/animation has been requested
 bool SFX = false;                // True if the sound effects system successfully initialized
 bool sfxLoop = false;            // True if a sound effect command is supposed to play endlessly
 byte pulseIndex = 1;             // Tracks the color changes for the heartbeat/pulse LED
@@ -103,7 +103,7 @@ byte progressDir = 0;            // Motor speed progress direction, 0 = down, 1 
 int Locations[16][3];            // Queue for caching location ID numbers and associated actions
 int LoRa_Address = 100;          // Device address [1..65535], 1 is reserved for mission control
 int LoRa_Network = 18;           // Network ID [0..15], 18 is valid but often never used
-int SceneCounter = 0;            // Counts the number of light scene iterations executed
+int sceneCounter = 0;            // Counts the number of light scene iterations executed
 unsigned long cmdCount = 0;      // Counts the number of received mission control commands
 unsigned long cmdPos = 0;        // Stepper current command position of the last executed command
 unsigned long currentPos = 0;    // Stepper current position reflected in total 1/32 steps
