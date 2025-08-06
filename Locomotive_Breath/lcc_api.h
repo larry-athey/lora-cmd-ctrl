@@ -19,14 +19,14 @@ inline void setupLights(int ID, byte Red, byte Green, byte Blue) { // Sets the c
       lights.setPixelColor(x,lights.Color(Red,Green,Blue));
     }
   }
-  LightScene = false;
+  lightScene = false;
   lights.show();
 }
 //------------------------------------------------------------------------------------------------
 inline void setupLightScene(int Scene, int Iterations) {
 
-  SceneCounter = 0;
-  LightScene = true;
+  sceneCounter = 0;
+  lightScene = true;
 }
 //------------------------------------------------------------------------------------------------
 inline void setupLocation(int Pin, int Action, int Data) { // Add a transponder pin and action to the Locations queue
