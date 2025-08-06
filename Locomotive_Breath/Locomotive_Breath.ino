@@ -70,7 +70,8 @@
 
 #include "Adafruit_NeoPixel.h"   // Used for the heartbeat/pulse LED since there is no pilot light
 //------------------------------------------------------------------------------------------------
-#define LED_PIN 21               // WS2812 LED on GPIO21
+#define LED_PIN 21               // Internal WS2812 LED on GPIO21
+#define TOTAL_LEDS 2             // Total number of LEDs on the Neopixel/WS2812 lighting bus
 // GPIO Left (USB top)
 #define LIMIT_1 1                // Limit switch 1 (forward)
 #define LIMIT_2 2                // Limit switch 2 (reverse)
@@ -85,13 +86,13 @@
 #define MOT_R 10                 // H-Bridge reverse pin or user defined if using a stepper, or SDA for I2C
 #define BUS_1 9                  // DFRobot TX or DRV8825 step pin
 #define BUS_2 8                  // DFRobot RX or DRV8825 direction pin
-#define BUS_3 7                  // Spare NeoPixel bus or DRV8825 sleep pin
+#define BUS_3 7                  // NeoPixel/WS2812 bus or DRV8825 sleep pin
 //------------------------------------------------------------------------------------------------
 #ifndef STEPPER
 DFRobotDFPlayerMini myDFPlayer;  // Set up the sound effects system object
 #endif
 Adafruit_NeoPixel neopixel(1,LED_PIN,NEO_RGB + NEO_KHZ800); // Set up the heartbeat/pulse LED
-Adafruit_NeoPixel lights(2,BUS_3,NEO_RGB + NEO_KHZ800); // Set up the locomotive lighting bus
+Adafruit_NeoPixel lights(TOTAL_LEDS,BUS_3,NEO_RGB + NEO_KHZ800); // Set up the Neopixel/WS2812 lighting bus
 //------------------------------------------------------------------------------------------------
 bool SFX = false;                // True if the sound effects system successfully initialized
 bool sfxLoop = false;            // True if a sound effect command is supposed to play endlessly
@@ -155,7 +156,7 @@ void setup() {
 
   // Initialize the Neopixel bus for the locomotive lights
   lights.begin();
-  lights.setBrightness(25); // These things run stupidly hot
+  lights.setBrightness(25);
   lights.clear();
   lights.setPixelColor(0,lights.Color(255,255,255));
   lights.setPixelColor(1,lights.Color(255,0,0));
