@@ -94,6 +94,7 @@ DFRobotDFPlayerMini myDFPlayer;  // Set up the sound effects system object
 Adafruit_NeoPixel neopixel(1,LED_PIN,NEO_RGB + NEO_KHZ800); // Set up the heartbeat/pulse LED
 Adafruit_NeoPixel lights(TOTAL_LEDS,BUS_3,NEO_RGB + NEO_KHZ800); // Set up the Neopixel/WS2812 lighting bus
 //------------------------------------------------------------------------------------------------
+bool LightScene = false;         // True if a lighting scene/animation has been requested
 bool SFX = false;                // True if the sound effects system successfully initialized
 bool sfxLoop = false;            // True if a sound effect command is supposed to play endlessly
 byte pulseIndex = 1;             // Tracks the color changes for the heartbeat/pulse LED
