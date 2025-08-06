@@ -11,6 +11,17 @@ inline void sendReplayRequest(String Request, String ID) { // Request a repeat o
   Serial2.readStringUntil('\n'); // Purge the +OK response
 }
 //------------------------------------------------------------------------------------------------
+inline void setupLights(int ID, byte Red, byte Green, byte Blue) { // Sets the color or a specific LED or all of them
+  if (ID < 65535) {
+    lights.setPixelColor(ID,lights.Color(Red,Green,Blue));
+  } else {
+    for (int x = 0; x < TOTAL_LEDS; x ++) {
+      lights.setPixelColor(x,lights.Color(Red,Green,Blue));
+    }
+  }
+  lights.show();
+}
+//------------------------------------------------------------------------------------------------
 inline void setupLocation(int Pin, int Action, int Data) { // Add a transponder pin and action to the Locations queue
   for (byte i = 0; i <= 15; i ++) {
     if (Locations[i][0] == 0) {
@@ -167,7 +178,10 @@ inline void runCommand(String Cmd) { // Execute a queued LCC mission control com
   // parts[0] : Command ID tag (32 character random string)
   // parts[1] : The command type identifier
   // parts[2..(partCount-1)] : Any additional parameters for the command type
-  if (parts[1] == "location") {
+  if (parts[1] == "light") {
+    //ID/light/led-id/red-level/green-level/blue-level
+    if (partCount == 6) setupLights(parts[2].toInt(),parts[3].toInt(),parts[4].toInt(),parts[5].toInt());
+  } else if (parts[1] == "location") {
     //ID/location/pin/action-type/action-data
     //e2YMYCc2BISl9bA9GjQg9iKqqwHrTya0/location/16/2/15
     if (partCount == 5) setupLocation(parts[2].toInt(),parts[3].toInt(),parts[4].toInt());
