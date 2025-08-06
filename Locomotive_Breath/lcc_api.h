@@ -23,6 +23,12 @@ inline void setupLights(int ID, byte Red, byte Green, byte Blue) { // Sets the c
   lights.show();
 }
 //------------------------------------------------------------------------------------------------
+inline void setupLightScene(int Scene, int Iterations) {
+
+  SceneCounter = 0;
+  LightScene = true;
+}
+//------------------------------------------------------------------------------------------------
 inline void setupLocation(int Pin, int Action, int Data) { // Add a transponder pin and action to the Locations queue
   for (byte i = 0; i <= 15; i ++) {
     if (Locations[i][0] == 0) {
@@ -183,8 +189,8 @@ inline void runCommand(String Cmd) { // Execute a queued LCC mission control com
     //ID/light/led-id/red-level/green-level/blue-level
     if (partCount == 6) setupLights(parts[2].toInt(),parts[3].toInt(),parts[4].toInt(),parts[5].toInt());
   } else if (parts[1] == "light-scene") {
-    //ID/light-scene/scene-id
-
+    //ID/light-scene/scene-id/iterations
+    if (partCount == 4) setupLightScene(parts[2].toInt(),parts[3].toInt());
   } else if (parts[1] == "location") {
     //ID/location/pin/action-type/action-data
     if (partCount == 5) setupLocation(parts[2].toInt(),parts[3].toInt(),parts[4].toInt());
