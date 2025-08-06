@@ -181,13 +181,14 @@ inline void runCommand(String Cmd) { // Execute a queued LCC mission control com
   if (parts[1] == "light") {
     //ID/light/led-id/red-level/green-level/blue-level
     if (partCount == 6) setupLights(parts[2].toInt(),parts[3].toInt(),parts[4].toInt(),parts[5].toInt());
+  } else if (parts[1] == "light-scene") {
+    //ID/light-scene/scene-id
+
   } else if (parts[1] == "location") {
     //ID/location/pin/action-type/action-data
-    //e2YMYCc2BISl9bA9GjQg9iKqqwHrTya0/location/16/2/15
     if (partCount == 5) setupLocation(parts[2].toInt(),parts[3].toInt(),parts[4].toInt());
   } else if (parts[1] == "motor") {
     //ID/motor/direction/speed/progression/duration
-    //b7f352dccb4372aff00d768a4728a64a/motor/1/80/30/0
     if (partCount == 6) setupMotor(parts[2].toInt(),parts[3].toInt(),parts[4].toInt(),parts[5].toInt());
   } else if (parts[1] == "reboot") {
     //ID/reboot
@@ -197,7 +198,6 @@ inline void runCommand(String Cmd) { // Execute a queued LCC mission control com
     if (partCount == 4) sendReplayRequest(parts[2],parts[3]);
   } else if (parts[1] == "sound") {
     //ID/sound/file-number/loop
-    //a7f352dccb4372aff00d768a4728a64a/sound/1/0
     if (partCount == 4) setupSound(parts[2].toInt(),parts[3].toInt());
   } else if (parts[1] == "stepper") {
     //ID/stepper/direction/speed/resolution/steps
