@@ -103,6 +103,7 @@ byte progressDir = 0;            // Motor speed progress direction, 0 = down, 1 
 int Locations[16][3];            // Queue for caching location ID numbers and associated actions
 int LoRa_Address = 100;          // Device address [1..65535], 1 is reserved for mission control
 int LoRa_Network = 18;           // Network ID [0..15], 18 is valid but often never used
+int SceneCounter = 0;            // Counts the number of light scene iterations executed
 unsigned long cmdCount = 0;      // Counts the number of received mission control commands
 unsigned long cmdPos = 0;        // Stepper current command position of the last executed command
 unsigned long currentPos = 0;    // Stepper current position reflected in total 1/32 steps
