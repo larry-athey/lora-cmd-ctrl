@@ -69,6 +69,12 @@
 #endif
 
 #include "Adafruit_NeoPixel.h"   // Used for the heartbeat/pulse LED since there is no pilot light
+
+extern "C" {                     // Lua runtime source code from https://github.com/lua/lua
+#include "lua.h"                 // Edit luaconf.h and change the LUA_32BITS 0 to LUA_32BITS 1
+#include "lauxlib.h"             // They put that in such a place that it always over-rides any
+#include "lualib.h"              // definition that you add to your sketch (sneaky bastards)
+}
 //------------------------------------------------------------------------------------------------
 #define LED_PIN 21               // Internal WS2812 LED on GPIO21
 #define TOTAL_LEDS 2             // Total number of LEDs on the Neopixel/WS2812 lighting bus
