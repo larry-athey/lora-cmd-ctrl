@@ -104,6 +104,7 @@ int Locations[16][3];            // Queue for caching location ID numbers and as
 int LoRa_Address = 100;          // Device address [1..65535], 1 is reserved for mission control
 int LoRa_Network = 18;           // Network ID [0..15], 18 is valid but often never used
 int sceneCounter = 0;            // Counts the number of light scene iterations executed
+int soundFile = -1;              // Sound file number to play from the DFPlayer Mini
 unsigned long cmdCount = 0;      // Counts the number of received mission control commands
 unsigned long cmdPos = 0;        // Stepper current command position of the last executed command
 unsigned long currentPos = 0;    // Stepper current position reflected in total 1/32 steps
@@ -118,7 +119,7 @@ float targetSpeed = 0.0;         // Motor target speed [0..100]
 String Commands[17];             // Queue for caching up to 16 commands plus 1 repeat command
 String msgCache[17];             // Temporary holding space for command acknowledgement messages
 String LoRa_PW = "1A2B3C4D";     // 8 character hex domain password, much like a WiFi password
-String wavFile = "";             // File name of the sound effect to load
+String Scenes[5];                // Storage for 5 Lua scripts to run lighting scenes/animations
 //------------------------------------------------------------------------------------------------
 volatile uint32_t lastLocation = 0; // Store the last received location ID
 volatile bool newLocation = false;  // Flag to indicate a new location has been detected
@@ -264,7 +265,7 @@ bool beaconCheck(int Pin) { // Perform any registered actions based on the curre
         targetSpeed = 0;
         progressFactor = 0;
       } else if (Locations[i][1] == 2) { // Play sound effect
-        wavFile = String(Locations[i][2]);
+        soundFile = Locations[i][2];
         sfxLoop = false;
       } else if (Locations[i][1] == 3) { // Request command with /replay/cmd/#
         Request = "/replay/cmd/" + String(Locations[i][2]);
@@ -355,13 +356,13 @@ void loop() {
   #ifndef STEPPER
   // Handle the sound effects as necessary
   if (SFX) {
-    if (wavFile.length() > 0) {
+    if (soundFile >= 0) {
       if (sfxLoop)  {
-        myDFPlayer.loop(wavFile.toInt());
+        myDFPlayer.loop(soundFile);
       } else {
-        myDFPlayer.play(wavFile.toInt());
+        myDFPlayer.play(soundFile);
       }
-      wavFile.clear();
+      soundFile = -1;
     }
   }
   #endif
