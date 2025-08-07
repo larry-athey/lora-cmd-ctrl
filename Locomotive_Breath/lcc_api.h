@@ -11,7 +11,8 @@ inline void sendReplayRequest(String Request, String ID) { // Request a repeat o
   Serial2.readStringUntil('\n'); // Purge the +OK response
 }
 //------------------------------------------------------------------------------------------------
-inline void setupLights(int ID, byte Red, byte Green, byte Blue) { // Sets the color or a specific LED or all of them
+inline void setupLights(int ID, byte Red, byte Green, byte Blue, float Fade) { // Sets the color or a specific LED or all of them
+  #ifndef STEPPER
   if (ID < 65535) {
     lights.setPixelColor(ID,lights.Color(Red,Green,Blue));
   } else {
@@ -19,14 +20,8 @@ inline void setupLights(int ID, byte Red, byte Green, byte Blue) { // Sets the c
       lights.setPixelColor(x,lights.Color(Red,Green,Blue));
     }
   }
-  lightScene = false;
   lights.show();
-}
-//------------------------------------------------------------------------------------------------
-inline void setupLightScene(byte Scene, int Iterations) { // Plays one of the five lighting scenes stored in memory
-
-  sceneCounter = 0;
-  lightScene = true;
+  #endif
 }
 //------------------------------------------------------------------------------------------------
 inline void setupLocation(int Pin, int Action, int Data) { // Add a transponder pin and action to the Locations queue
@@ -36,9 +31,9 @@ inline void setupLocation(int Pin, int Action, int Data) { // Add a transponder 
       Locations[i][1] = Action;
       Locations[i][2] = Data;
       if (Serial) {
-         Serial.println("Location pin added: " + String(Pin));
-         Serial.println("Location Action added: " + String(Action));
-         Serial.println("Location Data added: " + String(Data));
+        Serial.println("Location Pin added: " + String(Pin));
+        Serial.println("Location Action added: " + String(Action));
+        Serial.println("Location Data added: " + String(Data));
       }
       break;
     }
@@ -186,11 +181,8 @@ inline void runCommand(String Cmd) { // Execute a queued LCC mission control com
   // parts[1] : The command type identifier
   // parts[2..(partCount-1)] : Any additional parameters for the command type
   if (parts[1] == "light") {
-    //ID/light/led-id/red-level/green-level/blue-level
-    if (partCount == 6) setupLights(parts[2].toInt(),parts[3].toInt(),parts[4].toInt(),parts[5].toInt());
-  } else if (parts[1] == "light-scene") {
-    //ID/light-scene/scene-id/iterations
-    if (partCount == 4) setupLightScene(parts[2].toInt(),parts[3].toInt());
+    //ID/light/led-id/red-level/green-level/blue-level/fade-time
+    if (partCount == 7) setupLights(parts[2].toInt(),parts[3].toInt(),parts[4].toInt(),parts[5].toInt(),parts[6].toFloat());
   } else if (parts[1] == "location") {
     //ID/location/pin/action-type/action-data
     if (partCount == 5) setupLocation(parts[2].toInt(),parts[3].toInt(),parts[4].toInt());

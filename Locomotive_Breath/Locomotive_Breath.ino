@@ -69,12 +69,6 @@
 #endif
 
 #include "Adafruit_NeoPixel.h"   // Used for the heartbeat/pulse LED since there is no pilot light
-
-extern "C" {                     // Lua runtime source code from https://github.com/lua/lua
-#include "lua.h"                 // Edit luaconf.h and change "LUA_32BITS 0" to "LUA_32BITS 1"
-#include "lauxlib.h"             // They put that in such a place that it always over-rides any
-#include "lualib.h"              // definition that you add to your sketch (sneaky bastards)
-}
 //------------------------------------------------------------------------------------------------
 #define LED_PIN 21               // Internal WS2812 LED on GPIO21
 #define TOTAL_LEDS 2             // Total number of LEDs on the Neopixel/WS2812 lighting bus
@@ -98,9 +92,10 @@ extern "C" {                     // Lua runtime source code from https://github.
 DFRobotDFPlayerMini myDFPlayer;  // Set up the sound effects system object
 #endif
 Adafruit_NeoPixel neopixel(1,LED_PIN,NEO_RGB + NEO_KHZ800); // Set up the heartbeat/pulse LED
+#ifndef STEPPER
 Adafruit_NeoPixel lights(TOTAL_LEDS,BUS_3,NEO_RGB + NEO_KHZ800); // Set up the Neopixel/WS2812 lighting bus
+#endif
 //------------------------------------------------------------------------------------------------
-bool lightScene = false;         // True if a lighting scene/animation has been requested
 bool SFX = false;                // True if the sound effects system successfully initialized
 bool sfxLoop = false;            // True if a sound effect command is supposed to play endlessly
 byte pulseIndex = 1;             // Tracks the color changes for the heartbeat/pulse LED
@@ -109,7 +104,6 @@ byte progressDir = 0;            // Motor speed progress direction, 0 = down, 1 
 int Locations[16][3];            // Queue for caching location ID numbers and associated actions
 int LoRa_Address = 100;          // Device address [1..65535], 1 is reserved for mission control
 int LoRa_Network = 18;           // Network ID [0..15], 18 is valid but often never used
-int sceneCounter = 0;            // Counts the number of light scene iterations executed
 int soundFile = -1;              // Sound file number to play from the DFPlayer Mini
 unsigned long cmdCount = 0;      // Counts the number of received mission control commands
 unsigned long cmdPos = 0;        // Stepper current command position of the last executed command
@@ -125,7 +119,6 @@ float targetSpeed = 0.0;         // Motor target speed [0..100]
 String Commands[17];             // Queue for caching up to 16 commands plus 1 repeat command
 String msgCache[17];             // Temporary holding space for command acknowledgement messages
 String LoRa_PW = "1A2B3C4D";     // 8 character hex domain password, much like a WiFi password
-String Scenes[5];                // Storage for 5 Lua scripts to run lighting scenes/animations
 //------------------------------------------------------------------------------------------------
 volatile uint32_t lastLocation = 0; // Store the last received location ID
 volatile bool newLocation = false;  // Flag to indicate a new location has been detected
