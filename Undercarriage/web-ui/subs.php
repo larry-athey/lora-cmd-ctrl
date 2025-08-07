@@ -76,6 +76,7 @@ function ctrlButtonMenu($DevType,$Address) {
   if (($DevType == 1) || ($DevType == 4)) $Content .= "<li><a onClick=\"LoadForm('Brushed Motor Control','10','$Address')\" class=\"dropdown-item\" href=\"#\">Motor Control</a></li>";
   if ($DevType == 2) $Content .= "<li><a onClick=\"LoadForm('Stepper Motor Control','11','$Address')\" class=\"dropdown-item\" href=\"#\">Stepper Control</a></li>";
   if ($DevType != 3) $Content .= "<li><a onClick=\"LoadForm('Location Based Action','12','$Address')\" class=\"dropdown-item\" href=\"#\">Location Detection</a></li>";
+  if ($DevType != 2) $Content .= "<li><a onClick=\"LoadForm('RGB LED Control','15','$Address')\" class=\"dropdown-item\" href=\"#\">RGB LED Control</a></li>";
   if ($DevType != 2) $Content .= "<li><a onClick=\"LoadForm('Play Sound Effects','13','$Address')\" class=\"dropdown-item\" href=\"#\">Sound Effects</a></li>";
   $Content .=     "<li><a onClick=\"LoadForm('GPIO Pin Switching','14','$Address')\" class=\"dropdown-item\" href=\"#\">Switching Control</a></li>";
   $Content .=   "</ul>";

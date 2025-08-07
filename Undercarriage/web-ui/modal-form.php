@@ -10,7 +10,7 @@ $Content  = "<form id=\"modalForm\" onsubmit=\"return false;\">";
 $Content .= "<input type=\"hidden\" name=\"form-id\" value=\"" . $_GET["ID"] . "\">";
 $Content .= "<input type=\"hidden\" name=\"address\" value=\"" . $_GET["address"] . "\">";
 
-if ($_GET["ID"] == 1) { // CTRL button functions moved to 10..14
+if ($_GET["ID"] == 1) { // CTRL button functions moved to 10..15
 
 } elseif ($_GET["ID"] == 2) { // Send command
   $Result = mysqli_query($DBcnx,"SELECT * FROM commands WHERE cmd_class=" . $Dev["dev_type"] . " ORDER BY cmd_name");
@@ -102,6 +102,8 @@ if ($_GET["ID"] == 1) { // CTRL button functions moved to 10..14
   $Content .=   "<label for=\"gpio_state\" class=\"form-label fw-bolder\">GPIO Pin State</label>";
   $Content .=    OnOffSelector(0,"gpio_state");
   $Content .= "</div>";
+} elseif ($_GET["ID"] == 15) { // Send Neopixel/WS2812 lighting command - type 6
+
 } else {
   $Content = "<p>Unknown form requested</p>";
 }
