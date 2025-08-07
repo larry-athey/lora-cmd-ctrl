@@ -23,7 +23,7 @@ inline void setupLights(int ID, byte Red, byte Green, byte Blue) { // Sets the c
   lights.show();
 }
 //------------------------------------------------------------------------------------------------
-inline void setupLightScene(int Scene, int Iterations) {
+inline void setupLightScene(byte Scene, int Iterations) { // Plays one of the five lighting scenes stored in memory
 
   sceneCounter = 0;
   lightScene = true;
@@ -113,14 +113,14 @@ inline void setupStepper(byte Direction, byte Speed, byte Resolution, int Steps)
 //------------------------------------------------------------------------------------------------
 inline void setupSound(int FileNumber, byte Loop) { // Set up sound effect background process
   if (SFX) {
-    wavFile = String(FileNumber);
+    soundFile = FileNumber;
     if (Loop == 1) {
       sfxLoop = true;
     } else {
       sfxLoop = false;
     }
     if (Serial) {
-      Serial.println("Sound file queued: " + wavFile);
+      Serial.println("Sound file queued: " + String(soundFile));
       Serial.println("Playback loop: " + String(Loop));
     }
   }
