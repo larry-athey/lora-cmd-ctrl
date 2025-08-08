@@ -15,6 +15,7 @@ inline void setupLights(int ID, uint8_t targetR, uint8_t targetG, uint8_t target
   #ifndef STEPPER
   uint32_t durationMs = Fade * 1000;
   if (ID < 65535) { // Update a single LED/fixture
+    if (ID > (TOTAL_LEDS - 1)) return;
     if (Serial) Serial.println("Updating RGB LED/fixture: " + String(ID));
     uint32_t currentColor = lights.getPixelColor(ID);
     uint8_t currentR = (currentColor >> 16) & 0xFF;
