@@ -27,7 +27,7 @@ The recommended LCC mission control server is an [Orange Pi Zero 3 1GB](https://
 - Antenna and solar panel positioning
 - Conveyor and gate automation
 - Irrigation system automation
-- Motorized seasonal decorations
+- Seasonal decoration control
 - Model railroad automation
 
 ### Motor Control
