@@ -22,8 +22,8 @@
 //   2A Bridge Rectifier  - $0.50
 //
 // Roughly $30 in parts to convert any brand of model train locomotive to have all of the features
-// found in a full blown DCC enabled locomotive with sound effects. You want color changing LEDs?
-// That can be added too for a couple dollars. You name it, this system can be expanded to do it.
+// found in a full blown DCC enabled locomotive with sound effects. Eventually a PCB can be created
+// to simplify the build and installation process.
 //
 // Commands from the LCC mission control server are stored in a buffer on an LCC receiver device
 // and then executed in a FIFO (first-in, first-out) order. Feedback is sent to the server when a
