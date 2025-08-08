@@ -150,7 +150,7 @@ void setup() {
   Serial2.begin(115200,SERIAL_8N1,RX2,TX2);
   delay(500);
 
-  // Initialize the heartbeat/pulse LED
+  // Initialize the Neopixel bus for the heartbeat/pulse LED
   neopixel.begin();
   neopixel.setBrightness(25); // These things run stupidly hot
   neopixel.clear();
@@ -159,7 +159,7 @@ void setup() {
 
   // Initialize the Neopixel bus for the locomotive lights
   lights.begin();
-  lights.setBrightness(25);
+  lights.setBrightness(100);
   lights.clear();
   lights.setPixelColor(0,lights.Color(255,255,255));
   lights.setPixelColor(1,lights.Color(255,0,0));
@@ -169,8 +169,8 @@ void setup() {
   pinMode(IR_RCV,INPUT_PULLUP);
   pinMode(LIMIT_1,INPUT_PULLUP); // Probably not of much use in a model train locomotive
   pinMode(LIMIT_2,INPUT_PULLUP); // Convert these to outputs if you need additional ones
-  pinMode(OUT_1,OUTPUT); digitalWrite(OUT_1,LOW); // Interior lights
-  pinMode(OUT_2,OUTPUT); digitalWrite(OUT_2,LOW); // Exterior lights
+  pinMode(OUT_1,OUTPUT); digitalWrite(OUT_1,LOW);
+  pinMode(OUT_2,OUTPUT); digitalWrite(OUT_2,LOW);
   pinMode(MOT_F,OUTPUT); digitalWrite(MOT_F,LOW); // AIN1 (Standby is pulled high to enable the driver)
   pinMode(MOT_R,OUTPUT); digitalWrite(MOT_R,LOW); // AIN2
   pinMode(MOT_PWM,OUTPUT); digitalWrite(MOT_PWM,LOW); // PWMA
