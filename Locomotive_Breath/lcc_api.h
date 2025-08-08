@@ -11,16 +11,62 @@ inline void sendReplayRequest(String Request, String ID) { // Request a repeat o
   Serial2.readStringUntil('\n'); // Purge the +OK response
 }
 //------------------------------------------------------------------------------------------------
-inline void setupLights(int ID, byte Red, byte Green, byte Blue, float Fade) { // Sets the color or a specific LED or all of them
+inline void setupLights(int ID, uint8_t targetR, uint8_t targetG, uint8_t targetB, float Fade) { // Sets the color of a specific LED or all of them
   #ifndef STEPPER
-  if (ID < 65535) {
-    lights.setPixelColor(ID,lights.Color(Red,Green,Blue));
-  } else {
-    for (int x = 0; x < TOTAL_LEDS; x ++) {
-      lights.setPixelColor(x,lights.Color(Red,Green,Blue));
+  uint32_t durationMs = Fade * 1000;
+  if (ID < 65535) { // Update a single LED/fixture
+    if (Serial) Serial.println("Updating RGB LED/fixture: " + String(ID));
+    uint32_t currentColor = lights.getPixelColor(ID);
+    uint8_t currentR = (currentColor >> 16) & 0xFF;
+    uint8_t currentG = (currentColor >> 8) & 0xFF;
+    uint8_t currentB = currentColor & 0xFF;
+
+    // Number of steps for the transition (e.g., 100 steps for smooth fading)
+    const int steps = 100;
+    uint32_t delayPerStep = durationMs / steps;
+
+    // Perform the crossfade
+    for (int step = 0; step <= steps; step ++) {
+      float t = (float)step / steps;
+      uint8_t r = currentR + (targetR - currentR) * t;
+      uint8_t g = currentG + (targetG - currentG) * t;
+      uint8_t b = currentB + (targetB - currentB) * t;
+
+      // Set the new color
+      lights.setPixelColor(ID,lights.Color(r,g,b));
+      lights.show();
+
+      // Delay to control the speed of the fade
+      delay(delayPerStep);
+    }
+  } else { // Update the entire network of LEDs/fixtures
+    if (Serial) Serial.println("Updating all RGB LEDs/fixtures");
+    uint32_t currentColor = lights.getPixelColor(0);
+    uint8_t currentR = (currentColor >> 16) & 0xFF;
+    uint8_t currentG = (currentColor >> 8) & 0xFF;
+    uint8_t currentB = currentColor & 0xFF;
+
+    // Number of steps for the transition (e.g., 100 steps for smooth fading)
+    const int steps = 100;
+    uint32_t delayPerStep = durationMs / steps;
+
+    // Perform the crossfade
+    for (int step = 0; step <= steps; step ++) {
+      float t = (float)step / steps;
+      uint8_t r = currentR + (targetR - currentR) * t;
+      uint8_t g = currentG + (targetG - currentG) * t;
+      uint8_t b = currentB + (targetB - currentB) * t;
+
+      // Set the new color
+      for (int x = 0; x < TOTAL_LEDS; x ++) {
+        lights.setPixelColor(x,lights.Color(r,g,b));
+      }
+      lights.show();
+
+      // Delay to control the speed of the fade
+      delay(delayPerStep);
     }
   }
-  lights.show();
   #endif
 }
 //------------------------------------------------------------------------------------------------
