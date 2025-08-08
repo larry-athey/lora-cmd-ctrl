@@ -23,11 +23,12 @@ This system is intended for any personal application where remote control of mot
 The recommended LCC mission control server is an [Orange Pi Zero 3 1GB](https://www.amazon.com/dp/B0CB1BYTT8) running as a WiFi access point. You simply connect your phone or computer to this WiFi network, or connect the server's ethernet port to your home router if you need remote VPN access to it. Simple port forwarding into it is strongly discouraged!
 
 ### Use Cases
-- Lighting/Fan/Pump automation
+- Lighting and RGB LED automation
+- Fan and actuated vent automation
 - Antenna and solar panel positioning
 - Conveyor and gate automation
 - Irrigation system automation
-- Seasonal decoration control
+- Seasonal decoration automation
 - Model railroad automation
 
 ### Motor Control
