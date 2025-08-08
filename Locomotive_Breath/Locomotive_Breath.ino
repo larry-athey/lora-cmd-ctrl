@@ -9,7 +9,7 @@
 //
 // This ESP32 project is a collection of components that can be mounted in the top of an HO scale
 // (or larger) locomotive body to accomplish everything that you can do with a DCC/WCC locomotive
-// for not a whole lot of money. These components are as follows:
+// (and more) for not a whole lot of money. These components are as follows:
 //
 //   ESP32-S3 Mini        - $10.00
 //   Reyax RYLR998 Modem  - $12.00
@@ -17,7 +17,9 @@
 //   TSOP34838 IR Rcvr    - $1.00
 //   WWZMDiB Audio Module - $2.00
 //   10x15mm Speaker      - $0.80
+//   2x WS2812 RGB LED    - $2.00
 //   5V 1.8A Regulator    - $0.70
+//   2A Bridge Rectifier  - $0.50
 //
 // Roughly $30 in parts to convert any brand of model train locomotive to have all of the features
 // found in a full blown DCC enabled locomotive with sound effects. You want color changing LEDs?
@@ -25,16 +27,15 @@
 //
 // Commands from the LCC mission control server are stored in a buffer on an LCC receiver device
 // and then executed in a FIFO (first-in, first-out) order. Feedback is sent to the server when a
-// command starts so the operator knows what each device is doing at any moment. All motor control
-// commands run as a detached process so other commands can run in real time.
+// command starts so the operator knows what each device is doing at any moment.
 //
 // As commands are received, they are echoed back to the mission control server to show that they
-// have been received correctly. The server will attempt to send them 3 times over 30 seconds and
-// will mark them as failed if no acknowledgement is ever received.
+// have been received correctly. The server logs all commands sent and acknowledgements received
+// in order to facilitate reliable debugging.
 //
-// Sound effects must be 8 bit, 8 KHz mono .wav files since the ESP32 only has 4MB of storage for
-// these. This should be enough to store a decent air horn, air brakes, bell, etc. Please keep in
-// mind that all sound effects have to finish playing before further commands will be executed.
+// Sound effects are MP3 files and stored on an SD card (up to 32GB) in the locomotive. These can
+// be played in a single shot or in a loop. Sound effects are played by a separate MP3 player unit
+// rather than the ESP32 itself which prevents other CPU tasks from interrupting sound effects.
 //------------------------------------------------------------------------------------------------
 // LCC Mission Control Server:
 //
