@@ -284,6 +284,27 @@ bool beaconCheck(int Pin) { // Perform any registered actions based on the curre
         } else {
           digitalWrite(Locations[i][2],LOW);
         }
+      } else if (Locations[i][1] == 6) { // Toggle a specific (or all) Neopixel/WS2812 (off or full white)
+        if (Locations[i][2] < 65535) {
+          uint32_t currentColor = lights.getPixelColor(Locations[i][2]);
+          if (currentColor == 0) {
+            lights.setPixelColor(Locations[i][2],lights.Color(255,255,255));
+          } else {
+            lights.setPixelColor(Locations[i][2],lights.Color(0,0,0));
+          }
+        } else {
+          uint32_t currentColor = lights.getPixelColor(0);
+          if (currentColor == 0) {
+            for (int x = 0; x < TOTAL_LEDS; x ++) {
+              lights.setPixelColor(x,lights.Color(255,255,255));
+            }
+          } else {
+            for (int x = 0; x < TOTAL_LEDS; x ++) {
+              lights.setPixelColor(x,lights.Color(0,0,0));
+            }
+          }
+        }
+        lights.show();
       }
       // Clear the location memory slot
       Locations[i][0] = 0;
