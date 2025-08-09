@@ -67,9 +67,6 @@ function drawMenu($DBcnx) {
   $Content .=           "<a class=\"nav-link fw-bolder\" aria-current=\"page\" href=\"/index.php?page=scripts\">Scripts</a>";
   $Content .=         "</li>";
   $Content .=         "<li class=\"nav-item\">";
-  $Content .=           "<a class=\"nav-link fw-bolder\" aria-current=\"page\" href=\"/index.php?page=scenes\">Scenes</a>";
-  $Content .=         "</li>";
-  $Content .=         "<li class=\"nav-item\">";
   $Content .=           "<a class=\"nav-link fw-bolder\" aria-current=\"page\" href=\"/index.php?page=locations\">Locations</a>";
   $Content .=         "</li>";
   $Content .=         "<li class=\"nav-item\">";
