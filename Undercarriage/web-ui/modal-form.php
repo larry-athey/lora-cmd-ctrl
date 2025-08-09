@@ -103,7 +103,26 @@ if ($_GET["ID"] == 1) { // CTRL button functions moved to 10..15
   $Content .=    OnOffSelector(0,"gpio_state");
   $Content .= "</div>";
 } elseif ($_GET["ID"] == 15) { // Send Neopixel/WS2812 lighting command - type 6
-
+  $Content .= "<div>";
+  $Content .=   "<label for=\"light\" class=\"form-label fw-bolder\">LED/Fixture Number (65535 for all)</label>";
+  $Content .=   "<input type=\"number\" class=\"form-control fw-bolder\" id=\"light\" name=\"light\" min=\"0\" max=\"65535\" step=\"1\" value=\"0\">";
+  $Content .= "</div>";
+  $Content .= "<div style=\"margin-top: 0.5em;\">";
+  $Content .=   "<label for=\"red\" class=\"form-label fw-bolder\">Red Level [0..255]</label>";
+  $Content .=   "<input type=\"number\" class=\"form-control fw-bolder\" id=\"red\" name=\"red\" min=\"0\" max=\"255\" step=\"1\" value=\"0\">";
+  $Content .= "</div>";
+  $Content .= "<div style=\"margin-top: 0.5em;\">";
+  $Content .=   "<label for=\"green\" class=\"form-label fw-bolder\">Green Level [0..255]</label>";
+  $Content .=   "<input type=\"number\" class=\"form-control fw-bolder\" id=\"green\" name=\"green\" min=\"0\" max=\"255\" step=\"1\" value=\"0\">";
+  $Content .= "</div>";
+  $Content .= "<div style=\"margin-top: 0.5em;\">";
+  $Content .=   "<label for=\"blue\" class=\"form-label fw-bolder\">Blue Level [0..255]</label>";
+  $Content .=   "<input type=\"number\" class=\"form-control fw-bolder\" id=\"blue\" name=\"blue\" min=\"0\" max=\"255\" step=\"1\" value=\"0\">";
+  $Content .= "</div>";
+  $Content .= "<div style=\"margin-top: 0.5em;\">";
+  $Content .=   "<label for=\"fade\" class=\"form-label fw-bolder\">Fade Time [0..5 seconds]</label>";
+  $Content .=   "<input type=\"number\" class=\"form-control fw-bolder\" id=\"fade\" name=\"fade\" min=\"0\" max=\"5\" step=\"0.1\" value=\"1.0\">";
+  $Content .= "</div>";
 } else {
   $Content = "<p>Unknown form requested</p>";
 }
