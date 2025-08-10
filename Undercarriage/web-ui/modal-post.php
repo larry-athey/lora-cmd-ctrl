@@ -88,7 +88,7 @@ if ($_POST) {
       $blue = $_POST["blue"];
       $fade = $_POST["fade"];
       $Result = mysqli_query($DBcnx, "UPDATE commands SET cmd_type=6,cmd_class=1,light=$light,red=$red,green=$green,blue=$blue,fade=$fade WHERE ID=$ID");
-      $Result = mysqli_query($DBcnx, "UPDATE devices SET status='<span class=\"text-success\">Sent RGB LED control</span>' WHERE address='" . $_POST["address"] . "'");
+      $Result = mysqli_query($DBcnx, "UPDATE devices SET status='<span class=\"text-success\">Sent RGB LED command</span>' WHERE address='" . $_POST["address"] . "'");
     }
     $Temp = createMessage($DBcnx,$ID);
     $Msg = explode("|",$Temp);
