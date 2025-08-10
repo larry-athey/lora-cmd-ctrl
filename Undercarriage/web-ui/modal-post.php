@@ -14,7 +14,6 @@ if ($_POST) {
     $Temp = createMessage($DBcnx,$_POST["command"]);
     $Msg = explode("|",$Temp);
     sendCommand($DBcnx,$_POST["address"],$Msg[0]);
-    //if ($Msg[1] == 1) sendCommand($DBcnx,$_POST["address"],"/replay/cmd/" . $_POST["command"]); // Command replays are only used for sound effect looping, use script replays
     $Result = mysqli_query($DBcnx, "UPDATE devices SET status='<span class=\"text-primary\">Sent library command</span>' WHERE address='" . $_POST["address"] . "'");
     echo($jsonSuccess);
   } elseif ($_POST["form-id"] == 3) { // Send script
@@ -82,6 +81,14 @@ if ($_POST) {
       $gpio_state = $_POST["gpio_state"];
       $Result = mysqli_query($DBcnx, "UPDATE commands SET cmd_type=5,cmd_class=1,gpio_pin=$gpio_pin,direction=$gpio_state WHERE ID=$ID");
       $Result = mysqli_query($DBcnx, "UPDATE devices SET status='<span class=\"text-success\">Sent GPIO switch command</span>' WHERE address='" . $_POST["address"] . "'");
+    } elseif ($_POST["form-id"] == 15) { // RGB LED Control
+      $light = $_POST["light"];
+      $red = $_POST["red"];
+      $green = $_POST["green"];
+      $blue = $_POST["blue"];
+      $fade = $_POST["fade"];
+      $Result = mysqli_query($DBcnx, "UPDATE commands SET cmd_type=6,cmd_class=1,light=$light,red=$red,green=$green,blue=$blue,fade=$fade WHERE ID=$ID");
+      $Result = mysqli_query($DBcnx, "UPDATE devices SET status='<span class=\"text-success\">Sent RGB LED control</span>' WHERE address='" . $_POST["address"] . "'");
     }
     $Temp = createMessage($DBcnx,$ID);
     $Msg = explode("|",$Temp);

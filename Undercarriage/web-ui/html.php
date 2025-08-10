@@ -114,6 +114,7 @@ function editCommand($DBcnx) {
           $Content .=     "<a href=\"./index.php?page=edit_command&ID=0&cmd_class=" . $_GET["cmd_class"] . "&cmd_type=2\" class=\"btn btn-sm btn-primary fw-bolder\" style=\"width: 100%;\">Stepper Control Command</a>";
         }
         if ($_GET["cmd_class"] != 3) $Content .= "<a href=\"./index.php?page=edit_command&ID=0&cmd_class=" . $_GET["cmd_class"] . "&cmd_type=3\" class=\"btn btn-sm btn-primary fw-bolder\" style=\"width: 100%; margin-top: 1em;\">Location Based Action</a>";
+        if ($_GET["cmd_class"] != 2) $Content .= "<a href=\"./index.php?page=edit_command&ID=0&cmd_class=" . $_GET["cmd_class"] . "&cmd_type=6\" class=\"btn btn-sm btn-primary fw-bolder\" style=\"width: 100%; margin-top: 1em;\">RGB LED Control</a>";
         if ($_GET["cmd_class"] != 2) $Content .= "<a href=\"./index.php?page=edit_command&ID=0&cmd_class=" . $_GET["cmd_class"] . "&cmd_type=4\" class=\"btn btn-sm btn-primary fw-bolder\" style=\"width: 100%; margin-top: 1em;\">Sound Effect Command</a>";
         $Content .=       "<a href=\"./index.php?page=edit_command&ID=0&cmd_class=" . $_GET["cmd_class"] . "&cmd_type=5\" class=\"btn btn-sm btn-primary fw-bolder\" style=\"width: 100%; margin-top: 1em;\">Switching Control Command</a>";
         $Content .=     "</div>";
@@ -136,6 +137,11 @@ function editCommand($DBcnx) {
         $Cmd["location_id"]     = 0;
         $Cmd["location_action"] = 0;
         $Cmd["location_data"]   = 0;
+        $Cmd["light"]           = 0;
+        $Cmd["red"]             = 0;
+        $Cmd["green"]           = 0;
+        $Cmd["blue"]            = 0;
+        $Cmd["fade"]            = "1.0";
       }
     }
   } else {
@@ -155,7 +161,7 @@ function editCommand($DBcnx) {
   $Content .=         "<input type=\"text\" class=\"form-control fw-bolder\" id=\"cmd_name\" name=\"cmd_name\" maxlength=\"255\" value=\"" . $Cmd["cmd_name"] . "\">";
   $Content .=       "</div>";
   if ($Cmd["cmd_type"] == 1) {
-    $Content .= "<div>";
+    $Content .= "<div style=\"margin-top: 0.5em;\">";
     $Content .=   "<label for=\"direction\" class=\"form-label fw-bolder\">Direction</label>";
     $Content .=    directionSelector($Cmd["direction"]);
     $Content .= "</div>";
@@ -172,7 +178,7 @@ function editCommand($DBcnx) {
     $Content .=   "<input type=\"number\" class=\"form-control fw-bolder\" id=\"duration\" name=\"duration\" min=\"0\" max=\"86400\" step=\"1\" value=\"" . $Cmd["duration"] . "\">";
     $Content .= "</div>";
   } elseif ($Cmd["cmd_type"] == 2) {
-    $Content .= "<div>";
+    $Content .= "<div style=\"margin-top: 0.5em;\">";
     $Content .=   "<label for=\"direction\" class=\"form-label fw-bolder\">Direction</label>";
     $Content .=    directionSelector($Cmd["direction"]);
     $Content .= "</div>";
@@ -189,7 +195,7 @@ function editCommand($DBcnx) {
     $Content .=   "<input type=\"number\" class=\"form-control fw-bolder\" id=\"steps\" name=\"steps\" min=\"1\" max=\"100000\" step=\"1\" value=\"" . $Cmd["steps"] . "\">";
     $Content .= "</div>";
   } elseif ($Cmd["cmd_type"] == 3) {
-    $Content .= "<div>";
+    $Content .= "<div style=\"margin-top: 0.5em;\">";
     $Content .=   "<label for=\"location_id\" class=\"form-label fw-bolder\">Location</label>";
     $Content .=    locationSelector($DBcnx,$Cmd["location_id"]);
     $Content .= "</div>";
@@ -202,7 +208,7 @@ function editCommand($DBcnx) {
     $Content .=   "<input type=\"number\" class=\"form-control fw-bolder\" id=\"location_data\" name=\"location_data\" min=\"0\" max=\"2000000000\" step=\"1\" value=\"" . $Cmd["location_data"] . "\">";
     $Content .= "</div>";
   } elseif ($Cmd["cmd_type"] == 4) {
-    $Content .= "<div>";
+    $Content .= "<div style=\"margin-top: 0.5em;\">";
     $Content .=   "<label for=\"sound\" class=\"form-label fw-bolder\">Remote Sound File ID Number</label>";
     $Content .=   "<input type=\"number\" class=\"form-control fw-bolder\" id=\"sound\" name=\"sound\" min=\"0\" max=\"1000\" step=\"1\" value=\"" . $Cmd["sound"] . "\">";
     $Content .= "</div>";
@@ -211,13 +217,34 @@ function editCommand($DBcnx) {
     $Content .=    YNSelector($Cmd["replay"],"sound_loop");
     $Content .= "</div>";
   } elseif ($Cmd["cmd_type"] == 5) {
-    $Content .= "<div>";
+    $Content .= "<div style=\"margin-top: 0.5em;\">";
     $Content .=   "<label for=\"gpio_pin\" class=\"form-label fw-bolder\">GPIO Pin Number [0..31]</label>";
     $Content .=   "<input type=\"number\" class=\"form-control fw-bolder\" id=\"gpio_pin\" name=\"gpio_pin\" min=\"1\" max=\"32\" step=\"1\" value=\"" . $Cmd["gpio_pin"] . "\">";
     $Content .= "</div>";
     $Content .= "<div style=\"margin-top: 0.5em;\">";
     $Content .=   "<label for=\"gpio_state\" class=\"form-label fw-bolder\">GPIO Pin State</label>";
     $Content .=    OnOffSelector($Cmd["direction"],"gpio_state");
+    $Content .= "</div>";
+  } elseif ($Cmd["cmd_type"] == 6) {
+    $Content .= "<div style=\"margin-top: 0.5em;\">";
+    $Content .=   "<label for=\"light\" class=\"form-label fw-bolder\">LED/Fixture Number (65535 for all)</label>";
+    $Content .=   "<input type=\"number\" class=\"form-control fw-bolder\" id=\"light\" name=\"light\" min=\"0\" max=\"65535\" step=\"1\" value=\"" . $Cmd["light"] . "\">";
+    $Content .= "</div>";
+    $Content .= "<div style=\"margin-top: 0.5em;\">";
+    $Content .=   "<label for=\"red\" class=\"form-label fw-bolder\">Red Level [0..255]</label>";
+    $Content .=   "<input type=\"number\" class=\"form-control fw-bolder\" id=\"red\" name=\"red\" min=\"0\" max=\"255\" step=\"1\" value=\"" . $Cmd["red"] . "\">";
+    $Content .= "</div>";
+    $Content .= "<div style=\"margin-top: 0.5em;\">";
+    $Content .=   "<label for=\"green\" class=\"form-label fw-bolder\">Green Level [0..255]</label>";
+    $Content .=   "<input type=\"number\" class=\"form-control fw-bolder\" id=\"green\" name=\"green\" min=\"0\" max=\"255\" step=\"1\" value=\"" . $Cmd["green"] . "\">";
+    $Content .= "</div>";
+    $Content .= "<div style=\"margin-top: 0.5em;\">";
+    $Content .=   "<label for=\"blue\" class=\"form-label fw-bolder\">Blue Level [0..255]</label>";
+    $Content .=   "<input type=\"number\" class=\"form-control fw-bolder\" id=\"blue\" name=\"blue\" min=\"0\" max=\"255\" step=\"1\" value=\"" . $Cmd["blue"] . "\">";
+    $Content .= "</div>";
+    $Content .= "<div style=\"margin-top: 0.5em;\">";
+    $Content .=   "<label for=\"fade\" class=\"form-label fw-bolder\">Fade Time [0..5 seconds]</label>";
+    $Content .=   "<input type=\"number\" class=\"form-control fw-bolder\" id=\"fade\" name=\"fade\" min=\"0\" max=\"5\" step=\"0.1\" value=\"" . $Cmd["fade"] . "\">";
     $Content .= "</div>";
   }
   $Content .=     "</div>";

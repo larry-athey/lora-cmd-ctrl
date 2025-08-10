@@ -64,6 +64,8 @@ function createMessage($DBcnx,$ID) {
       $Msg = "/sound/" . $Cmd["sound"] . "/" . $Cmd["replay"] . "|0";
     } elseif ($Cmd["cmd_type"] == 5) { // GPIO output switching
       $Msg = "/switch/" . $Cmd["gpio_pin"] . "/" . $Cmd["direction"] . "|0";
+    } elseif ($Cmd["cmd_type"] == 6) { // RGB LED control
+      $Msg = "/light/" . $Cmd["light"] . "/" . $Cmd["red"] . "/" . $Cmd["green"] . "/" . $Cmd["blue"] . "/" . $Cmd["fade"] . "|0";
     }
   }
   return $Msg;
@@ -356,17 +358,20 @@ function locationActionSelector($Selected) {
   $S3 = "";
   $S4 = "";
   $S5 = "";
+  $S6 = "";
   if ($Selected == 1) $S1 = "selected";
   if ($Selected == 2) $S2 = "selected";
   if ($Selected == 3) $S3 = "selected";
   if ($Selected == 4) $S4 = "selected";
   if ($Selected == 5) $S5 = "selected";
+  if ($Selected == 6) $S6 = "selected";
   $Content  = "<select class=\"form-control form-select fw-bolder\" style=\"width: 100%;\" size=\"1\" id=\"location_action\" name=\"location_action\">";
   $Content .= "<option $S1 value=\"1\">Stop Motor/Stepper</option>";
   $Content .= "<option $S2 value=\"2\">Play Sound Effect</option>";
   $Content .= "<option $S3 value=\"3\">Request Command</option>";
   $Content .= "<option $S4 value=\"4\">Request Script</option>";
   $Content .= "<option $S5 value=\"5\">Toggle GPIO Pin</option>";
+  $Content .= "<option $S5 value=\"6\">Toggle RGB LED</option>";
   $Content .= "</select>";
   return $Content;
 }
