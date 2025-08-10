@@ -636,6 +636,7 @@ function showHomePage($DBcnx) {
     $Content .= "      success: function(response) {\n";
     $Content .= "        jQuery('#form-content').html('<p>Form submitted successfully</p>');\n";
     $Content .= "        jQuery('#dynamicModal').modal('hide');\n";
+    $Content .= "        console.log('response: ' + response);\n";
     $Content .= "      },\n";
     $Content .= "      error: function(xhr,status,error) {\n";
     $Content .= "        jQuery('#form-content').html('<p>An error occurred: ' + error + '</p>');\n";
