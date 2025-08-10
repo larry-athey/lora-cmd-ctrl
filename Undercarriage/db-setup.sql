@@ -23,9 +23,9 @@ CREATE TABLE commands (
   `location_action` INT(11) DEFAULT NULL,
   `location_data` INT(11) DEFAULT NULL,
   `light` INT(11) DEFAULT 0,
-  `red` TINYINT(4) DEFAULT 0,
-  `gren` TINYINT(4) DEFAULT 0,
-  `blue` TINYINT(4) DEFAULT 0,
+  `red` INT(11) DEFAULT 0,
+  `gren` INT(11) DEFAULT 0,
+  `blue` INT(11) DEFAULT 0,
   `fade` FLOAT DEFAULT 1.0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
