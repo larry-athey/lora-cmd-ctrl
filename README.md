@@ -56,4 +56,4 @@ The LCC mission control server can schedule scripts to run at specific times on 
 LCC remote control commands and scripts are completely open ended and are easy to create. Scripts can contain up to 16 sequential commands and run as a single shot instance or may run repeatedly. Scripts can also call another script at the end of its run, which means you can actually string an endless number of commands together. _(LCC receiver modules have a cache that can hold 16 commands at a time.)_
 
 ### Timer Function
-Each device has a timer that can run any number of command pairs _(on and off commands)_. This is an on-the-fly counterpart to the Scheduling system. These are extremely handy for setting lights or sprinklers to run for any amount of time up to 1 day _(86400 seconds)_ and automatically turn off.
+Each device has a timer that can run any number of command pairs _(on and off commands)_. This is an on-the-fly counterpart to the Scheduling system. These are extremely handy for setting things like lights, sprinklers, fans, etc to run for any amount of time up to 1 day _(86400 seconds)_ and then automatically turn off.
