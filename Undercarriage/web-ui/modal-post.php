@@ -8,8 +8,19 @@ $jsonSuccess = "{\"status\": \"success\",\"message\": \"Operation completed succ
 $jsonFailure = "{\"status\": \"error\",\"message\": \"Operation failed\"}\n";
 //---------------------------------------------------------------------------------------------------
 if ($_POST) {
-  if ($_POST["form-id"] == 1) { // CTRL button functions moved to 10..14
-
+  if ($_POST["form-id"] == 1) { // Set command start and stop timer
+    if (($_POST["command"][0] > 0) && ($_POST["command"][1] > 0)) {
+      $address = $_POST["address"];
+      $seconds = $_POST["seconds"];
+      $start_command = $_POST["command"][0];
+      $stop_command = $_POST["command"][1];
+      $Result = mysqli_query($DBcnx, "INSERT INTO timer (address,stop_time,start_command,stop_command) VALUES ('$address',TIMESTAMPADD(SECOND,$seconds,NOW()),$start_command,$stop_command)");
+      $Temp = createMessage($DBcnx,$start_command);
+      $Msg = explode("|",$Temp);
+      sendCommand($DBcnx,$_POST["address"],$Msg[0]);
+      $Result = mysqli_query($DBcnx,"UPDATE devices SET status='<span class=\"text-warning\">Sent timer start command</span>' WHERE address='$address'");
+      echo($jsonSuccess);
+    }
   } elseif ($_POST["form-id"] == 2) { // Send command
     $Temp = createMessage($DBcnx,$_POST["command"]);
     $Msg = explode("|",$Temp);

@@ -227,6 +227,10 @@ function getDeviceStats($DBcnx,$Address) {
   $Result = mysqli_query($DBcnx,"SELECT * FROM devices WHERE address=$Address");
   $Dev = mysqli_fetch_assoc($Result);
   $Content  = "<div class=\"row\">";
+  $Content .=   "<div class=\"col-5 text-secondary-emphasis\">Timer Active:</div>";
+  $Content .=   "<div class=\"col-7\" style=\"text-align: right;\"><a href=\"#\" onClick=\"LoadForm('Set Timer','1','" . $Dev["address"] . "')\">" . IntToYNC(timerActive($DBcnx,$Dev["address"])) . "</a></div>";
+  $Content .= "</div>";
+  $Content .= "<div class=\"row\">";
   $Content .=   "<div class=\"col-5 text-secondary-emphasis\">Honor Replays:</div>";
   $Content .=   "<div class=\"col-7\" style=\"text-align: right;\"><a href=\"/index.php?page=edit_device&ID=" . $Dev["ID"] . "\">" . IntToYNC($Dev["replay"]) . "</a></div>";
   $Content .= "</div>";
@@ -442,7 +446,7 @@ function scriptCommandSelector($DBcnx,$DevType,$ID) {
   $Result = mysqli_query($DBcnx,"SELECT * FROM commands WHERE cmd_class=$DevType ORDER BY cmd_name");
   if (mysqli_num_rows($Result) > 0) {
     $Content  = "<select class=\"form-control form-select fw-bolder\" style=\"width: 100%;\" size=\"1\"  id=\"command[]\" name=\"command[]\">";
-    $Content .= "<option value=\"0\">Command slot not in use</option>";
+    $Content .= "<option value=\"0\">No Command Selected</option>";
     while ($Cmd = mysqli_fetch_assoc($Result)) {
       if ($Cmd["ID"] == $ID) {
          $Content .= "<option selected value=\"" . $Cmd["ID"] . "\">" . $Cmd["cmd_name"] . "</option>";
@@ -453,7 +457,7 @@ function scriptCommandSelector($DBcnx,$DevType,$ID) {
     $Content .= "</select>";
     return $Content;
   } else {
-    return "<span class=\"text-danger fw-bolder\">No commands found for this device type</span>";
+    return "<p class=\"text-danger fw-bolder\">No commands found for this device type</p>";
   }
 }
 //---------------------------------------------------------------------------------------------------
@@ -494,6 +498,15 @@ function sendCommand($DBcnx,$Address,$Command) {
   $ID = generateRandomString(32);
   $Result = mysqli_query($DBcnx,"INSERT INTO outbound (address,msg) VALUES ('$Address','/" . $ID . $Command . "')");
   return "<pre>cmd://" . $ID . $Command . ":$Address</pre>\n";
+}
+//---------------------------------------------------------------------------------------------------
+function timerActive($DBcnx,$Address) {
+  $Result = mysqli_query($DBcnx,"SELECT * FROM timer WHERE address='$Address'");
+  if (mysqli_num_rows($Result) > 0) {
+    return 1;
+  } else {
+    return 0;
+  }
 }
 //---------------------------------------------------------------------------------------------------
 function YNSelector($Selected,$ID) {

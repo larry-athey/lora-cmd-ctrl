@@ -10,8 +10,19 @@ $Content  = "<form id=\"modalForm\" onsubmit=\"return false;\">";
 $Content .= "<input type=\"hidden\" name=\"form-id\" value=\"" . $_GET["ID"] . "\">";
 $Content .= "<input type=\"hidden\" name=\"address\" value=\"" . $_GET["address"] . "\">";
 
-if ($_GET["ID"] == 1) { // CTRL button functions moved to 10..15
-
+if ($_GET["ID"] == 1) { // Set command start and stop timer
+  $Content .= "<div>";
+  $Content .=   "<label for=\"seconds\" class=\"form-label fw-bolder\">Run Duration (seconds, 1..86400)</label>";
+  $Content .=   "<input type=\"number\" class=\"form-control fw-bolder\" id=\"seconds\" name=\"seconds\" min=\"0\" max=\"86400\" step=\"1\" value=\"1\">";
+  $Content .= "</div>";
+  $Content .= "<div style=\"margin-top: 0.5em;\">";
+  $Content .=   "<label for=\"start_command\" class=\"form-label fw-bolder\">Start Command</label>";
+  $Content .=   scriptCommandSelector($DBcnx,$Dev["dev_type"],0);
+  $Content .= "</div>";
+  $Content .= "<div style=\"margin-top: 0.5em;\">";
+  $Content .=   "<label for=\"stop_command\" class=\"form-label fw-bolder\">Stop Command</label>";
+  $Content .=   scriptCommandSelector($DBcnx,$Dev["dev_type"],0);
+  $Content .= "</div>";
 } elseif ($_GET["ID"] == 2) { // Send command
   $Result = mysqli_query($DBcnx,"SELECT * FROM commands WHERE cmd_class=" . $Dev["dev_type"] . " ORDER BY cmd_name");
   if (mysqli_num_rows($Result) > 0) {
@@ -43,8 +54,8 @@ if ($_GET["ID"] == 1) { // CTRL button functions moved to 10..15
   $Content .=    directionSelector(1);
   $Content .= "</div>";
   $Content .= "<div style=\"margin-top: 0.5em;\">";
-  $Content .=   "<label for=\"speed\" class=\"form-label fw-bolder\">Speed [0..100] Percent</label>";
-  $Content .=   "<input type=\"number\" class=\"form-control fw-bolder\" id=\"speed\" name=\"speed\" min=\"0\" max=\"100\" step=\"1\" value=\"0\">";
+  $Content .=   "<label for=\"speed\" class=\"form-label fw-bolder\">Speed [1..100] Percent</label>";
+  $Content .=   "<input type=\"number\" class=\"form-control fw-bolder\" id=\"speed\" name=\"speed\" min=\"1\" max=\"100\" step=\"1\" value=\"1\">";
   $Content .= "</div>";
   $Content .= "<div style=\"margin-top: 0.5em;\">";
   $Content .=   "<label for=\"progression\" class=\"form-label fw-bolder\">Progress Time (seconds)</label>";
@@ -60,8 +71,8 @@ if ($_GET["ID"] == 1) { // CTRL button functions moved to 10..15
   $Content .=    directionSelector(1);
   $Content .= "</div>";
   $Content .= "<div style=\"margin-top: 0.5em;\">";
-  $Content .=   "<label for=\"speed\" class=\"form-label fw-bolder\">Speed [0..100] Percent</label>";
-  $Content .=   "<input type=\"number\" class=\"form-control fw-bolder\" id=\"speed\" name=\"speed\" min=\"0\" max=\"100\" step=\"1\" value=\"0\">";
+  $Content .=   "<label for=\"speed\" class=\"form-label fw-bolder\">Speed [1..100] Percent</label>";
+  $Content .=   "<input type=\"number\" class=\"form-control fw-bolder\" id=\"speed\" name=\"speed\" min=\"1\" max=\"100\" step=\"1\" value=\"1\">";
   $Content .= "</div>";
   $Content .= "<div style=\"margin-top: 0.5em;\">";
   $Content .=   "<label for=\"resolution\" class=\"form-label fw-bolder\">Resolution</label>";

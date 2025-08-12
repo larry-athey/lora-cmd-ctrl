@@ -35,23 +35,36 @@ function deployScript($DBcnx,$ID,$Address) {
 //---------------------------------------------------------------------------------------------
 $today = new DateTime('today');
 $Result = mysqli_query($DBcnx,"SELECT * FROM schedule WHERE disabled=0 AND last_run < CURRENT_DATE");
-while ($RS = mysqli_fetch_array($Result)) {
-  if (checkDays($RS["days"])) {
-    // Create a DateTime object for the time specified by hour and minute today
-    $scheduledTime = new DateTime();
-    $scheduledTime->setDate($today->format('Y'), $today->format('m'), $today->format('d'));
-    $scheduledTime->setTime($RS["start_hour"],$RS["start_min"]);
+if (mysqli_num_rows($Result) > 0) {
+  while ($RS = mysqli_fetch_array($Result)) {
+    if (checkDays($RS["days"])) {
+      // Create a DateTime object for the time specified by hour and minute today
+      $scheduledTime = new DateTime();
+      $scheduledTime->setDate($today->format('Y'), $today->format('m'), $today->format('d'));
+      $scheduledTime->setTime($RS["start_hour"],$RS["start_min"]);
 
-    // Get Unix timestamps
-    $scheduledUnixTime = $scheduledTime->getTimestamp(); // Unix timestamp for today at hour:minute
-    $currentUnixTime = time(); // Current Unix timestamp
+      // Get Unix timestamps
+      $scheduledUnixTime = $scheduledTime->getTimestamp(); // Unix timestamp for today at hour:minute
+      $currentUnixTime = time(); // Current Unix timestamp
 
-    // See if the scheduled script deployment can run at this time
-    if ($currentUnixTime >= $scheduledUnixTime) {
-      echo "Deploying the script for the task '" . $RS["task_name"] . "'\n";
-      deployScript($DBcnx,$RS["script"],$RS["address"]);
-      $Update = mysqli_query($DBcnx,"UPDATE schedule SET last_run=NOW() WHERE ID=" . $RS["ID"]);
+      // See if the scheduled script deployment can run at this time
+      if ($currentUnixTime >= $scheduledUnixTime) {
+        echo "Deploying the script for the task '" . $RS["task_name"] . "'\n";
+        deployScript($DBcnx,$RS["script"],$RS["address"]);
+        $Update = mysqli_query($DBcnx,"UPDATE schedule SET last_run=NOW() WHERE ID=" . $RS["ID"]);
+      }
     }
+  }
+}
+//---------------------------------------------------------------------------------------------
+$Result = mysqli_query($DBcnx,"SELECT * FROM timer WHERE stop_time <= NOW()");
+if (mysqli_num_rows($Result) > 0) {
+  while ($RS = mysqli_fetch_array($Result)) {
+    $Temp = createMessage($DBcnx,$RS["stop_command"]);
+    $Msg = explode("|",$Temp);
+    sendCommand($DBcnx,$RS["address"],$Msg[0]);
+    $Result = mysqli_query($DBcnx,"UPDATE devices SET status='<span class=\"text-warning\">Sent timer stop command</span>' WHERE address='" . $RS["address"] . "'");
+    $Update = mysqli_query($DBcnx,"DELETE FROM timer WHERE ID=" . $RS["ID"]);
   }
 }
 //---------------------------------------------------------------------------------------------
