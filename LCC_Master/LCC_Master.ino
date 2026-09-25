@@ -83,6 +83,14 @@ void setup() {
   esp_wifi_set_channel(6,WIFI_SECOND_CHAN_NONE);
   esp_wifi_set_promiscuous(false);
 
+  // Force 20 MHz bandwidth
+  esp_wifi_set_bandwidth(WIFI_IF_STA,WIFI_BW_HT20);
+  // Maximum TX power (unit is 0.25 dBm, so 84 = 21 dBm)
+  esp_wifi_set_max_tx_power(84);
+  // Optional but often helpful with weak antennas: stick to 802.11b/g rates (more robust than pure 11n MCS rates)
+  uint8_t protocol = WIFI_PROTOCOL_11B | WIFI_PROTOCOL_11G;
+  esp_wifi_set_protocol(WIFI_IF_STA,protocol);
+
   // Initialize ESP-NOW
   if (esp_now_init() != ESP_OK) {
     Serial.println("Error initializing ESP-NOW");
