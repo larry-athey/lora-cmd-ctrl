@@ -4,7 +4,7 @@
 You may contact me directly at https://panhandleponics.com<br>
 Subscribe to the official YouTube channel at https://www.youtube.com/@PanhandlePonics
 
-_**NOTE:** While this can be used as an alternative to DCC and WCC in the model railroad world, that absolutely is not my specialty. However, I do have a local hobbyist in that field that I'm working with in order to make this a viable alternative for that purpose, which is far more affordable than a DCC/WCC upgrade._
+_**NOTE:** While this can be used as an alternative to DCC and WCC in the model railroad world, that absolutely is not my specialty. This is just a viable and far more affordable alternative._
 
 _...No, I don't use AI to design and build my projects, I actually still know how to use my brain..._
 
