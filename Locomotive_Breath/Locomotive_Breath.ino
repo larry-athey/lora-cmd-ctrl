@@ -1,11 +1,18 @@
 //------------------------------------------------------------------------------------------------
-// LCC - Locomotive Breath | (CopyLeft) 2025-Present | Larry Athey (https://panhandleponics.com)
+// Larry's CMD & CTRL (LCC) | (CopyLeft) 2025-Present | Larry Athey (https://panhandleponics.com)
 //
-// Designed for the Waveshare ESP32-S3 Mini (ESP32-S3FH4R2) development board using ESP32 v2.0.17
+// You must be using the Espressif ESP32 v2.0.17 library to compile this code. You will need to
+// add the URL below in your Arduino IDE preferences under Additional Boards Manager URLs.
 //
-// This is a custom LoRa-CMD+CTRL (LCC) device that bridges the LCC system with the model railroad
-// hobby. No, this is not another version of DCC or WCC, the LCC name is just a happy coincidence.
-// However, LCC can actualy do everything that DCC/WCC can do, plus a hell of a lot more.
+// https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
+//
+// This project is based on the Waveshare ESP32-S3 Mini/Stamp (ESP32-S3FH4R2) development board.
+//
+// Arduino IDE Board: ESP32S3 Dev Module
+//
+// This is a custom LCC device that bridges the LCC system with the model railroad hobby. No, this
+// is not another version of DCC or WCC, the LCC name is just a happy coincidence. However, LCC can
+// actualy do anything that DCC/WCC can do, plus a hell of a lot more.
 //
 // This ESP32 project is a collection of components that can be mounted in the top of an HO scale
 // (or larger) locomotive body to accomplish everything that you can do with a DCC/WCC locomotive
