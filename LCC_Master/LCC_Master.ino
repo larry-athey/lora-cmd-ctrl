@@ -52,7 +52,7 @@ void onDataSent(const uint8_t *mac, esp_now_send_status_t status) {
 void onDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len) {
   // Only print the message if it is addressed to the LCC Master
   String payload((const char*)incomingData,len);
-  if ((payload.length() < 17) || (payload.indexOf(myMacStr) < 0)) return;
+  if ((payload.length() < 18) || (payload.indexOf(myMacStr) < 0)) return;
 
   char macStr[18];
   snprintf(macStr,sizeof(macStr),
