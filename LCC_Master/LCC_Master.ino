@@ -74,6 +74,7 @@ void setup() {
   delay(1000);
   Serial.println("Starting LCC Master v" + Version);
 
+  // Make sure that WiFi is disconnected
   WiFi.mode(WIFI_STA);
   WiFi.disconnect();
   myMacStr = WiFi.macAddress();
