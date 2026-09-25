@@ -1,9 +1,9 @@
 #!/usr/bin/python3
 #----------------------------------------------------------------------------------------------
-# LCC (LoRa Command and Control) | (CopyLeft) 2025-Present | Larry Athey (https://panhandleponics.com)
+# Larry's CMD & CTRL (LCC) | (CopyLeft) 2025-Present | Larry Athey (https://panhandleponics.com)
 #
 # This is the daemon that handles all inbound and outbound messages (commands and responses).
-# A MySQL database is the communications conduit between the web UI and the RYLR998 modem.
+# A MySQL database is the communications conduit between the web UI and the LCC Master ESP32.
 #----------------------------------------------------------------------------------------------
 from datetime import datetime
 import serial
@@ -89,7 +89,7 @@ def signal_handler(sig, frame):
 
 signal.signal(signal.SIGINT, signal_handler)
 #----------------------------------------------------------------------------------------------
-def send_lora_message(ser, address, msg):
+def send_message(ser, address, msg):
     """Send a message via RYLR998."""
     try:
         # Format: AT+SEND=<address>,<length>,<msg>\r\n
@@ -121,6 +121,7 @@ def process_inbound_message(ser, db):
             match = re.match(r'\+RCV=(\d+),(\d+),([^,]+),-?\d+,-?\d+', line)
             if match:
                 address, _, msg = match.groups()
+                #msg[18:] # Strip the recipient MAC address from the start of the message
                 timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 print(f"[{timestamp}] Received: address={address}, msg={msg}")
                 # Store in inbound table
@@ -144,7 +145,7 @@ def check_outbound_messages(ser, db):
                 timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 print(f"[{timestamp}] {num_rows} unsent message(s) found")
             for msg in messages:
-                if send_lora_message(ser, msg['address'], msg['msg']):
+                if send_message(ser, msg['address'], msg['msg']):
                     # Mark as sent
                     with db.cursor() as cursor:
                         sql = "UPDATE outbound SET sent = TRUE, sent_time = NOW() WHERE ID = %s"
