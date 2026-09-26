@@ -1,10 +1,10 @@
-# LoRa+CMD+CTRL
-**aka: LCC** - Remote command and control system based on Raspberry Pi (or clone), ESP32, and RYLR998 LoRa wireless modems. Can be used for any kind of automation that requires remote switching, motor direction and speed control, position/location tracking, and scripting/scheduling. Also works great for model railroad control.
+# Larry's CMD & CTRL
+**aka: LCC** - Remote command and control system based on Raspberry Pi (or clone), ESP32, and ESP-NOW wireless communications. Can be used for any kind of automation that requires remote switching, motor direction and speed control, position/location tracking, and scripting/scheduling. Also works great for model railroad control.
 
 You may contact me directly at https://panhandleponics.com<br>
 Subscribe to the official YouTube channel at https://www.youtube.com/@PanhandlePonics
 
-_**NOTE:** While this can be used as an alternative to DCC and WCC in the model railroad world, that absolutely is not my specialty. However, I do have a local hobbyist in that field that I'm working with in order to make this a viable alternative for that purpose, which is far more affordable than a DCC/WCC upgrade._
+_**NOTE:** While this can be used as an alternative to DCC and WCC in the model railroad world, that absolutely is not my specialty. This is just a viable and far more affordable alternative if you want to use it for that purpose._
 
 _...No, I don't use AI to design and build my projects, I actually still know how to use my brain..._
 
