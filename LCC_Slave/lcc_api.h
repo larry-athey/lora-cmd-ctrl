@@ -6,9 +6,7 @@
 inline void sendReplayRequest(String Request, String ID) { // Request a repeat of the last command/script
   String Status = "/replay/" + Request + "/" + ID;
   if (Serial) Serial.println("Requesting replay: " + Status);
-  Serial2.print("AT+SEND=1," + String(Status.length()) + "," + Status + "\r\n");
-  delay(100);
-  Serial2.readStringUntil('\n'); // Purge the +OK response
+  sendCommand(Status);
 }
 //------------------------------------------------------------------------------------------------
 inline void setupLights(int ID, uint8_t targetR, uint8_t targetG, uint8_t targetB, float Fade) { // Sets the color of a specific LED or all of them
@@ -219,10 +217,7 @@ inline void runCommand(String Cmd) { // Execute a queued LCC mission control com
   }
 
   // Send the command execution start notice to mission control
-  String Status = "/exec/" + parts[0];
-  Serial2.print("AT+SEND=1," + String(Status.length()) + "," + Status + "\r\n");
-  delay(100);
-  Serial2.readStringUntil('\n'); // Purge the +OK response
+  sendCommand("/exec/" + parts[0]);
 
   // parts[0] : Command ID tag (32 character random string)
   // parts[1] : The command type identifier
@@ -269,62 +264,5 @@ inline void processQueue() { // Process the next command in the queue (FIFO styl
     }
     Commands[16].clear(); // Add a blank slot to the end of the queue
   }
-}
-//------------------------------------------------------------------------------------------------
-inline void queueCommand(String Cmd) { // Add a command to the next empty slot in the queue
-  for (byte i = 0; i <= 16; i ++) {
-    if (Commands[i].length() == 0) {
-      Commands[i] = Cmd;
-      break;
-    }
-  }
-}
-//------------------------------------------------------------------------------------------------
-inline byte queueSize() {
-  byte Size = 0;
-  for (byte i = 0; i <= 16; i ++) {
-    if (Commands[i].length() > 0) Size ++;
-  }
-  return Size;
-}
-//------------------------------------------------------------------------------------------------
-inline byte handleCommand() { // Handle commands sent from mission control
-  byte msgCount = 0;
-  for (byte x = 0; x <= 16; x ++) msgCache[x].clear();
-  delay(500); // Allow the 2048 byte buffer to fill a bit if a script was sent
-  while (Serial2.available()) {  
-    String incoming = Serial2.readStringUntil('\n');
-    if (Serial) Serial.println("LoRa message: " + incoming);
-    // Check if the message is a received LoRa message
-    if (incoming.startsWith("+RCV")) {
-      // Parse the Result: +RCV=SenderID,length,message,RSSI,SNR
-      int firstComma = incoming.indexOf(',');
-      if (firstComma > 4) { // Ensure valid +RCV format
-        String senderIDStr = incoming.substring(5,firstComma); // Extract SenderID
-        int senderID = senderIDStr.toInt();
-        // Only process if the sender is the mission control server (ID 1)
-        if (senderID == 1) {
-          int secondComma = incoming.indexOf(',',firstComma + 1);
-          int thirdComma = incoming.indexOf(',',secondComma + 1);
-          if (thirdComma > secondComma) {
-            String message = incoming.substring(secondComma + 1,thirdComma);
-            cmdCount ++;
-            if (msgCount < 17) {
-              if (Serial) Serial.println("Caching Command " + String(cmdCount) + ": " + message);
-              if (queueSize() < 17) {
-                queueCommand(message);
-                msgCount ++;
-                msgCache[msgCount - 1] = message;
-                if (Serial2.available()) delay(500);
-              }
-            }
-          }
-        }
-      }
-    } else {
-      if (Serial) Serial.println(F("Not a valid mission control command"));
-    }
-  }
-  return msgCount;
 }
 //------------------------------------------------------------------------------------------------

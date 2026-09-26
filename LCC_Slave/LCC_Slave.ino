@@ -65,7 +65,7 @@
 //#define STEPPER                // Remember, no sound effects are possible when using a stepper
 /************************************************************************************************/
 #define DISABLE_CODE_FOR_TRANSMITTER
-#define SEND_LEDC_CHANNEL 0
+#define SEND_LEDC_CHANNEL 1
 #include "IRremote.hpp"          // IR remote controller library, for location/position detection
 
 #ifndef STEPPER
@@ -125,7 +125,6 @@ float motorSpeed = 0.0;          // Current motor speed [0..100]
 float progressFactor = 0.0;      // How much (percent) to change the motor speed per second
 float targetSpeed = 0.0;         // Motor target speed [0..100]
 String Commands[17];             // Queue for caching up to 16 commands plus 1 repeat command
-String msgCache[17];             // Temporary holding space for command acknowledgement messages
 String myMacStr;                 // MAC address of this ESP32, used for message address checking
 String masterAddress;            // MAC address of the LCC Master, messages only allowed from this MAC
 String Version = "1.0.1";        // Current release version of the project
@@ -142,6 +141,23 @@ void IRAM_ATTR handleIRInterrupt() { // Interrupt hook to check for location tra
   }
 }
 //------------------------------------------------------------------------------------------------
+bool stringToMac(const String& macStr, uint8_t* mac) {
+  if (macStr.length() != 17) return false;
+
+  unsigned int values[6];
+  if (sscanf(macStr.c_str(),"%x:%x:%x:%x:%x:%x",
+             &values[0], &values[1], &values[2],
+             &values[3], &values[4], &values[5]) != 6) {
+    return false;
+  }
+
+  for (int i = 0; i < 6; i++) {
+    if (values[i] > 0xFF) return false;
+    mac[i] = static_cast < uint8_t > (values[i]);
+  }
+  return true;
+}
+//------------------------------------------------------------------------------------------------
 void onDataSent(const uint8_t *mac, esp_now_send_status_t status) {
   if (status == ESP_NOW_SEND_SUCCESS) { // Pretty much useless in a total broadcast configuration
 
@@ -151,25 +167,21 @@ void onDataSent(const uint8_t *mac, esp_now_send_status_t status) {
 }
 //------------------------------------------------------------------------------------------------
 void onDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len) {
-  // Only process the message if it is addressed to this slave device
-  String payload((const char*)incomingData,len);
-  if ((payload.length() < 18) || (payload.indexOf(myMacStr) < 0)) return;
-
-  /*
-  char macStr[18];
-  snprintf(macStr,sizeof(macStr),
-           "%02X:%02X:%02X:%02X:%02X:%02X",
-           mac[0], mac[1], mac[2],
-           mac[3], mac[4], mac[5]);
-
-  Serial.print("+RCV=");
-  Serial.print(macStr); // Sender MAC replaces the RYLR998 numeric sender address
-  Serial.print(",");
-  Serial.print(len);
-  Serial.print(",");
-  Serial.write(incomingData,len);
-  Serial.print(",0,0\r\n");
-  */
+  uint8_t master[6];
+  if (! stringToMac(masterAddress,master)) return;
+  if (memcmp(mac,master,6) == 0) { // Message is from the LCC Master
+    String Payload((const char*)incomingData,len);
+    if ((Payload.length() < 18) || (Payload.indexOf(myMacStr) < 0)) return; // Message isn't addressed to this slave device
+    Payload = Payload.substring(17); // Delete the destination /MAC from the message before processing
+    for (byte i = 0; i <= 16; i ++) { // Add the command to the queue
+      if (Commands[i].length() == 0) {
+        Commands[i] = Payload;
+        break;
+      }
+    }
+    sendCommand(Payload); // ACK the command by echoing the whole thing back to mission control
+    cmdCount ++;
+  }
 }
 //------------------------------------------------------------------------------------------------
 void setup() {
@@ -186,7 +198,7 @@ void setup() {
 
   // Initialize the Neopixel bus for the heartbeat/pulse LED
   neopixel.begin();
-  neopixel.setBrightness(25); // These things run stupidly hot
+  neopixel.setBrightness(15); // These things run stupidly hot
   neopixel.clear();
   neopixel.setPixelColor(0,neopixel.Color(0,0,255));
   neopixel.show();
@@ -222,7 +234,7 @@ void setup() {
   setMotorDirection(1);
 
   // Initialize the location/position detection sensor
-  IrReceiver.begin(IR_RCV,ENABLE_LED_FEEDBACK);
+  //IrReceiver.begin(IR_RCV,ENABLE_LED_FEEDBACK);
 
   // Attach interrupt to the IR receiver pin
   attachInterrupt(digitalPinToInterrupt(IR_RCV),handleIRInterrupt,CHANGE);
@@ -330,14 +342,10 @@ bool beaconCheck(int Pin) { // Perform any registered actions based on the curre
         sfxLoop = false;
       } else if (Locations[i][1] == 3) { // Request command with /replay/cmd/#
         Request = "/replay/cmd/" + String(Locations[i][2]);
-        Serial2.print("AT+SEND=1," + String(Request.length()) + "," + Request + "\r\n");
-        delay(100);
-        Serial2.readStringUntil('\n'); // Purge the +OK response
+        sendCommand(Request);
       } else if (Locations[i][1] == 4) { // Request script with /replay/scr/#
         Request = "/replay/scr/" + String(Locations[i][2]);
-        Serial2.print("AT+SEND=1," + String(Request.length()) + "," + Request + "\r\n");
-        delay(100);
-        Serial2.readStringUntil('\n'); // Purge the +OK response
+        sendCommand(Request);
       } else if (Locations[i][1] == 5) { // Toggle GPIO pin
         byte State = digitalRead(Locations[i][2]);
         if (State == 0) {
@@ -423,6 +431,33 @@ void pulseLED() { // Update the color of the heartbeat/pulse LED
   neopixel.show();
 }
 //------------------------------------------------------------------------------------------------
+bool processCmd(String Cmd) { // Process AT+ commands received via serial communications
+  if (Cmd.indexOf("AT+") == 0) {
+    Cmd.remove(0,3);
+    if (Cmd == "MAC") {
+      // AT+MAC
+      Serial.print(myMacStr + "\r\n");
+      return true;
+    } if (Cmd == "MASTER") {
+      Serial.print(masterAddress + "\r\n");
+      return true;
+    } else if (Cmd.indexOf("MASTER=") == 0) {
+      Cmd.remove(0,7);
+      masterAddress = Cmd;
+      SetMemory();
+      return true;
+    } if (Cmd == "RESET") {
+      // AT+RESET
+      Serial.print("Rebooting...\r\n");
+      delay(1000);
+      ESP.restart();
+    }
+    return false;
+  } else {
+    return false;
+  }
+}
+//------------------------------------------------------------------------------------------------
 // External function includes are used here to reduce the overall size of the main sketch.
 // Go ahead and call it non-standard, but I don't like spaghetti code that goes on forever.
 #include "lcc_api.h" // Inline function library for the LCC message processing functions.
@@ -463,9 +498,7 @@ void loop() {
     }
     if (Serial) Serial.println("Limit switch tripped: " + Status);
     // Send the status notification to mission control
-    Serial2.print("AT+SEND=1," + String(Status.length()) + "," + Status + "\r\n");
-    delay(100);
-    Serial2.readStringUntil('\n'); // Purge the +OK response
+    sendCommand(Status);
   }
 
   // Handle new location transponder detection
@@ -482,9 +515,7 @@ void loop() {
       Status = "/location/" + String(Location) + "/report";
     }
     if (Serial) Serial.println("Location transponder detected: " + Status);
-    Serial2.print("AT+SEND=1," + String(Status.length()) + "," + Status + "\r\n");
-    delay(100);
-    Serial2.readStringUntil('\n'); // Purge the +OK response
+    sendCommand(Status);
   }
 
   #ifndef STEPPER
@@ -497,9 +528,7 @@ void loop() {
     // Send the runtime end status to mission control
     String Status = "/runtime/end";
     if (Serial) Serial.println("Status: " + Status);
-    Serial2.print("AT+SEND=1," + String(Status.length()) + "," + Status + "\r\n");
-    delay(100);
-    Serial2.readStringUntil('\n'); // Purge the +OK response
+    sendCommand(Status);
   }
   #endif
 
@@ -528,17 +557,19 @@ void loop() {
 
   #endif
 
-  // Handle new commands received from mission control
-  if ((Serial2) && (Serial2.available())) {
-    byte msgCount = handleCommand();    
-    if (msgCount > 0) {
-      // Send the command acknowledgement(s) to mission control
-      for (byte x = 0; x < msgCount; x ++) {
-        String Response = "AT+SEND=1," + String(msgCache[x].length()) + "," + msgCache[x];
-        Serial2.print(Response + "\r\n");
-        delay(100);
-        Serial2.readStringUntil('\n'); // Purge the +OK response
-        delay(400);
+  while (Serial.available()) {
+    String Data = Serial.readStringUntil('\n');
+    Data.trim();
+    Data.toUpperCase();
+    if (Data == "AT") {
+      Serial.print("OK\r\n");
+    } else {
+      if (Data.length() > 0) {
+        if (processCmd(Data)) {
+          Serial.print("OK\r\n");
+        } else {
+          Serial.print("ERROR\r\n");
+        }
       }
     }
   }
@@ -548,7 +579,7 @@ void loop() {
 }
 //------------------------------------------------------------------------------------------------
 /*
-// Location transponder code
+// Location transponder code E4:B3:23:F8:0D:2C
 
 #include <IRremote.hpp>
 

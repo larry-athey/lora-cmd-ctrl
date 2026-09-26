@@ -35,8 +35,15 @@
 #include "WiFi.h"                // ESP32 high-level WiFi connectivity library
 #include "esp_now.h"             // ESP-NOW wireless communications library
 #include "esp_wifi.h"            // ESP32 low-level WiFi connectivity library
+#include "Adafruit_NeoPixel.h"   // Used for the heartbeat/pulse LED since there is no pilot light
 //------------------------------------------------------------------------------------------------
+#define LED_PIN 21               // Internal WS2812 LED on GPIO21
+
 uint8_t broadcastAddress[] = {0xFF,0xFF,0xFF,0xFF,0xFF,0xFF}; // Peer address for all communications
+Adafruit_NeoPixel neopixel(1,LED_PIN,NEO_RGB + NEO_KHZ800); // Set up the heartbeat/pulse LED
+
+unsigned long lastCheck = 0;     // Used to track 1-second checks in the main loop()
+byte pulseIndex = 1;             // Tracks the color changes for the heartbeat/pulse LED
 
 String myMacStr;                 // MAC address of this ESP32, used for message address checking
 String Version = "1.0.1";        // Current release version of the project
@@ -73,6 +80,13 @@ void setup() {
   Serial.begin(115200);
   delay(1000);
   Serial.println("Starting LCC Master v" + Version);
+
+  // Initialize the Neopixel bus for the heartbeat/pulse LED
+  neopixel.begin();
+  neopixel.setBrightness(15); // These things run stupidly hot
+  neopixel.clear();
+  neopixel.setPixelColor(0,neopixel.Color(0,0,255));
+  neopixel.show();
 
   // Make sure that WiFi is disconnected
   WiFi.mode(WIFI_STA);
@@ -114,6 +128,7 @@ void setup() {
   }
 
   Serial.println("ESP-NOW Ready!");
+  lastCheck = millis();
 }
 //------------------------------------------------------------------------------------------------
 bool sendCommand(String Cmd) { // Send AT+SEND command to the broadcast peer address
@@ -157,7 +172,39 @@ bool processCmd(String Cmd) { // Process AT+ commands received via serial commun
   }
 }
 //------------------------------------------------------------------------------------------------
+void pulseLED() { // Update the color of the heartbeat/pulse LED
+  pulseIndex ++;
+  if (pulseIndex > 7) pulseIndex = 1;
+  if (pulseIndex == 1) {
+    neopixel.setPixelColor(0,neopixel.Color(0,0,255));
+  } else if (pulseIndex == 2) {
+    neopixel.setPixelColor(0,neopixel.Color(0,255,255));
+  } else if (pulseIndex == 3) {
+    neopixel.setPixelColor(0,neopixel.Color(0,255,0));
+  } else if (pulseIndex == 4) {
+    neopixel.setPixelColor(0,neopixel.Color(255,255,0));
+  } else if (pulseIndex == 5) {
+    neopixel.setPixelColor(0,neopixel.Color(255,0,0));
+  } else if (pulseIndex == 6) {
+    neopixel.setPixelColor(0,neopixel.Color(255,0,255));
+  } else if (pulseIndex == 7) {
+    neopixel.setPixelColor(0,neopixel.Color(255,255,255));
+  }
+  neopixel.show();
+}
+//------------------------------------------------------------------------------------------------
 void loop() {
+  unsigned long CurrentTime = millis();
+  if (CurrentTime > 4200000000) {
+    // Reboot the system if we're reaching the maximum long integer value of CurrentTime (49 days)
+    ESP.restart();
+  } 
+
+  if (CurrentTime - lastCheck >= 1000) {
+    pulseLED();
+    lastCheck = CurrentTime;
+  }
+
   while (Serial.available()) {
     String Data = Serial.readStringUntil('\n');
     Data.trim();
