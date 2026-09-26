@@ -10,16 +10,18 @@
 //
 // Arduino IDE Board: ESP32S3 Dev Module
 //
-// This is a custom LCC device that bridges the LCC system with the model railroad hobby. No, this
-// is not another version of DCC or WCC, the LCC name is just a happy coincidence. However, LCC can
-// actualy do anything that DCC/WCC can do, plus a hell of a lot more.
+// This is an example LCC slave device that can be used for anything from a model train locomotive
+// to anything else where you may need to wirelessly control a brushed motor with a PWM, a stepper
+// motor, RGB LEDs, a bank of solid state relays, or even play MP3 files for announcements/alerts,
+// all on a manual, triggered, or scheduled basis.
 //
-// This ESP32 project is a collection of components that can be mounted in the top of an HO scale
-// (or larger) locomotive body to accomplish everything that you can do with a DCC/WCC locomotive
-// (and more) for not a whole lot of money. These components are as follows:
+// For model railroad enthusiasts, this ESP32 project and a collection of components that can be
+// mounted in the top of an HO scale (or larger) locomotive body to accomplish everything that you
+// can do with a DCC/WCC locomotive (and more) for not a whole lot of money.
 //
-//   ESP32-S3 Mini        - $10.00
-//   Reyax RYLR998 Modem  - $12.00
+// These components are as follows:
+//
+//   ESP32-S3 Mini        - $12.00
 //   TB6612FNG H-Bridge   - $3.50
 //   TSOP34838 IR Rcvr    - $1.00
 //   WWZMDiB Audio Module - $2.00
@@ -28,9 +30,8 @@
 //   5V 1.8A Regulator    - $0.70
 //   2A Bridge Rectifier  - $0.50
 //
-// Roughly $30 in parts to convert any brand of model train locomotive to have all of the features
-// found in a full blown DCC enabled locomotive with sound effects. Eventually a PCB can be created
-// to simplify the build and installation process.
+// Less than $25 in parts to convert any model train locomotive to have all of the features found
+// in a full blown DCC enabled locomotive with sound effects.
 //
 // Commands from the LCC mission control server are stored in a buffer on an LCC receiver device
 // and then executed in a FIFO (first-in, first-out) order. Feedback is sent to the server when a
@@ -40,15 +41,15 @@
 // have been received correctly. The server logs all commands sent and acknowledgements received
 // in order to facilitate reliable debugging.
 //
-// Sound effects are MP3 files and stored on an SD card (up to 32GB) in the locomotive. These can
+// Sound effects are MP3 files and stored on an SD card (up to 32GB) in the MP3 player. These can
 // be played in a single shot or in a loop. Sound effects are played by a separate MP3 player unit
 // rather than the ESP32 itself which prevents other CPU tasks from interrupting sound effects.
 //------------------------------------------------------------------------------------------------
 // LCC Mission Control Server:
 //
 //   Orange Pi Zero 3 1GB     - $30.00 (with power supply)
-//   Reyax RYLR998 Modem      - $12.00
-//   TTL to USB Adapter       - $5.00
+//   ESP32-S3 Mini            - $12.00
+//   USB-C data cable         - $5.00
 //   32 GB Micro SD Card      - $5.00
 //   3D Printed Case          - $3.00
 //
@@ -61,35 +62,34 @@
 //
 // NOTE: The location transponder MCU can actually run up to 11 unique LED transmitters.
 /************************************************************************************************/
-//#define MCP23017               // Can only be used with a stepper, not a brushed DC motor
 //#define STEPPER                // Remember, no sound effects are possible when using a stepper
 /************************************************************************************************/
 #define DISABLE_CODE_FOR_TRANSMITTER
 #define SEND_LEDC_CHANNEL 0
 #include "IRremote.hpp"          // IR remote controller library, for location/position detection
 
-#ifndef MCP23017
-#include "Adafruit_MCP23X17.h"   // MCP23017 I2C 16 port GPIO expansion module library
-#endif
-
 #ifndef STEPPER
 #include "DFRobotDFPlayerMini.h" // From https://github.com/DFRobot/DFRobotDFPlayerMini
 #endif
 
 #include "Adafruit_NeoPixel.h"   // Used for the heartbeat/pulse LED since there is no pilot light
+#include "WiFi.h"                // ESP32 high-level WiFi connectivity library
+#include "esp_now.h"             // ESP-NOW wireless communications library
+#include "esp_wifi.h"            // ESP32 low-level WiFi connectivity library
+#include "Preferences.h"         // ESP32 Flash memory read/write library
 //------------------------------------------------------------------------------------------------
 #define LED_PIN 21               // Internal WS2812 LED on GPIO21
 #define TOTAL_LEDS 2             // Total number of LEDs on the Neopixel/WS2812 lighting bus
-// GPIO Left (USB top)
+// GPIO Left side (USB top)
 #define LIMIT_1 1                // Limit switch 1 (forward)
 #define LIMIT_2 2                // Limit switch 2 (reverse)
 #define IR_RCV 3                 // TSOP34838 input pin
-#define OUT_1 4                  // Output 1 or DRV8825 M0
-#define OUT_2 5                  // Output 2 or DRV8825 M1
+#define OUT_1 4                  // Output 1 (SSR) or DRV8825 M0
+#define OUT_2 5                  // Output 2 (SSR) or DRV8825 M1
 #define MOT_PWM 6                // H-Bridge PWM or DRV8825 M2
-// GPIO Right (USB top)
-#define TX2 13                   // To RYLR998 RX pin
-#define RX2 12                   // To RYLR998 TX pin
+// GPIO Right side (USB top)
+#define OUT_3 13                 // Output 3 (SSR)
+#define OUT_4 12                 // Output 4 (SSR)
 #define MOT_F 11                 // H-Bridge forward pin or user defined if using a stepper, or SCL for I2C
 #define MOT_R 10                 // H-Bridge reverse pin or user defined if using a stepper, or SDA for I2C
 #define BUS_1 9                  // DFRobot TX or DRV8825 step pin
@@ -103,15 +103,15 @@ Adafruit_NeoPixel neopixel(1,LED_PIN,NEO_RGB + NEO_KHZ800); // Set up the heartb
 #ifndef STEPPER
 Adafruit_NeoPixel lights(TOTAL_LEDS,BUS_3,NEO_RGB + NEO_KHZ800); // Set up the Neopixel/WS2812 lighting bus
 #endif
+Preferences preferences;
 //------------------------------------------------------------------------------------------------
 bool SFX = false;                // True if the sound effects system successfully initialized
 bool sfxLoop = false;            // True if a sound effect command is supposed to play endlessly
 byte pulseIndex = 1;             // Tracks the color changes for the heartbeat/pulse LED
 byte motorDirection = 1;         // Motor direction, 0 = reverse, 1 = forward
 byte progressDir = 0;            // Motor speed progress direction, 0 = down, 1 = up
+byte sysInit = 0;                // Flag to indicate whether this is a first boot and no flash settings
 int Locations[16][3];            // Queue for caching location ID numbers and associated actions
-int LoRa_Address = 100;          // Device address [1..65535], 1 is reserved for mission control
-int LoRa_Network = 18;           // Network ID [0..15], 18 is valid but often never used
 int soundFile = -1;              // Sound file number to play from the DFPlayer Mini
 unsigned long cmdCount = 0;      // Counts the number of received mission control commands
 unsigned long cmdPos = 0;        // Stepper current command position of the last executed command
@@ -126,7 +126,10 @@ float progressFactor = 0.0;      // How much (percent) to change the motor speed
 float targetSpeed = 0.0;         // Motor target speed [0..100]
 String Commands[17];             // Queue for caching up to 16 commands plus 1 repeat command
 String msgCache[17];             // Temporary holding space for command acknowledgement messages
-String LoRa_PW = "1A2B3C4D";     // 8 character hex domain password, much like a WiFi password
+String myMacStr;                 // MAC address of this ESP32, used for message address checking
+String masterAddress;            // MAC address of the LCC Master, messages only allowed from this MAC
+String Version = "1.0.1";        // Current release version of the project
+uint8_t broadcastAddress[] = {0xFF,0xFF,0xFF,0xFF,0xFF,0xFF}; // Peer address for all communications
 //------------------------------------------------------------------------------------------------
 volatile uint32_t lastLocation = 0; // Store the last received location ID
 volatile bool newLocation = false;  // Flag to indicate a new location has been detected
@@ -139,23 +142,47 @@ void IRAM_ATTR handleIRInterrupt() { // Interrupt hook to check for location tra
   }
 }
 //------------------------------------------------------------------------------------------------
-void echoRYLR998() { // Used for debugging RYLR998 output
-  char Data;
-  if (Serial) {
-    while (Serial2.available()) {
-      Data = Serial2.read();
-      Serial.print(Data);
-    }
+void onDataSent(const uint8_t *mac, esp_now_send_status_t status) {
+  if (status == ESP_NOW_SEND_SUCCESS) { // Pretty much useless in a total broadcast configuration
+
   } else {
-    while (Serial2.available()) Serial2.read();
+
   }
+}
+//------------------------------------------------------------------------------------------------
+void onDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len) {
+  // Only process the message if it is addressed to this slave device
+  String payload((const char*)incomingData,len);
+  if ((payload.length() < 18) || (payload.indexOf(myMacStr) < 0)) return;
+
+  /*
+  char macStr[18];
+  snprintf(macStr,sizeof(macStr),
+           "%02X:%02X:%02X:%02X:%02X:%02X",
+           mac[0], mac[1], mac[2],
+           mac[3], mac[4], mac[5]);
+
+  Serial.print("+RCV=");
+  Serial.print(macStr); // Sender MAC replaces the RYLR998 numeric sender address
+  Serial.print(",");
+  Serial.print(len);
+  Serial.print(",");
+  Serial.write(incomingData,len);
+  Serial.print(",0,0\r\n");
+  */
 }
 //------------------------------------------------------------------------------------------------
 void setup() {
   Serial.begin(115200);
-  Serial2.setRxBufferSize(2048);
-  Serial2.begin(115200,SERIAL_8N1,RX2,TX2);
-  delay(500);
+  delay(1000);
+  if (Serial) Serial.println("Starting LCC Slave v" + Version);
+
+  // Get the last user settings from flash memory
+  GetMemory();
+  if (sysInit == 1) {
+    sysInit = 0;
+    SetMemory();
+  }
 
   // Initialize the Neopixel bus for the heartbeat/pulse LED
   neopixel.begin();
@@ -178,20 +205,11 @@ void setup() {
   pinMode(LIMIT_2,INPUT_PULLUP); // Convert these to outputs if you need additional ones
   pinMode(OUT_1,OUTPUT); digitalWrite(OUT_1,LOW);
   pinMode(OUT_2,OUTPUT); digitalWrite(OUT_2,LOW);
+  pinMode(OUT_3,OUTPUT); digitalWrite(OUT_3,LOW);
+  pinMode(OUT_4,OUTPUT); digitalWrite(OUT_4,LOW);
   pinMode(MOT_F,OUTPUT); digitalWrite(MOT_F,LOW); // AIN1 (Standby is pulled high to enable the driver)
   pinMode(MOT_R,OUTPUT); digitalWrite(MOT_R,LOW); // AIN2
   pinMode(MOT_PWM,OUTPUT); digitalWrite(MOT_PWM,LOW); // PWMA
-
-  #ifdef MCP23017
-  // Inidialize I2C
-  Wire.begin(MOT_R,MOT_F);
-  // Initialize MCP23017
-  mcp.begin_I2C(0x20);
-  for (int i = 0; i <= 15; i ++) {
-    mcp.pinMode(i,OUTPUT);
-    mcp.digitalWrite(i,LOW);
-  }
-  #endif
 
   #ifndef STEPPER
   // Initialize the PWM motor speed/direction controller
@@ -208,33 +226,6 @@ void setup() {
 
   // Attach interrupt to the IR receiver pin
   attachInterrupt(digitalPinToInterrupt(IR_RCV),handleIRInterrupt,CHANGE);
-
-  // Initialize the RYLR998 modem
-  if (Serial) Serial.println(F("Initializing the RYLR998 modem..."));
-  Serial2.print(F("AT+FACTORY\r\n"));
-  delay(1000);
-  echoRYLR998();
-  Serial2.print(F("AT+RESET\r\n"));
-  delay(200);
-  echoRYLR998();
-  Serial2.print("AT+ADDRESS=" + String(LoRa_Address) + "\r\n");
-  delay(200);
-  echoRYLR998();
-  Serial2.print("AT+NETWORKID=" + String(LoRa_Network) + "\r\n");
-  delay(200);
-  echoRYLR998();
-  Serial2.print("AT+CPIN=" + LoRa_PW + "\r\n");
-  delay(200);
-  echoRYLR998();
-  Serial2.print(F("AT+BAND=915000000\r\n"));
-  delay(200);
-  echoRYLR998();
-  Serial2.print(F("AT+IPR=115200\r\n"));
-  delay(200);
-  echoRYLR998();
-  Serial2.print(F("AT+PARAMETER=9,7,1,12\r\n"));
-  delay(200);
-  echoRYLR998();
 
   #ifndef STEPPER
   // Initialize the sound effects system
@@ -256,10 +247,73 @@ void setup() {
     Locations[i][2] = 0;
   }
 
+  // Make sure that WiFi is disconnected
+  WiFi.mode(WIFI_STA);
+  WiFi.disconnect();
+  myMacStr = WiFi.macAddress();
+
+  // Force the radio to channel 6 so we're in the center of the 2.4 GHz band
+  esp_wifi_set_promiscuous(true);
+  esp_wifi_set_channel(6,WIFI_SECOND_CHAN_NONE);
+  esp_wifi_set_promiscuous(false);
+
+  // Force 20 MHz bandwidth
+  esp_wifi_set_bandwidth(WIFI_IF_STA,WIFI_BW_HT20);
+  // Maximum TX power (unit is 0.25 dBm, so 84 = 21 dBm)
+  esp_wifi_set_max_tx_power(84);
+  // Optional but often helpful with weak antennas: stick to 802.11b/g rates (more robust than pure 11n MCS rates)
+  uint8_t protocol = WIFI_PROTOCOL_11B | WIFI_PROTOCOL_11G;
+  esp_wifi_set_protocol(WIFI_IF_STA,protocol);
+
+  // Initialize ESP-NOW
+  if (esp_now_init() != ESP_OK) {
+    if (Serial) Serial.println("Error initializing ESP-NOW");
+    return;
+  }
+
+  // Register ESP-NOW callback handlers
+  esp_now_register_send_cb(onDataSent);
+  esp_now_register_recv_cb(onDataRecv);
+
+  // Register the broadcast peer
+  esp_now_peer_info_t peerInfo = {};
+  memcpy(peerInfo.peer_addr,broadcastAddress,6);
+  peerInfo.channel = 0;     // 0 = current channel
+  peerInfo.encrypt = false; // Broadcast cannot be encrypted
+
+  if (esp_now_add_peer(&peerInfo) != ESP_OK) {
+    if (Serial) Serial.println("Failed to add broadcast peer");
+    return;
+  }
+
+  if (Serial) Serial.println("ESP-NOW Ready!");
+
   // Initialize the main loop() 1 second timer
   lastCheck = millis();
-
-  if (Serial) Serial.println(F("Locomotive Breath now initialized and running"));
+}
+//------------------------------------------------------------------------------------------------
+void GetMemory() { // Get the configuration settings from flash memory on startup
+  preferences.begin("prefs",true);
+  masterAddress = preferences.getString("master_address","AA:BB:CC:DD:EE:FF");
+  sysInit       = preferences.getUInt("sys_init",1);
+  preferences.end();
+}
+//------------------------------------------------------------------------------------------------
+void SetMemory() { // Update flash memory with the current configuration settings
+  preferences.begin("prefs",false);
+  preferences.putString("master_address",masterAddress);
+  preferences.putUInt("sys_init",sysInit);
+  preferences.end();
+}
+//------------------------------------------------------------------------------------------------
+bool sendCommand(String Cmd) { // Send AT+SEND command to the broadcast peer address
+  Cmd = "/" + masterAddress + Cmd;
+  esp_err_t result = esp_now_send(broadcastAddress,(uint8_t *)Cmd.c_str(),Cmd.length());
+  if (result == ESP_OK) {
+    return true;
+  } else {
+    return false;
+  }
 }
 //------------------------------------------------------------------------------------------------
 bool beaconCheck(int Pin) { // Perform any registered actions based on the current location beacon
