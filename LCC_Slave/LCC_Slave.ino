@@ -130,17 +130,6 @@ String masterAddress;            // MAC address of the LCC Master, messages only
 String Version = "1.0.1";        // Current release version of the project
 uint8_t broadcastAddress[] = {0xFF,0xFF,0xFF,0xFF,0xFF,0xFF}; // Peer address for all communications
 //------------------------------------------------------------------------------------------------
-volatile uint32_t lastLocation = 0; // Store the last received location ID
-volatile bool newLocation = false;  // Flag to indicate a new location has been detected
-//------------------------------------------------------------------------------------------------
-void IRAM_ATTR handleIRInterrupt() { // Interrupt hook to check for location transponder detection
-  if (IrReceiver.decode()) {
-    lastLocation = IrReceiver.decodedIRData.decodedRawData;
-    newLocation = true;
-    IrReceiver.resume();
-  }
-}
-//------------------------------------------------------------------------------------------------
 bool stringToMac(const String& macStr, uint8_t* mac) {
   if (macStr.length() != 17) return false;
 
@@ -234,10 +223,7 @@ void setup() {
   setMotorDirection(1);
 
   // Initialize the location/position detection sensor
-  //IrReceiver.begin(IR_RCV,ENABLE_LED_FEEDBACK);
-
-  // Attach interrupt to the IR receiver pin
-  attachInterrupt(digitalPinToInterrupt(IR_RCV),handleIRInterrupt,CHANGE);
+  IrReceiver.begin(IR_RCV,DISABLE_LED_FEEDBACK);
 
   #ifndef STEPPER
   // Initialize the sound effects system
@@ -502,12 +488,9 @@ void loop() {
   }
 
   // Handle new location transponder detection
-  if (newLocation) {
-    noInterrupts();
-    uint32_t Location = lastLocation;
-    newLocation = false;
-    interrupts();
-    // Send the location update and stop status to mission control
+  if (IrReceiver.decode()) {
+    uint32_t Location = IrReceiver.decodedIRData.decodedRawData;
+
     String Status;
     if (beaconCheck(Location)) {
       Status = "/location/" + String(Location) + "/action";
@@ -516,6 +499,8 @@ void loop() {
     }
     if (Serial) Serial.println("Location transponder detected: " + Status);
     sendCommand(Status);
+
+    IrReceiver.resume();
   }
 
   #ifndef STEPPER
