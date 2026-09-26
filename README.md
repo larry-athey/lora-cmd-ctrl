@@ -16,11 +16,7 @@ _...No, I don't use AI to design and build my projects, I actually still know ho
 
 LCC is a client & server system where a mission control web app runs on a Raspberry Pi _(or clone)_ or any other Debian Linux based PC/SBC. The communications backbone between the server and client devices is LoRa WAN wireless networking based on the Reyax RYLR998 modem.
 
-LoRa WAN networking runs at a lower frequency than WiFi and Bluetooth, so it doesn't suffer from all of the noise and congestion that plagues the 2.4 GHz and 5 GHz ISM bands. This method also doesn't require a persistent connection between the client and server and only exchanges short text based messages.
-
-Due to the lower frequency and near zero RF noise/congestion, this system works over incredibly long ranges with no additional infrastructure needed. For example, the mission control modem could be mounted on a rooftop and communicate with clients well over a mile away.
-
-This system is intended for any personal application where remote control of motorized devices and remote switching is wanted without the need for WiFi infrastructure and where internet exposure is unwanted. Keep in mind that LoRa WAN only provides network password protection, communications are not encrypted.
+This system is intended for any personal application where remote control of motorized devices and remote switching is wanted without the need for WiFi infrastructure and where internet exposure is unwanted.
 
 The recommended LCC mission control server is an [Orange Pi Zero 3 1GB](https://www.amazon.com/dp/B0CB1BYTT8) running as a WiFi access point. You simply connect your phone or computer to this WiFi network, or connect the server's ethernet port to your home router if you need remote VPN access to it. Simple port forwarding into it is strongly discouraged!
 
