@@ -134,8 +134,7 @@ void setup() {
 bool sendCommand(String Cmd) { // Send AT+SEND command to the broadcast peer address
   int firstComma  = Cmd.indexOf(',');
   int secondComma = Cmd.indexOf(',',firstComma + 1);
-  Cmd = Cmd.substring(0,firstComma + 1) + Cmd.substring(secondComma + 1);
-  Cmd.setCharAt(17,'/');
+  Cmd = Cmd.substring(0,firstComma) + Cmd.substring(secondComma + 1);
   Cmd = "/" + Cmd;
   esp_err_t result = esp_now_send(broadcastAddress,(uint8_t *)Cmd.c_str(),Cmd.length());
   if (result == ESP_OK) {
@@ -214,9 +213,9 @@ void loop() {
     } else {
       if (Data.length() > 0) {
         if (processCmd(Data)) {
-          Serial.print("OK\r\n");
+          Serial.print("+OK\r\n");
         } else {
-          Serial.print("ERROR\r\n");
+          Serial.print("+ERROR\r\n");
         }
       }
     }
