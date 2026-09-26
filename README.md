@@ -39,7 +39,7 @@ In the case of mobile LCC receivers such as those on a model train or conveyor b
 The LCC receiver module uses two GPIO pins for limit sensing so that the motor will stop running in the current direction if its limit switch is triggered. These are common in linear actuators and motorized ball valves. The unit will phone home to mission control to report this status.
 
 ### Remote Switching
-The LCC receiver module can be any variety of ESP32, the switching capabilities are only limited by the number of exposed GPIO pins. If you have a large number of switching needs per receiver, you may use an MCP23017 I2C 16 port GPIO expansion module.
+The LCC receiver module can be any variety of ESP32, the switching capabilities are only limited by the number of exposed GPIO pins. By default, the base code for the Waveshare ESP32-S3 Mini/Stamp has 4 outputs for switching.
 
 ### Remote MP3 Playback
 Sound files (.mp3) can be stored on an SD card and played back as needed. These are useful for greetings, sound effects, warnings, etc. This requires a WWZMDiB _(DFRobot DFPlayer)_ sound module and speaker attached. Sound files can play as a single shot or in a continuous loop.
